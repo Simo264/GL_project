@@ -16,8 +16,11 @@ public:
   void destroy();
   
   void vertexSpecification(uint32_t index, uint32_t size, uint32_t type, int offset);
-  
+  void attribBinding(uint32_t attribindex, uint32_t bindingindex);
+  void bindBuffer(uint32_t bindingindex, uint32_t buffer, int offset, int stride);
   void enableAttribute(uint32_t index);
+
+  uint32_t get();
 
 private:
   uint32_t mVertexArray;

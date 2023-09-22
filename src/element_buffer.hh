@@ -13,6 +13,8 @@ public:
   void unbind();
   void destroy();
 
+  uint32_t get();
+
 private:
   uint32_t mBuffer;
 };

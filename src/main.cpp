@@ -2,6 +2,9 @@
 #include "GLFW/glfw3.h"
 #include "spdlog/spdlog.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "window_manager.hh"
 #include "shader.hh"
 #include "vertex_buffer.hh"
@@ -10,24 +13,9 @@
 
 #include <string>
 
-const char *vertexShaderSource = "#version 330 core\n"
-  "layout (location = 0) in vec3 aPos;\n"
-  "void main()\n"
-  "{\n"
-  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-  "}\0";
-  
-const char *fragmentShaderSource = "#version 330 core\n"
-  "out vec4 FragColor;\n"
-  "void main()\n"
-  "{\n"
-  "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-  "}\n\0";
-
-
 void inputCallback()
 {
-  spdlog::info("input...");
+  //spdlog::info("input...");
 }
 
 void renderCallback()
@@ -42,36 +30,83 @@ int main()
   windowMgr->createWindow("OpenGL");
 
   // build and compile our shader program
-  Shader shader { vertexShaderSource,fragmentShaderSource };
+  Shader shader { "shaders/vertex.shader","shaders/fragment.shader" };
 
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
   float vertices[] = {
-    0.5f,  0.5f,   // top right
-    0.5f, -0.5f,   // bottom right
-    -0.5f, -0.5f,  // bottom left
-    -0.5f,  0.5f,  // top left 
+    // position         // color        // texture
+    0.5f, 0.5f,  0.0f,  1.0, 0.0, 0.0,  1.0, 1.0,   // top right
+    0.5f, -0.5f, 0.0f,  0.0, 1.0, 0.0,  1.0, 0.0,   // bottom right
+    -0.5f, -0.5f,0.0f,  0.0, 0.0, 1.0,  0.0, 0.0,   // bottom left
+    -0.5f, 0.5f, 0.0f,  1.0, 0.0, 1.0,  0.0, 1.0,   // top left 
   };
-  uint32_t indices[] = {  // note that we start from 0!
+
+  uint32_t indices[] = {  
     0, 1, 3,  // first Triangle
     1, 2, 3   // second Triangle
   };
-
   
   VertexArray vertexArray { };
   VertexBuffer vBuffer { sizeof(vertices),vertices };
   ElementBuffer eBuffer { sizeof(indices),indices };
 
-  vertexArray.vertexSpecification(0, 2, GL_FLOAT, 0);
+  // 0 -> position
+  vertexArray.vertexSpecification(0, 3, GL_FLOAT, 0); 
+  vertexArray.bindBuffer(0, vBuffer.get(), 0, 8*sizeof(float));
+  vertexArray.attribBinding(0, 0);
   vertexArray.enableAttribute(0);
 
-  windowMgr->loop(inputCallback, [shader, vertexArray](){
+  // 1 -> color
+  vertexArray.vertexSpecification(1, 3, GL_FLOAT, 0); 
+  vertexArray.bindBuffer(1, vBuffer.get(), 12, 8*sizeof(float));
+  vertexArray.attribBinding(1, 1);
+  vertexArray.enableAttribute(1);
+
+  // 2 -> texture
+  vertexArray.vertexSpecification(2, 2, GL_FLOAT, 0); 
+  vertexArray.bindBuffer(2, vBuffer.get(), 24, 8*sizeof(float));
+  vertexArray.attribBinding(2, 2);
+  vertexArray.enableAttribute(2);
+
+
+  // load and create a texture 
+  // -------------------------
+  unsigned int texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture); 
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  int width, height, nrChannels;
+  //stbi_set_flip_vertically_on_load(true); 
+  unsigned char *data = stbi_load("textures/wall.jpg", &width, &height, &nrChannels, 0);
+  if (data)
+  {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+  else
+  {
+    spdlog::error("Failed to load texture");
+  }
+  stbi_image_free(data);
+
+  shader.use();
+  shader.setInt("texture1", 0);
+
+  windowMgr->loop(inputCallback, [texture, shader, vertexArray](){
     glClearColor(0.1f, 0.1f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shader.use();
+    // bind textures on corresponding texture units
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
+    shader.use();
     vertexArray.bind();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   });
