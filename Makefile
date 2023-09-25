@@ -6,8 +6,12 @@ EXT_LIBS 		= externals/libs/
 GLAD_STATIC_LIB 	= ${EXT_LIBS}glad.a
 GLFW_STATIC_LIB 	= ${EXT_LIBS}libglfw3.a
 SPDLOG_STATIC_LIB = ${EXT_LIBS}libspdlog.a
+GLM_STATIC_LIB 		= ${EXT_LIBS}libglm_static.a
 
-STATIC_LIBS = ${GLAD_STATIC_LIB} ${GLFW_STATIC_LIB} ${SPDLOG_STATIC_LIB}
+STATIC_LIBS = ${GLAD_STATIC_LIB} \
+							${GLFW_STATIC_LIB} \
+							${SPDLOG_STATIC_LIB} \
+							${GLM_STATIC_LIB}
 
 SOURCES = $(wildcard src/*.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
