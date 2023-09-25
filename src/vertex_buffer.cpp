@@ -7,12 +7,12 @@ VertexBuffer::VertexBuffer(uint32_t size, float* data, uint32_t usage)
   glNamedBufferData(mBuffer, size, data, usage);
 }
 
-void VertexBuffer::bind() 
+void VertexBuffer::bind() const
 { 
   glBindBuffer(GL_ARRAY_BUFFER, mBuffer); 
 }
 
-void VertexBuffer::unbind() 
+void VertexBuffer::unbind() const
 { 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -22,7 +22,7 @@ void VertexBuffer::destroy()
   glDeleteBuffers(1, &mBuffer);
 }
 
-uint32_t VertexBuffer::get() 
+uint32_t VertexBuffer::get() const
 { 
   return mBuffer;
 }

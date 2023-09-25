@@ -20,7 +20,7 @@ public:
   void bindBuffer(uint32_t bindingindex, uint32_t buffer, int offset, int stride);
   void enableAttribute(uint32_t index);
 
-  uint32_t get();
+  uint32_t get() const; 
 
 private:
   uint32_t mVertexArray;

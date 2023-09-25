@@ -2,14 +2,12 @@
 #include "GLFW/glfw3.h"
 #include "spdlog/spdlog.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 #include "window_manager.hh"
 #include "shader.hh"
 #include "vertex_buffer.hh"
 #include "element_buffer.hh"
 #include "vertex_array.hh"
+#include "texture.hh"
 
 #include <string>
 
@@ -73,27 +71,11 @@ int main()
 
   // load and create a texture 
   // -------------------------
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture); 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  int width, height, nrChannels;
-  //stbi_set_flip_vertically_on_load(true); 
-  unsigned char *data = stbi_load("textures/wall.jpg", &width, &height, &nrChannels, 0);
-  if (data)
-  {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
-  else
-  {
-    spdlog::error("Failed to load texture");
-  }
-  stbi_image_free(data);
+  Texture texture {"textures/wall.jpg"};
+  texture.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  texture.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  texture.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  texture.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   shader.use();
   shader.setInt("texture1", 0);
@@ -103,8 +85,8 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT);
 
     // bind textures on corresponding texture units
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    texture.activeTextUnit(0);  
+    texture.bind();
 
     shader.use();
     vertexArray.bind();
@@ -117,6 +99,7 @@ int main()
   vBuffer.destroy();
   eBuffer.destroy();
   shader.destroy();
+  texture.destroy();
 
   windowMgr->destroyWindow();
   windowMgr->release();

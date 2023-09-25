@@ -41,7 +41,7 @@ void VertexArray::destroy()
   glDeleteVertexArrays(1, &mVertexArray);
 }
 
-uint32_t VertexArray::get()
+uint32_t VertexArray::get() const
 {
   return mVertexArray;
 }

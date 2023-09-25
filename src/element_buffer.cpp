@@ -7,12 +7,12 @@ ElementBuffer::ElementBuffer(uint32_t size, uint32_t* data, uint32_t usage)
   glNamedBufferData(mBuffer, size, data, usage);
 }
 
-void ElementBuffer::bind() 
+void ElementBuffer::bind() const
 { 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer); 
 }
 
-void ElementBuffer::unbind() 
+void ElementBuffer::unbind() const
 { 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
 }
@@ -22,7 +22,7 @@ void ElementBuffer::destroy()
   glDeleteBuffers(1, &mBuffer);
 }
 
-uint32_t ElementBuffer::get() 
+uint32_t ElementBuffer::get() const
 { 
   return mBuffer; 
 }

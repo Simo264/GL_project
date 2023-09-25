@@ -14,7 +14,7 @@ public:
 
   void destroy() { glDeleteProgram(mShader); }
 
-  uint32_t get() { return mShader; }
+  uint32_t get() const { return mShader; }
 
 
   void setBool(const std::string &name, bool value) const;
