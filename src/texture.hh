@@ -7,7 +7,7 @@
 class Texture
 {
 public:
-  Texture(const std::string& filename);
+  Texture(const std::string& filename, bool isImmutable = false);
   ~Texture() = default;
 
   void bind() const;
@@ -25,6 +25,7 @@ private:
   uint32_t mTexture;
   int mWidth;
   int mHeight;
+  bool mIsImmutable;
 
   void load(const std::string& filename);
 };

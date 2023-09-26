@@ -12,12 +12,15 @@ WindowManager* WindowManager::getInstance()
 
 GLFWwindow* WindowManager::createWindow(const char* title, uint16_t w, uint16_t h)
 {
+  mWidth = w; 
+  mHeigth = h;
+
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  mWindow = glfwCreateWindow(w, h, title, NULL, NULL);
+  mWindow = glfwCreateWindow(mWidth, mHeigth, title, NULL, NULL);
   if (!mWindow)
   {
     spdlog::error("Failed to create GLFW window");
@@ -40,25 +43,50 @@ void WindowManager::destroyWindow()
   glfwTerminate();
 }
 
-void WindowManager::loop(std::function<void()> inputCallback, std::function<void()> renderCallback)
+void WindowManager::loop(std::function<void(double delta)> inputCallback, 
+  std::function<void(double delta)> renderCallback)
 {
+
+  // configure global opengl state
+  // -----------------------------
+  glEnable(GL_DEPTH_TEST);
+
   while(!glfwWindowShouldClose(mWindow))
   {
+    const double delta = glfwGetTime();
+
     // input
-    if(glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-      glfwSetWindowShouldClose(mWindow, true);
-    inputCallback();
+    inputCallback(delta);
 
     // render
-    renderCallback();
+    glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    renderCallback(delta);
 
     glfwSwapBuffers(mWindow);
     glfwPollEvents();
   }
 }
 
+void WindowManager::close()
+{
+  glfwSetWindowShouldClose(mWindow, GLFW_TRUE);
+} 
+
 void WindowManager::release()
 {
   auto windowMgr = getInstance();
   delete windowMgr;
 }
+
+
+uint16_t WindowManager::getWidth() const
+{
+  return mWidth;
+}
+
+uint16_t WindowManager::getHeigth() const
+{
+  return mHeigth;
+}
+

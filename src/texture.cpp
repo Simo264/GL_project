@@ -5,7 +5,7 @@
 
 #include "spdlog/spdlog.h"
 
-Texture::Texture(const std::string& filename)
+Texture::Texture(const std::string& filename, bool isImmutable) : mIsImmutable{isImmutable}
 {
   glGenTextures(1, &mTexture);
   glBindTexture(GL_TEXTURE_2D, mTexture); 
@@ -44,7 +44,18 @@ void Texture::load(const std::string& filename)
   unsigned char *data = stbi_load(filename.c_str(), &mWidth, &mHeight, &nrChannels, 0);
   if (data)
   {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mWidth, mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    if(mIsImmutable)
+    {
+      // immutable object
+      glTextureStorage2D(mTexture, 1, GL_RGB8, mWidth, mHeight);
+      glTextureSubImage2D(mTexture, 0, 0, 0, mWidth, mHeight, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+    else
+    {
+      // mutable object
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mWidth, mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+        
     glGenerateMipmap(GL_TEXTURE_2D);
   }
   else

@@ -22,7 +22,11 @@ public:
   GLFWwindow* get() const { return mWindow; }
 
   // render loop: input events, render scene, swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-  void loop(std::function<void()> inputCallback, std::function<void()> renderCallback);
+  void loop(std::function<void(double delta)> inputCallback, 
+    std::function<void(double delta)> renderCallback);
+
+  // set close flag TRUE
+  void close();
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   void destroyWindow();
@@ -30,9 +34,15 @@ public:
   // release all resources
   void release();
 
+  uint16_t getWidth() const;
+  uint16_t getHeigth() const;
+
+
 private:
   GLFWwindow* mWindow;
 
+  uint16_t mWidth;
+  uint16_t mHeigth;
 };
 
 
