@@ -14,6 +14,16 @@
 #include "texture.hh"
 
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <iterator>
+
+#define VERTEX_COMPONENTS 5   // position=3 texture=2
+#define VERTEX_LENGTH VERTEX_COMPONENTS*4  // 4=sizeof(float)
+
+void loadVertices(const char* filename, std::vector<float>& vertices);
 
 int main()
 { 
@@ -23,66 +33,23 @@ int main()
   // build and compile our shader program
   Shader shader { "shaders/vertex.shader","shaders/fragment.shader" };
 
-
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
-  float vertices[] = {
-        // position           // texture
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-  };
+  std::vector<float> vertices;
+  loadVertices("res/vertices.txt", vertices);
 
   VertexArray vertexArray { };
-  VertexBuffer vBuffer { sizeof(vertices),vertices };
+  VertexBuffer vBuffer { static_cast<uint32_t>(vertices.size()*sizeof(float)), vertices.data() };
 
   // 0 -> position
   vertexArray.vertexSpecification(0, 3, GL_FLOAT, 0); 
-  vertexArray.bindBuffer(0, vBuffer.get(), 0, 5*sizeof(float));
+  vertexArray.bindBuffer(0, vBuffer.get(), 0, VERTEX_LENGTH);
   vertexArray.attribBinding(0, 0);
   vertexArray.enableAttribute(0);
 
   // 1 -> texture
   vertexArray.vertexSpecification(1, 2, GL_FLOAT, 0); 
-  vertexArray.bindBuffer(1, vBuffer.get(), 12, 5*sizeof(float));
+  vertexArray.bindBuffer(1, vBuffer.get(), 12, VERTEX_LENGTH);
   vertexArray.attribBinding(1, 1);
   vertexArray.enableAttribute(1);
 
@@ -97,26 +64,23 @@ int main()
 
   shader.use();
   shader.setInt("texture1", 0);
-  
-  windowMgr->loop(
-  [&windowMgr](double delta){ /* input callback */ 
+
+  /* input callback */
+  auto inputCallback = [&](double delta){
     if(glfwGetKey(windowMgr->get(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
       windowMgr->close();
 
     delta = delta + 0; // avoids werror
-  },
-  [&windowMgr, &texture, &shader, &vertexArray](double delta){  /* render callback */ 
-    
+  };
+  
+  /* render callback */
+  auto renderCallback = [&](double delta){
     texture.activeTextUnit(0);  
     texture.bind();
 
     shader.use();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(
-      model, 
-      glm::radians(-55.0f), 
-      glm::vec3(1.0f, 0.0f, 0.0f)); 
     model = glm::rotate(
       model, 
       glm::radians(static_cast<float>(delta * 100 * glm::radians(50.0f))), 
@@ -139,7 +103,11 @@ int main()
     vertexArray.bind();
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-  });
+  };
+  
+  windowMgr->loop(inputCallback, renderCallback);
+
+
 
   // de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
@@ -151,5 +119,33 @@ int main()
   windowMgr->destroyWindow();
   windowMgr->release();
   return 0;
+}
+
+
+
+void loadVertices(const char* filename, std::vector<float>& vertices)
+{
+  std::ifstream f(filename);
+  
+  const int lines = std::count(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>(), '\n');
+  vertices.reserve(lines * VERTEX_COMPONENTS);
+
+  f.seekg(0,std::ios::beg);
+
+  std::string line;
+  std::getline(f, line); // skip first line
+
+  while(std::getline(f, line))
+  {
+    std::istringstream iss(line);
+    std::string sVal;
+    while (iss >> sVal) 
+    {
+      float fValue = std::stof(sVal);
+      vertices.push_back(fValue);
+    }
+  }
+
+  f.close();
 }
 
