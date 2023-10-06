@@ -35,6 +35,10 @@ GLFWwindow* WindowManager::createWindow(const char* title, uint16_t w, uint16_t 
     return nullptr;
   } 
 
+  // configure global opengl state
+  // -----------------------------
+  glEnable(GL_DEPTH_TEST);
+
   return mWindow;
 }
 
@@ -43,25 +47,24 @@ void WindowManager::destroyWindow()
   glfwTerminate();
 }
 
-void WindowManager::loop(std::function<void(double delta)> inputCallback, 
-  std::function<void(double delta)> renderCallback)
+void WindowManager::loop(std::function<void(double deltaTime)> inputCallback, 
+  std::function<void(double deltaTime)> renderCallback)
 {
-
-  // configure global opengl state
-  // -----------------------------
-  glEnable(GL_DEPTH_TEST);
-
+  float deltaTime = 0.0f;	// time between current frame and last frame
+  float lastFrame = 0.0f;
   while(!glfwWindowShouldClose(mWindow))
   {
-    const double delta = glfwGetTime();
-
+    float currentFrame = static_cast<float>(glfwGetTime());
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    
     // input
-    inputCallback(delta);
+    inputCallback(deltaTime);
 
     // render
     glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderCallback(delta);
+    renderCallback(deltaTime);
 
     glfwSwapBuffers(mWindow);
     glfwPollEvents();
