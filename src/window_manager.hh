@@ -22,8 +22,7 @@ public:
   GLFWwindow* get() const { return mWindow; }
 
   // render loop: input events, render scene, swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-  void loop(std::function<void(double deltaTime)> inputCallback, 
-    std::function<void(double deltaTime)> renderCallback);
+  void loop(std::function<void()>& renderCallback, std::function<void(double deltaTime)>& inputCallback);
 
   // set close flag TRUE
   void close();

@@ -42,10 +42,25 @@ void loadVertices(const char* filename, std::vector<float>& vertices);
 void setVertexAttributes(VertexArray&, VertexBuffer&);
 void setTextParams(Texture&);
 
+void mouseInputCallback(GLFWwindow* window, double xpos, double ypos)
+{
+  (void)window;
+  std::cout << xpos << ", " << ypos << "\n";
+}
+
+
 int main()
 { 
-  WindowManager* windowMgr = WindowManager::getInstance();
-  auto window = windowMgr->createWindow("OpenGL");
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  GLFWwindow* window = glfwCreateWindow(720, 720, "OpenGL", nullptr, nullptr);
+  glfwMakeContextCurrent(window);
+  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+  glEnable(GL_DEPTH_TEST);
 
   Shader shader { "shaders/vertex.shader","shaders/fragment.shader" };
 
@@ -64,22 +79,21 @@ int main()
 
   const glm::mat4 projection = glm::perspective(
     glm::radians(45.f), // FOV=45.0
-    static_cast<float>(windowMgr->getWidth()/windowMgr->getHeigth()),
+    static_cast<float>(720/720),
     0.1f, 100.0f);
   
-  // if we want the camera to move backwards, we move along the positive z-axis
+ 
   const glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 5.0f);
   const glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-
   Camera camera { cameraPos,cameraFront };
-  
+
   // input callback 
   // ------------------------------------------------------------------------
-  auto inputCallback = [&](double deltaTime){
+  auto keyInputCallback = [&](double deltaTime){
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-      windowMgr->close();
+      glfwSetWindowShouldClose(window, GLFW_TRUE);
     
-    float cameraSpeed = 2.5f * deltaTime;
+    const float cameraSpeed = 2.5f * deltaTime;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
       camera.position += cameraSpeed * cameraFront;
@@ -90,12 +104,12 @@ int main()
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
       camera.position += glm::normalize(glm::cross(cameraFront, camera.up)) * cameraSpeed;
   };
- 
+
+  glfwSetCursorPosCallback(window, mouseInputCallback);
+
   // render callback 
   // ------------------------------------------------------------------------
-  auto renderCallback = [&](double deltaTime){
-    deltaTime = deltaTime + 0;
-
+  auto renderCallback = [&](){
     texture.activeTextUnit(0);  
     texture.bind();
 
@@ -115,10 +129,28 @@ int main()
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
   };
+
   
+  float deltaTime = 0.0f;	
+  float lastFrame = 0.0f;
+  float currentFrame = 0.0f;
+  while(!glfwWindowShouldClose(window))
+  {
+    currentFrame = static_cast<float>(glfwGetTime());
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
 
-  windowMgr->loop(inputCallback, renderCallback);
+    // input
+    keyInputCallback(deltaTime);
 
+    // Render here...
+    glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    renderCallback();
+    
+    glfwSwapBuffers(window);  // Swap front and back buffers 
+    glfwPollEvents();         // Poll for and process events 
+  }
 
   // de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
@@ -127,8 +159,8 @@ int main()
   shader.destroy();
   texture.destroy();
 
-  windowMgr->destroyWindow();
-  windowMgr->release();
+  glfwTerminate();
+
   return 0;
 }
 

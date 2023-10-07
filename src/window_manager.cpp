@@ -47,8 +47,7 @@ void WindowManager::destroyWindow()
   glfwTerminate();
 }
 
-void WindowManager::loop(std::function<void(double deltaTime)> inputCallback, 
-  std::function<void(double deltaTime)> renderCallback)
+void WindowManager::loop(std::function<void()>& renderCallback, std::function<void(double deltaTime)>& inputCallback)
 {
   float deltaTime = 0.0f;	// time between current frame and last frame
   float lastFrame = 0.0f;
@@ -64,7 +63,7 @@ void WindowManager::loop(std::function<void(double deltaTime)> inputCallback,
     // render
     glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderCallback(deltaTime);
+    renderCallback();
 
     glfwSwapBuffers(mWindow);
     glfwPollEvents();
