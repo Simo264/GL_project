@@ -11,12 +11,11 @@ public:
   Shader(const std::string& vFilename, const std::string& fFilename);
   ~Shader() = default;
 
-  void use() const { glUseProgram(mShader); }
+  void use() const { glUseProgram(_shader); }
 
-  void destroy() { glDeleteProgram(mShader); }
+  void destroy() { glDeleteProgram(_shader); }
 
-  uint32_t get() const { return mShader; }
-
+  uint32_t get() const { return _shader; }
 
   void setBool(const std::string& name, bool value) const;
   void setInt(const std::string& name, int value) const;
@@ -30,8 +29,8 @@ public:
   void setMat4(const std::string& name, const glm::mat4& mat) const;
 
 private:
-  uint32_t mShader; 
-
+  uint32_t _shader;
+  
   void getSourceFromFile(const std::string& filename, std::string& dest);
   bool compile(uint32_t& shader, const char* src);
   bool createAndLink(uint32_t vShader, uint32_t fShader);

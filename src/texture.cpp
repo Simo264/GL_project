@@ -5,16 +5,16 @@
 
 #include "spdlog/spdlog.h"
 
-Texture::Texture(const std::string& filename, bool isImmutable) : mIsImmutable{isImmutable}
+Texture::Texture(const std::string& filename, bool isImmutable) : _isImmutable{isImmutable}
 {
-  glGenTextures(1, &mTexture);
-  glBindTexture(GL_TEXTURE_2D, mTexture); 
+  glGenTextures(1, &_texture);
+  glBindTexture(GL_TEXTURE_2D, _texture); 
   load(filename);
 }
 
 void Texture::bind() const
 {
-  glBindTexture(GL_TEXTURE_2D, mTexture); 
+  glBindTexture(GL_TEXTURE_2D, _texture); 
 }
 
 void Texture::unbind() const
@@ -24,7 +24,7 @@ void Texture::unbind() const
 
 void Texture::destroy()
 {
-  glDeleteTextures(1, &mTexture);
+  glDeleteTextures(1, &_texture);
 }
 
 void Texture::activeTextUnit(uint32_t index) const
@@ -34,26 +34,26 @@ void Texture::activeTextUnit(uint32_t index) const
 
 void Texture::setParameteri(int pname, int param)
 {
-  glTextureParameteri(mTexture, pname, param);
+  glTextureParameteri(_texture, pname, param);
 }
 
 void Texture::load(const std::string& filename)
 {
   int nrChannels;
   //stbi_set_flip_vertically_on_load(true); 
-  unsigned char *data = stbi_load(filename.c_str(), &mWidth, &mHeight, &nrChannels, 0);
+  unsigned char *data = stbi_load(filename.c_str(), &_width, &_height, &nrChannels, 0);
   if (data)
   {
-    if(mIsImmutable)
+    if(_isImmutable)
     {
       // immutable object
-      glTextureStorage2D(mTexture, 1, GL_RGB8, mWidth, mHeight);
-      glTextureSubImage2D(mTexture, 0, 0, 0, mWidth, mHeight, GL_RGB, GL_UNSIGNED_BYTE, data);
+      glTextureStorage2D(_texture, 1, GL_RGB8, _width, _height);
+      glTextureSubImage2D(_texture, 0, 0, 0, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, data);
     }
     else
     {
       // mutable object
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mWidth, mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     }
         
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -67,16 +67,16 @@ void Texture::load(const std::string& filename)
 
 int Texture::getWidth() const
 {
-  return mWidth;
+  return _width;
 }
 
 int Texture::getHeight() const
 {
-  return mHeight;
+  return _height;
 }
 
 uint32_t Texture::get() const
 {
-  return mTexture;
+  return _texture;
 }
 

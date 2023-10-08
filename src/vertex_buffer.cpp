@@ -2,14 +2,14 @@
 
 VertexBuffer::VertexBuffer(uint32_t size, float* data, uint32_t usage)
 {
-  glGenBuffers(1, &mBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, mBuffer);
-  glNamedBufferData(mBuffer, size, data, usage);
+  glGenBuffers(1, &_buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, _buffer);
+  glNamedBufferData(_buffer, size, data, usage);
 }
 
 void VertexBuffer::bind() const
 { 
-  glBindBuffer(GL_ARRAY_BUFFER, mBuffer); 
+  glBindBuffer(GL_ARRAY_BUFFER, _buffer); 
 }
 
 void VertexBuffer::unbind() const
@@ -19,10 +19,10 @@ void VertexBuffer::unbind() const
 
 void VertexBuffer::destroy() 
 { 
-  glDeleteBuffers(1, &mBuffer);
+  glDeleteBuffers(1, &_buffer);
 }
 
 uint32_t VertexBuffer::get() const
 { 
-  return mBuffer;
+  return _buffer;
 }

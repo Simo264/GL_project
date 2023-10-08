@@ -16,7 +16,7 @@ public:
   uint32_t get() const; 
   
 private:
-  uint32_t mBuffer;
+  uint32_t _buffer;
 };
 
 #endif

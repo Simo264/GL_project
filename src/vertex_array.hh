@@ -23,7 +23,7 @@ public:
   uint32_t get() const; 
 
 private:
-  uint32_t mVertexArray;
+  uint32_t _vertexArray;
 
 };
 

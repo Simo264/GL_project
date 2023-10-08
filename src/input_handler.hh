@@ -4,21 +4,12 @@
 class InputHandler
 {
 public:
-  InputHandler();
-  ~InputHandler();
+  InputHandler() = default;
+  ~InputHandler() = default;
 
 private:
 
-
 };
-
-InputHandler::InputHandler()
-{
-}
-
-InputHandler::~InputHandler()
-{
-}
 
 
 #endif

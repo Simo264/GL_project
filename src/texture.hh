@@ -22,10 +22,10 @@ public:
   int getHeight() const;
 
 private:
-  uint32_t mTexture;
-  int mWidth;
-  int mHeight;
-  bool mIsImmutable;
+  uint32_t _texture;
+  int _width;
+  int _height;
+  bool _isImmutable;
 
   void load(const std::string& filename);
 };
