@@ -1,9 +1,27 @@
 #include "vertex_array.hh"
+#include "spdlog/spdlog.h"
 
-VertexArray::VertexArray()
+VertexArray::VertexArray(VertexBuffer& vBuffer)
 {
   glGenVertexArrays(1, &_vertexArray);
-  glBindVertexArray(_vertexArray);
+  if(_vertexArray == GL_INVALID_VALUE)
+  {
+    spdlog::warn("VertexArray object is GL_INVALID_VALUE");
+  }
+  else
+  {
+    glBindVertexArray(_vertexArray);
+    // 0 -> position
+    vertexArray.vertexSpecification(0, 3, GL_FLOAT, 0); 
+    vertexArray.bindBuffer(0, vBuffer.get(), 0, VERTEX_LENGTH);
+    vertexArray.attribBinding(0, 0);
+    vertexArray.enableAttribute(0);
+    // 1 -> texture
+    vertexArray.vertexSpecification(1, 2, GL_FLOAT, 0); 
+    vertexArray.bindBuffer(1, vBuffer.get(), 12, VERTEX_LENGTH);
+    vertexArray.attribBinding(1, 1);
+    vertexArray.enableAttribute(1);
+  }
 }
 
 void VertexArray::vertexSpecification(uint32_t index, uint32_t size, uint32_t type, int offset)
@@ -26,22 +44,8 @@ void VertexArray::enableAttribute(uint32_t index)
   glEnableVertexArrayAttrib(_vertexArray, index);
 }
 
-void VertexArray::bind() const
-{
-  glBindVertexArray(_vertexArray);
-}
-
-void VertexArray::unbind() const
-{
- glBindVertexArray(0);
-}
-
 void VertexArray::destroy()
 {
-  glDeleteVertexArrays(1, &_vertexArray);
-}
-
-uint32_t VertexArray::get() const
-{
-  return _vertexArray;
+  if(_vertexArray != GL_INVALID_VALUE)
+    glDeleteVertexArrays(1, &_vertexArray);
 }

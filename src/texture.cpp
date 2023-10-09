@@ -5,43 +5,31 @@
 
 #include "spdlog/spdlog.h"
 
-Texture::Texture(const std::string& filename, bool isImmutable) : _isImmutable{isImmutable}
+Texture::Texture(const std::string& filename, bool immutable) : _isImmutable{immutable}
 {
   glGenTextures(1, &_texture);
-  glBindTexture(GL_TEXTURE_2D, _texture); 
-  load(filename);
-}
+  if(_vertexArray == GL_INVALID_VALUE)
+  {
 
-void Texture::bind() const
-{
-  glBindTexture(GL_TEXTURE_2D, _texture); 
-}
+  }
+  else
+  {
+    glBindTexture(GL_TEXTURE_2D, _texture); 
+    load(filename);
 
-void Texture::unbind() const
-{
-  glBindTexture(GL_TEXTURE_2D, 0); 
-}
+    setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  }
 
-void Texture::destroy()
-{
-  glDeleteTextures(1, &_texture);
-}
-
-void Texture::activeTextUnit(uint32_t index) const
-{
-  glActiveTexture(GL_TEXTURE0 + index);
-}
-
-void Texture::setParameteri(int pname, int param)
-{
-  glTextureParameteri(_texture, pname, param);
 }
 
 void Texture::load(const std::string& filename)
 {
   int nrChannels;
   //stbi_set_flip_vertically_on_load(true); 
-  unsigned char *data = stbi_load(filename.c_str(), &_width, &_height, &nrChannels, 0);
+  u_char* data = stbi_load(filename.c_str(), &_width, &_height, &nrChannels, 0);
   if (data)
   {
     if(_isImmutable)
@@ -64,19 +52,3 @@ void Texture::load(const std::string& filename)
   }
   stbi_image_free(data);
 }
-
-int Texture::getWidth() const
-{
-  return _width;
-}
-
-int Texture::getHeight() const
-{
-  return _height;
-}
-
-uint32_t Texture::get() const
-{
-  return _texture;
-}
-

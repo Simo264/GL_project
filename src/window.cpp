@@ -4,67 +4,51 @@
 #include<iterator> 
 #include<algorithm>
 
-Window::Window(const std::map<int,int>& hints) 
+Window::Window()
 {
-  _isInitialized = static_cast<bool>(glfwInit());
-  if(!_isInitialized)
-    throw std::runtime_error("GLFW failed to initialize.");
+  if(!glfwInit())
+  {
+    spdlog::error("GLFW failed to initialize.");
+    exit(EXIT_FAILURE);
+  }
 
-  for (const auto& [hint, value] : hints) 
-    glfwWindowHint(hint, value);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  glfwSetErrorCallback(errorCallback);
 }
 
-Window::~Window()
+void Window::create(std::string title, uint16_t width, uint16_t heigth)
 {
-  if (_isInitialized)
-    glfwTerminate();
-
-  if (_window)
-    glfwDestroyWindow(m_Window);
-}
-
-GLFWwindow* Window::create(std::string title, uint16_t width, uint16_t heigth)
-{
-  _title = title; 
   _width = width; 
-  _height = height;
+  _height = heigth;
 
-  _window = glfwCreateWindow(width, height, title, NULL, NULL);
+  _window = glfwCreateWindow(width, heigth, title.c_str(), NULL, NULL);
   if (!_window)
-    throw std::runtime_error("Failed to create GLFW window");
+  {
+    spdlog::error("Failed to create GLFW window");
+    glfwTerminate();
+    exit(EXIT_FAILURE);
+  }
 
   glfwMakeContextCurrent(_window);
+  glfwSetWindowUserPointer(_window, this);
+  glfwSetKeyCallback(_window, defaultKeyCallback);
 
   gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
   // configure global opengl state
   // -----------------------------
   glEnable(GL_DEPTH_TEST);
-
-  return _window;
 }
 
-void Window::loop(std::function<void()>& renderCallback, std::function<void(double deltaTime)>& inputCallback)
+void Window::terminate()
 {
-  float deltaTime = 0.0f;	// time between current frame and last frame
-  float lastFrame = 0.0f;
-  while(!glfwWindowShouldClose(_window))
-  {
-    float currentFrame = static_cast<float>(glfwGetTime());
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
-    
-    // input
-    inputCallback(deltaTime);
+  if (_window)
+    glfwDestroyWindow(_window);
 
-    // render
-    glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderCallback();
-
-    glfwSwapBuffers(_window);
-    glfwPollEvents();
-  }
+  glfwTerminate();
 }
 
 void Window::close()
@@ -72,20 +56,34 @@ void Window::close()
   glfwSetWindowShouldClose(_window, GLFW_TRUE);
 } 
 
-void Window::release()
+void Window::swapBuffersAndProcessEvents()
 {
-  auto windowMgr = getInstance();
-  delete windowMgr;
+  glfwSwapBuffers(_window);  
+  glfwPollEvents();
 }
 
-
-uint16_t Window::getWidth() const
+void Window::errorCallback(int error, const char* description)
 {
-  return mWidth;
+  (void)error; // suppress werror
+
+  spdlog::error(description);
 }
 
-uint16_t Window::getHeigth() const
+void Window::defaultKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-  return mHeigth;
+  (void) window;    // suppress werror
+  (void) scancode;  // suppress werror
+  (void) mods;      // suppress werror
+
+  // Window* pw = (Window*)glfwGetWindowUserPointer(window);
+
+  if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
+
+void Window::setCursorPosCallback(GLFWcursorposfun callback)
+{
+  glfwSetCursorPosCallback(_window, callback);
+}
+
 

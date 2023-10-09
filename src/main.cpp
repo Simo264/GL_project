@@ -17,24 +17,14 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
-#include <algorithm>
-#include <iterator>
-#include <map>
 
 #define VERTEX_COMPONENTS 5                // position=3 texture=2
 #define VERTEX_LENGTH VERTEX_COMPONENTS*4  // sizeof(float)=4
 
 void loadVertices(const char* filename, std::vector<float>& vertices);
 void setVertexAttributes(VertexArray&, VertexBuffer&);
-void setTextParams(Texture&);
-void mouseInputCallback(GLFWwindow* window, double xpos, double ypos);
-
-const std::map<int,int> WINDOW_HINTS = { 
-  { GLFW_CONTEXT_VERSION_MAJOR, 3 }
-  { GLFW_CONTEXT_VERSION_MINOR, 3 }
-  { GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE }
-};
+void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
+void processInput(const Window& window, Camera& camera, float deltaTime);
 
 std::vector<glm::vec3> CUBES = {
   glm::vec3( 0.0f,  0.0f,  0.0f), 
@@ -50,13 +40,8 @@ std::vector<glm::vec3> CUBES = {
 };
 glm::vec3& CUBE_TARGET = CUBES[0];
 
-// timing
-float deltaTime = 0.0f;	
-float lastFrame = 0.0f;
-float currentFrame = 0.0f;
-
 // camera
-glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 5.0f);
+
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -70,29 +55,11 @@ float pitch = 0.0f;
 
 int main()
 { 
-  Window window { WINDOW_HINTS };
-
-  // glfw: initialize and configure
-  // ------------------------------
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow* window = glfwCreateWindow(720, 720, "OpenGL", nullptr, nullptr);
-  glfwMakeContextCurrent(window);
-  
-  // glad: load all OpenGL function pointers
-  // ---------------------------------------
-  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-  glfwSetCursorPosCallback(window, mouseInputCallback);
-
-  // configure global opengl state
-  // -----------------------------
-  glEnable(GL_DEPTH_TEST);
-
-  // build and compile our shader zprogram
+  Window window;
+  window.create("OpenGL", 720, 720);
+  window.setCursorPosCallback(cursorPositionCallback);
+ 
+  // build and compile our shader program
   // ------------------------------------
   Shader shader { "shaders/vertex.shader","shaders/fragment.shader" };
 
@@ -100,9 +67,10 @@ int main()
   // ------------------------------------------------------------------
   std::vector<float> vertices;
   loadVertices("res/vertices.txt", vertices);
-
-  VertexArray vertexArray { };
   VertexBuffer vBuffer { static_cast<uint32_t>(vertices.size()*sizeof(float)), vertices.data() };
+
+  VertexArray vertexArray { vBuffer };
+  
   setVertexAttributes(vertexArray, vBuffer);
 
   Texture texture {"textures/wall.jpg", true};
@@ -111,32 +79,34 @@ int main()
   shader.use();
   shader.setInt("texture1", 0);
 
+
+  const glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 5.0f);
+
   Camera camera { cameraPos,cameraFront,cameraUp };
 
-  // key input callback 
-  // ------------------------------------------------------------------------
-  auto keyInputCallback = [&](double deltaTime){
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+  // render loop
+  // -----------
+  float deltaTime = 0.0f;	
+  float lastFrame = 0.0f;
+  float currentFrame = 0.0f;
+  while(window.loop())
+  {
+    currentFrame = static_cast<float>(glfwGetTime());
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
+    // input
+    // ------
+    processInput(window, camera, deltaTime);
+
+    // Render 
+    // ------
+    window.clearColor(0.5f, 0.5f, 0.8f, 1.0f);
+    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   
     
-    const float cameraSpeed = 2.5f * deltaTime;
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-      camera.position += cameraSpeed * camera.front;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-      camera.position -= cameraSpeed * camera.front;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-      camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-      camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
-  };
-
-  // render callback 
-  // ------------------------------------------------------------------------
-  auto renderCallback = [&](){
     texture.activeTextUnit(0);  
     texture.bind();
-
     shader.use();
 
     camera.front = cameraFront;
@@ -156,34 +126,10 @@ int main()
       shader.setMat4("model", model);
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
-  };
-
-
-
-  // render loop
-  // -----------
-  while(!glfwWindowShouldClose(window))
-  {
-    // per-frame time logic
-    // --------------------
-    currentFrame = static_cast<float>(glfwGetTime());
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
-
-    // input
-    // ------
-    keyInputCallback(deltaTime);
-
-    // Render 
-    // ------
-    glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderCallback();
     
-    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-    // -------------------------------------------------------------------------------
-    glfwSwapBuffers(window);  
-    glfwPollEvents();         
+    // Swapping buffers, processing events
+    // ------
+    window.swapBuffersAndProcessEvents();  
   }
 
   // de-allocate all resources once they've outlived their purpose:
@@ -196,7 +142,7 @@ int main()
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------
-  glfwTerminate();
+  window.terminate();
   return 0;
 }
 
@@ -230,27 +176,10 @@ void loadVertices(const char* filename, std::vector<float>& vertices)
 
 void setVertexAttributes(VertexArray& vertexArray, VertexBuffer& vBuffer)
 {
-  // 0 -> position
-  vertexArray.vertexSpecification(0, 3, GL_FLOAT, 0); 
-  vertexArray.bindBuffer(0, vBuffer.get(), 0, VERTEX_LENGTH);
-  vertexArray.attribBinding(0, 0);
-  vertexArray.enableAttribute(0);
-  // 1 -> texture
-  vertexArray.vertexSpecification(1, 2, GL_FLOAT, 0); 
-  vertexArray.bindBuffer(1, vBuffer.get(), 12, VERTEX_LENGTH);
-  vertexArray.attribBinding(1, 1);
-  vertexArray.enableAttribute(1);
+  
 }
 
-void setTextParams(Texture& texture)
-{
-  texture.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-  texture.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-  texture.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  texture.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
-
-void mouseInputCallback(GLFWwindow* window, double xposIn, double yposIn)
+void cursorPositionCallback(GLFWwindow* window, double xposIn, double yposIn)
 {
   (void)window;
 
@@ -284,5 +213,20 @@ void mouseInputCallback(GLFWwindow* window, double xposIn, double yposIn)
   cameraUp    = glm::normalize(glm::cross(right, cameraFront));
 }
 
+void processInput(const Window& window, Camera& camera, float deltaTime)
+{
+  const float cameraSpeed = 2.5f * deltaTime;
 
+  if (window.getKey(GLFW_KEY_W) == GLFW_PRESS)
+    camera.position += cameraSpeed * camera.front;
+  
+  if (window.getKey(GLFW_KEY_S) == GLFW_PRESS)
+    camera.position -= cameraSpeed * camera.front;
+  
+  if (window.getKey(GLFW_KEY_A) == GLFW_PRESS)
+    camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
+  
+  if (window.getKey(GLFW_KEY_D) == GLFW_PRESS)
+    camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
+}
 
