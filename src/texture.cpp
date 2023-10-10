@@ -8,9 +8,9 @@
 Texture::Texture(const std::string& filename, bool immutable) : _isImmutable{immutable}
 {
   glGenTextures(1, &_texture);
-  if(_vertexArray == GL_INVALID_VALUE)
+  if(_texture == GL_INVALID_VALUE)
   {
-
+    spdlog::error("Texture object is GL_INVALID_VALUE");
   }
   else
   {

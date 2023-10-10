@@ -6,7 +6,7 @@ VertexBuffer::VertexBuffer(uint32_t size, float* data, uint32_t usage)
   glGenBuffers(1, &_buffer);
   if(_buffer == GL_INVALID_VALUE)
   {
-    spdlog::warn("VertexBuffer object is GL_INVALID_VALUE");
+    spdlog::error("VertexBuffer object is GL_INVALID_VALUE");
   } 
   else
   {
@@ -15,23 +15,8 @@ VertexBuffer::VertexBuffer(uint32_t size, float* data, uint32_t usage)
   }
 }
 
-void VertexBuffer::bind() const
-{ 
-  glBindBuffer(GL_ARRAY_BUFFER, _buffer); 
-}
-
-void VertexBuffer::unbind() const
-{ 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 void VertexBuffer::destroy() 
 { 
   if(_buffer != GL_INVALID_VALUE)
     glDeleteBuffers(1, &_buffer);
-}
-
-uint32_t VertexBuffer::get() const
-{ 
-  return _buffer;
 }

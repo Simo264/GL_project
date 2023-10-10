@@ -14,13 +14,13 @@ public:
   ~Window() = default;
   
   // creating a window and context
-  void create(std::string title, uint16_t width=720, uint16_t heigth=720);
+  void create(std::string title, uint16_t width=720, uint16_t heigth=720, bool fullscreen = false);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   void terminate();
   
   // set close flag TRUE
-  void close();
+  void close() { glfwSetWindowShouldClose(_window, GLFW_TRUE); }
 
   // render loop
   bool loop() const { return !glfwWindowShouldClose(_window); }
@@ -40,11 +40,23 @@ public:
   // keyboard input
   int getKey(uint32_t key) const { return glfwGetKey(_window, key); }
 
-  void setCursorPosCallback(GLFWcursorposfun callback);
-
   // window size
-  uint16_t getWidth() const { return _width; }
-  uint16_t getHeight() const { return _height; }
+  uint16_t width() const { return _width; }
+  uint16_t height() const { return _height; }
+
+  void processKeyboardInput();
+
+  // window position
+  void getPosition(int& x, int& y) { glfwGetWindowPos(_window, &x, &y); }
+
+  // cursor position
+  void getCursorPosition(double& x, double& y) { glfwGetCursorPos(_window, &x, &y); }
+
+  // value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
+  void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
+
+  double delta() const;
+  void update();
 
 private:
   GLFWwindow* _window;
@@ -52,9 +64,12 @@ private:
   uint16_t _width;
   uint16_t _height;
 
+  // time
+  double prevFrame;
+  double currFrame;
+
   static void errorCallback(int error, const char* description);
   static void defaultKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-  // static void defaultCursoPosCallback(GLFWwindow* window, double xpos, double ypos);
 };
 
 

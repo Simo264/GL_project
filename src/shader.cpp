@@ -46,7 +46,7 @@ void Shader::getSourceFromFile(const std::string& filename, std::string& dest)
   std::ifstream file(filename);
   if(!file.is_open())
   {
-    spdlog::error("Error on opening file");
+    spdlog::error("Shader::getSourceFromFile error on opening file in ");
     return;
   }
 

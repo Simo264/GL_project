@@ -17,14 +17,22 @@ Window::Window()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   glfwSetErrorCallback(errorCallback);
+  
+  prevFrame = 0;
+  currFrame = 0;	
 }
 
-void Window::create(std::string title, uint16_t width, uint16_t heigth)
+void Window::create(std::string title, uint16_t width, uint16_t heigth, bool fullscreen)
 {
   _width = width; 
   _height = heigth;
 
-  _window = glfwCreateWindow(width, heigth, title.c_str(), NULL, NULL);
+  GLFWmonitor* monitor = nullptr;
+
+  if(fullscreen)
+    monitor = glfwGetPrimaryMonitor();
+
+  _window = glfwCreateWindow(width, heigth, title.c_str(), monitor, NULL);
   if (!_window)
   {
     spdlog::error("Failed to create GLFW window");
@@ -34,7 +42,6 @@ void Window::create(std::string title, uint16_t width, uint16_t heigth)
 
   glfwMakeContextCurrent(_window);
   glfwSetWindowUserPointer(_window, this);
-  glfwSetKeyCallback(_window, defaultKeyCallback);
 
   gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
@@ -51,11 +58,6 @@ void Window::terminate()
   glfwTerminate();
 }
 
-void Window::close()
-{
-  glfwSetWindowShouldClose(_window, GLFW_TRUE);
-} 
-
 void Window::swapBuffersAndProcessEvents()
 {
   glfwSwapBuffers(_window);  
@@ -69,21 +71,22 @@ void Window::errorCallback(int error, const char* description)
   spdlog::error(description);
 }
 
-void Window::defaultKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Window::processKeyboardInput()
 {
-  (void) window;    // suppress werror
-  (void) scancode;  // suppress werror
-  (void) mods;      // suppress werror
-
-  // Window* pw = (Window*)glfwGetWindowUserPointer(window);
-
-  if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
+  if(getKey(GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    close();
 }
 
-void Window::setCursorPosCallback(GLFWcursorposfun callback)
+double Window::delta() const
 {
-  glfwSetCursorPosCallback(_window, callback);
+  return currFrame - prevFrame;
 }
+
+void Window::update()
+{
+  prevFrame = currFrame;
+  currFrame = glfwGetTime();
+}
+
 
 

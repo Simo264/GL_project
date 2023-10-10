@@ -3,6 +3,8 @@
 
 #include "glm/glm.hpp"
 
+#include "window.hh"
+
 class Camera
 {
 public:
@@ -15,10 +17,23 @@ public:
   glm::mat4 lookAt(glm::vec3 target);
   glm::mat4 lookAround();
 
+  void processKeyboardInput(Window& window, double deltaTime);
+  void processMouseMovement(Window& window);
+
 public:
   glm::vec3 position;
   glm::vec3 front;
   glm::vec3 up;
+
+  double yaw;
+  double pitch;
+  double speed;
+  double sensitivity;
+
+private:
+  double _lastX;
+  double _lastY;
+
 };
 
 #endif

@@ -9,11 +9,11 @@ public:
   VertexBuffer(uint32_t size, float* data, uint32_t usage = GL_STATIC_DRAW);
   ~VertexBuffer() = default;
 
-  void bind() const;
-  void unbind() const;
+  void bind() const { glBindBuffer(GL_ARRAY_BUFFER, _buffer); }
+  void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
   void destroy();
 
-  uint32_t get() const; 
+  uint32_t get() const { return _buffer; }
   
 private:
   uint32_t _buffer;
