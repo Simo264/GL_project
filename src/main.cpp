@@ -6,7 +6,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "vertex_components.hh"
+#include "vertex.hh"
 #include "window.hh"
 #include "shader.hh"
 #include "vertex_buffer.hh"
@@ -23,7 +23,7 @@
 #define WINDOW_HEIGTH 720.0f
 
 void loadVertices(const char* filename, std::vector<float>& vertices);
-
+const glm::mat4 perspective(float fov);
 
 std::vector<glm::vec3> CUBES = {
   glm::vec3( 0.0f,  0.0f,  0.0f), 
@@ -62,17 +62,10 @@ int main()
   // ------------------------------------
   Texture texture {"textures/wall.jpg", true};
 
+  // create camera object
+  // ------------------------------------
+  Camera camera { glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
 
-  const glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 5.0f);
-  const glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-  const glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
-  Camera camera { cameraPos,cameraFront,cameraUp };
-
-
-  const glm::mat4 projection = glm::perspective(
-    glm::radians(45.f), 
-    static_cast<float>(window.width()/window.height()), 
-    0.1f, 100.0f); 
 
   // render loop
   // -----------
@@ -99,6 +92,7 @@ int main()
     shader.use();
 
     const glm::mat4 view = camera.lookAround();
+    const glm::mat4 projection = perspective(45.0f);
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
 
@@ -137,7 +131,7 @@ void loadVertices(const char* filename, std::vector<float>& vertices)
   std::ifstream f(filename);
   
   const int lines = std::count(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>(), '\n');
-  vertices.reserve(lines * VERTEX_COMPONENTS);
+  vertices.reserve(lines * vertex_t::VERTEX_COMPONENTS);
 
   f.seekg(0,std::ios::beg);
 
@@ -158,5 +152,13 @@ void loadVertices(const char* filename, std::vector<float>& vertices)
   f.close();
 }
 
+const glm::mat4 perspective(float fov)
+{
+  return glm::perspective(
+    glm::radians(fov), 
+    static_cast<float>(WINDOW_WIDTH / WINDOW_HEIGTH), 
+    0.1f,
+    100.0f); 
+}
 
 

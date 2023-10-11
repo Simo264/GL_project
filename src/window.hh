@@ -44,6 +44,7 @@ public:
   uint16_t width() const { return _width; }
   uint16_t height() const { return _height; }
 
+  // keyboard input
   void processKeyboardInput();
 
   // window position
@@ -55,6 +56,7 @@ public:
   // value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
   void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
 
+  // time
   double delta() const;
   void update();
 

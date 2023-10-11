@@ -1,5 +1,5 @@
 #include "camera.hh"
-
+#include "spdlog/spdlog.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up)
@@ -26,19 +26,27 @@ glm::mat4 Camera::lookAround()
 
 void Camera::processKeyboardInput(Window& window, double deltaTime)
 {
-  const float movementSpeed = static_cast<float>(speed * deltaTime);
+  const float velocity = static_cast<float>(speed * deltaTime);
 
   if (window.getKey(GLFW_KEY_W) == GLFW_PRESS)
-    position += movementSpeed * front;
+    position += front * velocity;
   
   if (window.getKey(GLFW_KEY_S) == GLFW_PRESS)
-    position -= movementSpeed * front;
+    position -= front * velocity;
   
   if (window.getKey(GLFW_KEY_A) == GLFW_PRESS)
-    position -= glm::normalize(glm::cross(front, up)) * movementSpeed;
+    position -= right * velocity;
   
   if (window.getKey(GLFW_KEY_D) == GLFW_PRESS)
-    position += glm::normalize(glm::cross(front, up)) * movementSpeed;
+    position += right * velocity;
+
+  if (window.getKey(GLFW_KEY_SPACE) == GLFW_PRESS)
+    position += up * velocity;
+  
+  if (window.getKey(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+    position -= up * velocity;
+
+  
 }
 
 void Camera::processMouseMovement(Window& window)
@@ -64,7 +72,6 @@ void Camera::processMouseMovement(Window& window)
     sin(glm::radians(yaw)) * cos(glm::radians(pitch))
   ));
 
-  auto right  = glm::normalize(glm::cross(front, {0.f,1.f,0.f}));
-
-  up = glm::normalize(glm::cross(right, front));
+  right = glm::normalize(glm::cross(front, {0.f, 1.f, 0.f}));
+  up    = glm::normalize(glm::cross(right, front));
 }

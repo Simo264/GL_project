@@ -1,7 +1,7 @@
 #include "vertex_array.hh"
 #include "spdlog/spdlog.h"
 
-#include "vertex_components.hh"
+#include "vertex.hh"
 
 VertexArray::VertexArray(VertexBuffer& vBuffer)
 {
@@ -16,13 +16,13 @@ VertexArray::VertexArray(VertexBuffer& vBuffer)
     
     // 0 -> position (x,y,z)
     vertexSpecification(0, 3, GL_FLOAT, 0); 
-    bindBuffer(0, vBuffer.get(), 0, VERTEX_LENGTH);
+    bindBuffer(0, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
     attribBinding(0, 0);
     enableAttribute(0);
     
     // 1 -> texture (s,t)
     vertexSpecification(1, 2, GL_FLOAT, 0); 
-    bindBuffer(1, vBuffer.get(), 12, VERTEX_LENGTH);
+    bindBuffer(1, vBuffer.get(), 12, vertex_t::VERTEX_LENGTH);
     attribBinding(1, 1);
     enableAttribute(1);
   }
