@@ -25,30 +25,18 @@
 void loadVertices(const char* filename, std::vector<float>& vertices);
 const glm::mat4 perspective(float fov);
 
-std::vector<glm::vec3> CUBES = {
-  glm::vec3( 0.0f,  0.0f,  0.0f), 
-  glm::vec3( 2.0f,  5.0f, -15.0f), 
-  glm::vec3(-1.5f, -2.2f, -2.5f),  
-  glm::vec3(-3.8f, -2.0f, -12.3f),  
-  glm::vec3( 2.4f, -0.4f, -3.5f),  
-  glm::vec3(-1.7f,  3.0f, -7.5f),  
-  glm::vec3( 1.3f, -2.0f, -2.5f),  
-  glm::vec3( 1.5f,  2.0f, -2.5f), 
-  glm::vec3( 1.5f,  0.2f, -1.5f), 
-  glm::vec3(-1.3f,  1.0f, -1.5f)  
-};
-glm::vec3& CUBE_TARGET = CUBES[0];
-
 
 int main()
 { 
   Window window;
   window.create("OpenGL", WINDOW_WIDTH, WINDOW_HEIGTH);
+  
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
   std::vector<float> vertices;
   loadVertices("res/vertices.txt", vertices);
+  
   VertexBuffer vBuffer { static_cast<uint32_t>(vertices.size()*sizeof(float)), vertices.data() };
   VertexArray vertexArray { vBuffer }; 
 
@@ -56,15 +44,24 @@ int main()
   // ------------------------------------
   Shader shader { "shaders/vertex.shader","shaders/fragment.shader" };
   shader.use();
-  shader.setInt("texture1", 0);
+  
+  const glm::vec3 cubeObjectPos     = glm::vec3(0.0f,  0.0f,  0.0f);
+  glm::vec3 lightObjectPos    = glm::vec3(2.0f,  0.0f, -5.0f);
+  const glm::vec3 cubeObjectColor   = glm::vec3(1.0f, 0.5f, 0.31f);
+  const glm::vec3 lightObjectColor  = glm::vec3(1.0f, 1.0f, 1.0f);
+  shader.setVec3("objectColor", cubeObjectColor);
+  shader.setVec3("lightColor",  lightObjectColor);
+  shader.setVec3("lightPos", lightObjectPos);  
 
   // create texture object
   // ------------------------------------
-  Texture texture {"textures/wall.jpg", true};
+  // Texture texture {"res/wall.jpg", true};
 
   // create camera object
   // ------------------------------------
-  Camera camera { glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
+  Camera camera { glm::vec3(0.0f, 1.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
+
+
 
 
   // render loop
@@ -85,25 +82,37 @@ int main()
     // Render 
     // ------
     window.clearColor(0.5f, 0.5f, 0.8f, 1.0f);
-    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   
+    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
     
-    texture.activeTextUnit(0);  
-    texture.bind();
+    //texture.activeTextUnit(0);  
+    //texture.bind();
     shader.use();
-
-    const glm::mat4 view = camera.lookAround();
+    vertexArray.bind();
+    
+    
+    const glm::mat4 view       = camera.lookAround();
     const glm::mat4 projection = perspective(45.0f);
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
 
-    vertexArray.bind();
-    for(size_t i = 0; i < CUBES.size(); i++)
-    {
-      glm::mat4 model = glm::translate(glm::mat4(1.0f), CUBES[i]);
-      model = glm::rotate(model, glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
-      shader.setMat4("model", model);
-      glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    glm::mat4 model;
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, cubeObjectPos);
+    vertexArray.enableAttribute(1);
+    shader.setMat4("model", model);
+    shader.setBool("ligthObject", false);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, lightObjectPos);
+    vertexArray.disableAttribute(1);
+    shader.setMat4("model", model);
+    shader.setBool("ligthObject", true);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    lightObjectPos.y = sin(glfwGetTime()) * 5;
+    shader.setVec3("lightPos", lightObjectPos); 
+    shader.setVec3("viewPos", camera.position); 
     
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
@@ -115,7 +124,7 @@ int main()
   vertexArray.destroy();
   vBuffer.destroy();
   shader.destroy();
-  texture.destroy();
+  //texture.destroy();
 
 
   // glfw: terminate, clearing all previously allocated GLFW resources.

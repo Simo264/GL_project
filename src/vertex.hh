@@ -6,10 +6,10 @@
 struct vertex_t
 {
   glm::vec3 position;
-  glm::vec2 textureCoords;
+  glm::vec3 normal;
 
-  static const int VERTEX_COMPONENTS = 5;
-  static const int VERTEX_LENGTH = sizeof(position) + sizeof(textureCoords);
+  static constexpr int VERTEX_COMPONENTS = 6;
+  static constexpr int VERTEX_LENGTH  = sizeof(position) + sizeof(normal);
 };
 
 #endif

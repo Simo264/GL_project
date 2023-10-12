@@ -8,7 +8,7 @@ Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up)
   yaw   = -90;
   pitch = 0;
   speed = 2.5;
-  sensitivity = 0.05;
+  sensitivity = 0.25;
 
   _lastX = 0;
   _lastY = 0;
@@ -55,8 +55,8 @@ void Camera::processMouseMovement(Window& window)
   window.getCursorPosition(cposx, cposy);
 
   // if cursor is outside of window
-  if(!(cposx >= 0 && cposx <= window.width() && cposy >= 0 && cposy <= window.height()))
-    return;
+  // if(!(cposx >= 0 && cposx <= window.width() && cposy >= 0 && cposy <= window.height()))
+  //   return;
 
   double xoffset = cposx - _lastX;
   double yoffset = _lastY - cposy;

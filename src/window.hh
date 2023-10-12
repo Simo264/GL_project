@@ -5,7 +5,6 @@
 #include "GLFW/glfw3.h"
 
 #include <string>
-#include <functional>
 
 class Window
 {
@@ -48,6 +47,7 @@ public:
   void processKeyboardInput();
 
   // window position
+  void setPosition(int x, int y) { glfwSetWindowPos(_window, x, y); }
   void getPosition(int& x, int& y) { glfwGetWindowPos(_window, &x, &y); }
 
   // cursor position

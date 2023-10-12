@@ -19,12 +19,18 @@ VertexArray::VertexArray(VertexBuffer& vBuffer)
     bindBuffer(0, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
     attribBinding(0, 0);
     enableAttribute(0);
-    
-    // 1 -> texture (s,t)
-    vertexSpecification(1, 2, GL_FLOAT, 0); 
+
+    // 1 -> normal (x,y,z)
+    vertexSpecification(1, 3, GL_FLOAT, 0); 
     bindBuffer(1, vBuffer.get(), 12, vertex_t::VERTEX_LENGTH);
     attribBinding(1, 1);
     enableAttribute(1);
+    
+    // 1 -> texture (s,t)
+    // vertexSpecification(1, 2, GL_FLOAT, 0); 
+    // bindBuffer(1, vBuffer.get(), 12, vertex_t::VERTEX_LENGTH);
+    // attribBinding(1, 1);
+    // enableAttribute(1);
   }
 }
 
@@ -46,6 +52,11 @@ void VertexArray::bindBuffer(uint32_t bindingindex, uint32_t buffer, int offset,
 void VertexArray::enableAttribute(uint32_t index)
 {
   glEnableVertexArrayAttrib(_vertexArray, index);
+}
+
+void VertexArray::disableAttribute(uint32_t index)
+{
+  glDisableVertexArrayAttrib(_vertexArray, index);
 }
 
 void VertexArray::destroy()
