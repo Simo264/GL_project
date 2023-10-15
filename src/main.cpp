@@ -2,13 +2,13 @@
 #include "GLFW/glfw3.h"
 #include "spdlog/spdlog.h"
 
+#include "assimp/cimport.h"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
 
 #include "vertex.hh"
 #include "window.hh"
@@ -31,20 +31,13 @@ const glm::mat4 perspective(float fov);
 
 int main()
 { 
+  C_STRUCT aiLogStream stream;
+  stream = aiGetPredefinedLogStream(aiDefaultLogStream_STDOUT,NULL);
+  aiAttachLogStream(&stream);
+
   Window window;
   window.create("OpenGL", WINDOW_WIDTH, WINDOW_HEIGTH);
   window.setPosition(200,200);
-
-  // Setup Dear ImGui context
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO(); 
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-  ImGui::StyleColorsDark();
-  ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
-  ImGui_ImplOpenGL3_Init("#version 150");
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
@@ -85,10 +78,8 @@ int main()
 
   // create camera object
   // ------------------------------------
-  Camera camera { glm::vec3(0.0f, 1.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
+  Camera camera { glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
 
-
-  bool show_demo_window = true;
 
   // render loop
   // -----------
@@ -107,38 +98,8 @@ int main()
 
     // Render 
     // ------
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    {
-      static float f = 0.0f;
-      static int counter = 0;
-      static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-      ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-      ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-      ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-
-      ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-      
-      ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-      if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        counter++;
-      ImGui::SameLine();
-      ImGui::Text("counter = %d", counter);
-
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-      ImGui::End();
-    }
-    ImGui::Render();
-    
     window.clearColor(0.2f, 0.1f, 0.2f, 1.0f);
     window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
     //texture.activeTextUnit(0);  
     //texture.bind();
@@ -201,10 +162,6 @@ int main()
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
-  
   window.terminate();
   return 0;
 }

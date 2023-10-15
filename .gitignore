@@ -1,4 +1,3 @@
 .vscode/
-externals/libs/*
 src/*.o
 exe
