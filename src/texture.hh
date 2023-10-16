@@ -13,7 +13,7 @@ public:
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }
   void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
   void destroy() { glDeleteTextures(1, &_texture); }
-  void activeTextUnit(uint32_t index) const { glActiveTexture(GL_TEXTURE0 + index); }
+  static void activeTextUnit(uint32_t index) { glActiveTexture(GL_TEXTURE0 + index); }
   void setParameteri(int pname, int param) { glTextureParameteri(_texture, pname, param); }
   
   uint32_t get() const { return _texture; }

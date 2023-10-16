@@ -14,23 +14,32 @@ VertexArray::VertexArray(VertexBuffer& vBuffer)
   {
     glBindVertexArray(_vertexArray);
     
+    int offset;
+    int components;
+
     // 0 -> position (x,y,z)
-    vertexSpecification(0, 3, GL_FLOAT, 0); 
+    offset     = 0;
+    components = vertex_t::posComponent::length();
+    vertexSpecification(0, components, GL_FLOAT, offset); 
     bindBuffer(0, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
     attribBinding(0, 0);
     enableAttribute(0);
 
     // 1 -> normal (x,y,z)
-    vertexSpecification(1, 3, GL_FLOAT, 0); 
-    bindBuffer(1, vBuffer.get(), 12, vertex_t::VERTEX_LENGTH);
+    offset     = sizeof(vertex_t::posComponent);
+    components = vertex_t::normalComponent::length();
+    vertexSpecification(1, components, GL_FLOAT, offset); 
+    bindBuffer(1, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
     attribBinding(1, 1);
     enableAttribute(1);
     
-    // 1 -> texture (s,t)
-    // vertexSpecification(1, 2, GL_FLOAT, 0); 
-    // bindBuffer(1, vBuffer.get(), 12, vertex_t::VERTEX_LENGTH);
-    // attribBinding(1, 1);
-    // enableAttribute(1);
+    // 2 -> texture (s,t)
+    offset     = sizeof(vertex_t::posComponent) + sizeof(vertex_t::normalComponent);
+    components = vertex_t::texcoordComponent::length();
+    vertexSpecification(2, components, GL_FLOAT, offset); 
+    bindBuffer(2, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
+    attribBinding(2, 2);
+    enableAttribute(2);
   }
 }
 

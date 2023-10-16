@@ -2,10 +2,6 @@
 #include "GLFW/glfw3.h"
 #include "spdlog/spdlog.h"
 
-#include "assimp/cimport.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -31,10 +27,6 @@ const glm::mat4 perspective(float fov);
 
 int main()
 { 
-  C_STRUCT aiLogStream stream;
-  stream = aiGetPredefinedLogStream(aiDefaultLogStream_STDOUT,NULL);
-  aiAttachLogStream(&stream);
-
   Window window;
   window.create("OpenGL", WINDOW_WIDTH, WINDOW_HEIGTH);
   window.setPosition(200,200);
@@ -49,40 +41,41 @@ int main()
 
   // build and compile our shader program
   // ------------------------------------
-  Shader shader { "shaders/vertex.shader","shaders/fragment.shader" };
-  shader.use();
+  Shader cubeShader  { "shaders/cube.vertex.shader","shaders/cube.fragment.shader" };
+  Shader lightShader { "shaders/light.vertex.shader","shaders/light.fragment.shader" };
   
-  const glm::vec3 cubePos     = glm::vec3(0.0f,  0.0f,  0.0f);
-  const glm::vec3 cubeAmbient = glm::vec3(1.0f, 0.5f, 0.31f);
-  const glm::vec3 cubeDiffuse = glm::vec3(1.0f, 0.5f, 0.31f);
-  const glm::vec3 cubeSpecular= glm::vec3(0.5f, 0.5f, 0.5f);
-  const float cubeShininess   = 32.0f;
-  shader.setVec3("material.ambient",    cubeAmbient);
-  shader.setVec3("material.diffuse",    cubeDiffuse);
-  shader.setVec3("material.specular",   cubeSpecular);
-  shader.setFloat("material.shininess", cubeShininess);
   
-  glm::vec3 lightPos              = glm::vec3(2.0f,  2.0f, -5.0f);
-  glm::vec3 lightColor            = glm::vec3(1.f, 1.f, 1.f);
-  glm::vec3 lightAmbient          = glm::vec3(0.2f, 0.2f, 0.2f);
-  glm::vec3 lightDiffuse          = glm::vec3(0.5f, 0.5f, 0.5f);
-  const glm::vec3 lightSpecular   = glm::vec3(1.0f, 1.0f, 1.0f);
-  shader.setVec3("lightPos",      lightPos);  
-  shader.setVec3("light.ambient", lightAmbient);
-  shader.setVec3("light.diffuse", lightDiffuse);
-  shader.setVec3("light.specular",lightSpecular);
+  const glm::vec3 cubePos           = {0.0f, 0.0f, 0.0f};
+  const int       materialDiffuse   = 0;
+  const glm::vec3 materialSpecular  = {0.5f, 0.5f, 0.5f};
+  const float     materialShininess = 64.0f;
+  const glm::vec3 lightAmbient      = {0.2f, 0.2f, 0.2f};
+  const glm::vec3 lightDiffuse      = {0.5f, 0.5f, 0.5f};
+  const glm::vec3 lightSpecular     = {1.0f, 1.0f, 1.0f};
+  cubeShader.use();
+  cubeShader.setInt("material.diffuse",     materialDiffuse);
+  cubeShader.setVec3("material.specular",   materialSpecular);
+  cubeShader.setFloat("material.shininess", materialShininess);
+  cubeShader.setVec3("light.ambient",       lightAmbient); 
+  cubeShader.setVec3("light.diffuse",       lightDiffuse);
+  cubeShader.setVec3("light.specular",      lightSpecular);
+
+  
+  glm::vec3 lightObjectPos = {2.0f,  2.0f, -5.0f};
+
 
   // create texture object
   // ------------------------------------
-  // Texture texture {"res/wall.jpg", true};
+  Texture texContainer {"res/container.png", true};
 
   // create camera object
   // ------------------------------------
   Camera camera { glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
 
-
+   
   // render loop
   // -----------
+  glm::mat4 model;
   while(window.loop())
   {
     // update delta time
@@ -99,54 +92,41 @@ int main()
     // Render 
     // ------
     window.clearColor(0.2f, 0.1f, 0.2f, 1.0f);
-    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    //texture.activeTextUnit(0);  
-    //texture.bind();
-    shader.use();
-    vertexArray.bind();
-    
-    
+    // view/projection transformations
     const glm::mat4 view       = camera.lookAround();
     const glm::mat4 projection = perspective(45.0f);
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
-
-    glm::mat4 model;
     
-    // cube object
+    // draw the cube object
     model = glm::mat4(1.0f);
     model = glm::translate(model, cubePos);
+    cubeShader.use();
+    cubeShader.setMat4("view", view);
+    cubeShader.setMat4("projection", projection);
+    cubeShader.setMat4("model", model);
+    cubeShader.setVec3("light.position", lightObjectPos);
+    cubeShader.setVec3("viewPos", camera.position);
+    Texture::activeTextUnit(0);
+    texContainer.bind();
     vertexArray.enableAttribute(1);
-    shader.setMat4("model", model);
-    shader.setBool("isLigthObject", false);
+    vertexArray.enableAttribute(2);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-    // light object
+    // draw the lamp object
     model = glm::mat4(1.0f);
-    model = glm::translate(model, lightPos);
-    model = glm::scale(model, glm::vec3(0.25,0.25,0.25));
+    model = glm::translate(model, lightObjectPos);
+    model = glm::scale(model, glm::vec3(0.2f)); 
+    lightShader.use();
+    lightShader.setMat4("view", view);
+    lightShader.setMat4("projection", projection);
+    lightShader.setMat4("model", model);
     vertexArray.disableAttribute(1);
-    shader.setMat4("model", model);
-    shader.setBool("isLigthObject", true);
-    glDrawArrays(GL_TRIANGLES, 0, 36);  
+    vertexArray.disableAttribute(2);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    const auto posX = sin(glfwGetTime()) * 5;
-    const auto posZ = cos(glfwGetTime()) * 5;
-    lightPos.x = posX;
-    lightPos.z = posZ;
-    lightColor.x = sin(glfwGetTime() * 2.0f);
-    lightColor.y = sin(glfwGetTime() * 0.7f);
-    lightColor.z = sin(glfwGetTime() * 1.3f);
-    lightDiffuse = lightColor   * glm::vec3(0.5f); 
-    lightAmbient = lightDiffuse * glm::vec3(0.2f);
-    shader.setVec3("lightPos", lightPos); 
-    shader.setVec3("lightColor", lightColor); 
-    shader.setVec3("light.ambient", lightAmbient);
-    shader.setVec3("light.diffuse", lightDiffuse);
-    shader.setVec3("viewPos", camera.position); 
-    
+
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
     window.swapBuffersAndProcessEvents();
@@ -156,8 +136,9 @@ int main()
   // ------------------------------------------------------------------------
   vertexArray.destroy();
   vBuffer.destroy();
-  shader.destroy();
-  //texture.destroy();
+  lightShader.destroy();
+  cubeShader.destroy();
+  texContainer.destroy();
 
 
   // glfw: terminate, clearing all previously allocated GLFW resources.

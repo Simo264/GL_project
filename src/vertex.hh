@@ -5,11 +5,21 @@
 
 struct vertex_t
 {
-  glm::vec3 position;
-  glm::vec3 normal;
+  using posComponent      = glm::vec3;
+  using normalComponent   = glm::vec3;
+  using texcoordComponent = glm::vec2;
+  
+  posComponent      position;
+  normalComponent   normal;
+  texcoordComponent texCoord;
 
-  static constexpr int VERTEX_COMPONENTS = 6;
-  static constexpr int VERTEX_LENGTH  = sizeof(position) + sizeof(normal);
+  static constexpr int VERTEX_COMPONENTS =  posComponent::length()    +
+                                            normalComponent::length() +
+                                            texcoordComponent::length();
+  
+  static constexpr int VERTEX_LENGTH  = sizeof(posComponent)      + 
+                                        sizeof(normalComponent)   + 
+                                        sizeof(texcoordComponent);
 };
 
 #endif
