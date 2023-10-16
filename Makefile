@@ -1,4 +1,7 @@
-CXXFLAGS = -g -std=c++20 -Wall -Werror -Wextra -Wpedantic
+CXXFLAGS 	 = -g -std=c++20 -Wall -Werror -Wextra -Wpedantic
+LDFLAGS 	 = -lX11 -lassimp
+
+EXECUTABLE = main.exe
 
 INCLUDE_DIR 		= externals/include/
 STATIC_LIBS_DIR = externals/libs/static/
@@ -9,29 +12,26 @@ STATIC_LIBS = ${STATIC_LIBS_DIR}libglad.a \
 							${STATIC_LIBS_DIR}libspdlog.a \
 							${STATIC_LIBS_DIR}libglm.a 
 
-SHARED_LIBS = -lX11 \
-							-lassimp
 
 SOURCES 	= 	$(wildcard src/*.cpp)
 SOURCES  += 	$(wildcard src/imgui/*.cpp)
 
-OBJECTS		=		$(patsubst %.cpp, %.o, $(SOURCES))
-#OBJECTS		=		$(patsubst src/%, build/%, $(OBJECTS))
+OBJDIR 		= debug/
+OBJECTS 	= $(patsubst %.cpp, $(OBJDIR)%.o, $(SOURCES))
 
-TARGET = exe
+all: $(EXECUTABLE)
 
-TARGET:
-	echo "${OBJECTS}"
+$(EXECUTABLE): $(OBJECTS)
+	g++ -o ${EXECUTABLE} $^ ${STATIC_LIBS} \
+	-L${SHARED_LIBS_DIR} -Wl,-rpath=${SHARED_LIBS_DIR} ${LDFLAGS}
 
 
-# TARGET: ${OBJECTS}
-# 	g++ -o ${TARGET} $^ ${STATIC_LIBS} \
-# 	-L${SHARED_LIBS_DIR} -Wl,-rpath=${SHARED_LIBS_DIR} ${SHARED_LIBS}
-	 
+$(OBJDIR)%.o: %.cpp
+	@mkdir -p '$(@D)'
+	g++ -o $@ -c $< -I${INCLUDE_DIR} ${CXXFLAGS}
 
-# ${OBJECTS}: ${SOURCES}
-# 	g++ -c $< -I${INCLUDE_DIR} ${CXXFLAGS} -o $@
 
-# .PHONY: clean
-# clean:
-# 	rm -f build/* src/*.o src/imgui/*.o ${TARGET}
+.PHONY: clean
+clean:
+	find . -name "*.o" -delete
+	rm -f ${EXECUTABLE}
