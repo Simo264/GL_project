@@ -1,7 +1,7 @@
 #include "element_buffer.hh"
 #include "spdlog/spdlog.h"
 
-ElementBuffer::ElementBuffer(uint32_t size, uint32_t* data, uint32_t usage)
+ElementBuffer::ElementBuffer(uint64_t nIndices, IndexDataType* data, int usage)
 {
   glGenBuffers(1, &_buffer);
   if(_buffer == GL_INVALID_VALUE)
@@ -10,6 +10,7 @@ ElementBuffer::ElementBuffer(uint32_t size, uint32_t* data, uint32_t usage)
   } 
   else
   {
+    uint64_t size = nIndices * sizeof(IndexDataType); 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer);
     glNamedBufferData(_buffer, size, data, usage);
   }

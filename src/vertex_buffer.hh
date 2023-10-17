@@ -6,10 +6,12 @@
 class VertexBuffer
 {
 public:
-  VertexBuffer(uint32_t size, float* data, uint32_t usage = GL_STATIC_DRAW);
+  using VertexDataType = float;
+
+  VertexBuffer(uint64_t nVertices, VertexDataType* data, int usage = GL_STATIC_DRAW);
   ~VertexBuffer() = default;
 
-  void bind() const { glBindBuffer(GL_ARRAY_BUFFER, _buffer); }
+  void bind() const   { glBindBuffer(GL_ARRAY_BUFFER, _buffer); }
   void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
   void destroy();
 

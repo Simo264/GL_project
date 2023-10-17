@@ -6,10 +6,12 @@
 class ElementBuffer
 {
 public:
-  ElementBuffer(uint32_t size, uint32_t* data, uint32_t usage = GL_STATIC_DRAW);
+  using IndexDataType = uint64_t; 
+
+  ElementBuffer(uint64_t nIndices, IndexDataType* data, int usage = GL_STATIC_DRAW);
   ~ElementBuffer() = default;
 
-  void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer); }
+  void bind() const   { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer); }
   void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
   void destroy();
 

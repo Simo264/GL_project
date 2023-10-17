@@ -8,7 +8,8 @@
 
 #include <array>
 
-Texture::Texture(const std::string& filename, bool immutable) : _isImmutable{immutable}
+Texture::Texture(const std::string& filename, TextureType type, bool immutable)
+  : _type { type }
 {
   glGenTextures(1, &_texture);
   if(_texture == GL_INVALID_VALUE)
@@ -18,7 +19,7 @@ Texture::Texture(const std::string& filename, bool immutable) : _isImmutable{imm
   else
   {
     glBindTexture(GL_TEXTURE_2D, _texture); 
-    load(filename);
+    load(filename, immutable);
 
     setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
     setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -28,7 +29,7 @@ Texture::Texture(const std::string& filename, bool immutable) : _isImmutable{imm
 
 }
 
-void Texture::load(const std::string& filename)
+void Texture::load(const std::string& filename, bool immutable)
 {
   int nrChannels;
   //stbi_set_flip_vertically_on_load(true); 
@@ -47,7 +48,7 @@ void Texture::load(const std::string& filename)
       internalFormat = GL_RGBA8;
     }
 
-    if(_isImmutable)
+    if(immutable)
     {
       // immutable object
       glTextureStorage2D(_texture, 1, internalFormat, _width, _height);

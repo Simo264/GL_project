@@ -39,6 +39,10 @@ public:
   // keyboard input
   int getKey(uint32_t key) const { return glfwGetKey(_window, key); }
 
+  // mouse input
+  int getMouseButton(uint32_t key) const { return glfwGetMouseButton(_window, key); }
+
+
   // window size
   uint16_t width() const { return _width; }
   uint16_t height() const { return _height; }
@@ -56,9 +60,10 @@ public:
   // value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
   void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
 
-  // time
-  double delta() const;
+  // update delta time
   void update();
+
+  double delta() const;
 
 private:
   GLFWwindow* _window;

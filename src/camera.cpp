@@ -54,6 +54,9 @@ void Camera::processMouseMovement(Window& window)
   double cposx, cposy;
   window.getCursorPosition(cposx, cposy);
 
+  if(window.getMouseButton(GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS) 
+    return;
+
   // if cursor is outside of window
   // if(!(cposx >= 0 && cposx <= window.width() && cposy >= 0 && cposy <= window.height()))
   //   return;

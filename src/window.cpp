@@ -6,6 +6,8 @@
 
 Window::Window()
 {
+  glfwSetErrorCallback(errorCallback);
+
   if(!glfwInit())
   {
     spdlog::error("GLFW failed to initialize.");
@@ -15,9 +17,8 @@ Window::Window()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  glfwSetErrorCallback(errorCallback);
   
+
   prevFrame = 0;
   currFrame = 0;	
 }
@@ -42,6 +43,7 @@ void Window::create(std::string title, uint16_t width, uint16_t heigth, bool ful
 
   glfwMakeContextCurrent(_window);
   glfwSetWindowUserPointer(_window, this);
+  glfwSwapInterval(1); // Enable vsync
 
   gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 

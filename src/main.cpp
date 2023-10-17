@@ -6,6 +6,10 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include "vertex.hh"
 #include "window.hh"
 #include "shader.hh"
@@ -14,6 +18,7 @@
 #include "vertex_array.hh"
 #include "texture.hh"
 #include "camera.hh"
+#include "mesh"
 
 #include <string>
 #include <fstream>
@@ -31,67 +36,78 @@ int main()
   window.create("OpenGL", WINDOW_WIDTH, WINDOW_HEIGTH);
   window.setPosition(200,200);
 
+  // Setup Dear ImGui context
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+  // Setup Dear ImGui style
+  ImGui::StyleColorsDark();
+
+  ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
+  ImGui_ImplOpenGL3_Init("#version 150");
+
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
   std::vector<float> vertices;
   loadVertices("res/vertices.txt", vertices);
   
-  VertexBuffer vBuffer { static_cast<uint32_t>(vertices.size()*sizeof(float)), vertices.data() };
+  VertexBuffer vBuffer    { vertices.size(), vertices.data() };
   VertexArray vertexArray { vBuffer }; 
 
   // build and compile our shader program
-  // ------------------------------------
+  // ------------------------------------------------------------------------
   Shader cubeShader  { "shaders/cube.vertex.shader","shaders/cube.fragment.shader" };
   Shader lightShader { "shaders/light.vertex.shader","shaders/light.fragment.shader" };
   
   
-  const glm::vec3 cubePos           = {0.0f, 0.0f, 0.0f};
-  const int       materialDiffuse   = 0;
-  const glm::vec3 materialSpecular  = {0.5f, 0.5f, 0.5f};
-  const float     materialShininess = 64.0f;
-  const glm::vec3 lightAmbient      = {0.2f, 0.2f, 0.2f};
-  const glm::vec3 lightDiffuse      = {0.5f, 0.5f, 0.5f};
-  const glm::vec3 lightSpecular     = {1.0f, 1.0f, 1.0f};
+  glm::vec3   cubePos           = {0.0f, 0.0f, 0.0f};
+  float       materialShininess = 64.0f;
+  glm::vec3   lightColor        = {1.f, 1.f, 1.f}; // white color
+  float       lightAmbient      = 0.05f; 
+  float       lightDiffuse      = 0.5f;            // light intensity
+  float       lightSpecular     = 1.f;
   cubeShader.use();
-  cubeShader.setInt("material.diffuse",     materialDiffuse);
-  cubeShader.setVec3("material.specular",   materialSpecular);
+  cubeShader.setInt("material.diffuse",  0);
+  cubeShader.setInt("material.specular", 1);
   cubeShader.setFloat("material.shininess", materialShininess);
-  cubeShader.setVec3("light.ambient",       lightAmbient); 
-  cubeShader.setVec3("light.diffuse",       lightDiffuse);
-  cubeShader.setVec3("light.specular",      lightSpecular);
+  cubeShader.setVec3("light.ambient",       lightColor * lightAmbient); 
+  cubeShader.setVec3("light.diffuse",       lightColor * lightDiffuse);
+  cubeShader.setVec3("light.specular",      lightColor * lightSpecular);
 
-  
-  glm::vec3 lightObjectPos = {2.0f,  2.0f, -5.0f};
-
+  glm::vec3 lightObjectPos = {0.0f,  2.0f, 5.0f};
 
   // create texture object
-  // ------------------------------------
-  Texture texContainer {"res/container.png", true};
+  // ------------------------------------------------------------------------
+  Texture texContainerDiffuse  {"res/container.png", TextureType::TEX_DIFFUSE, true};
+  Texture texContainerSpecular {"res/container_specular.png", TextureType::TEX_SPECULAR, true};
+
 
   // create camera object
-  // ------------------------------------
+  // ------------------------------------------------------------------------
   Camera camera { glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
-
    
   // render loop
-  // -----------
+  // ------------------------------------------------------------------------
   glm::mat4 model;
   while(window.loop())
   {
     // update delta time
-    // --------------------
+    // ------------------------------------------------------------------------
     window.update();
     const double deltaTime = window.delta();
 
     // input
-    // ------
+    // ------------------------------------------------------------------------
     window.processKeyboardInput();
     camera.processKeyboardInput(window, deltaTime); 
     camera.processMouseMovement(window); 
 
     // Render 
-    // ------
-    window.clearColor(0.2f, 0.1f, 0.2f, 1.0f);
+    // ------------------------------------------------------------------------
+    window.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
     window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // view/projection transformations
@@ -107,8 +123,13 @@ int main()
     cubeShader.setMat4("model", model);
     cubeShader.setVec3("light.position", lightObjectPos);
     cubeShader.setVec3("viewPos", camera.position);
+    
     Texture::activeTextUnit(0);
-    texContainer.bind();
+    texContainerDiffuse.bind();
+    
+    Texture::activeTextUnit(1);
+    texContainerSpecular.bind();
+
     vertexArray.enableAttribute(1);
     vertexArray.enableAttribute(2);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -126,6 +147,21 @@ int main()
     vertexArray.disableAttribute(2);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
+    // render Imgui
+    // ImGui_ImplOpenGL3_NewFrame();
+    // ImGui_ImplGlfw_NewFrame();
+    // ImGui::NewFrame();
+    // ImGui::Begin("Light object");                          
+    // ImGui::SliderFloat3("light pos", (float*) &lightObjectPos, -5.f, 5.f);
+    // ImGui::SliderFloat("shininess", &materialShininess, 0, 256);
+    // ImGui::SliderFloat3("light color",   (float*) &lightColor, 0.0f, 1.f);
+    // ImGui::SliderFloat("light ambient",  &lightAmbient,   0.0f, 1.f);
+    // ImGui::SliderFloat("light diffuse",  &lightDiffuse,   0.0f, 1.f);
+    // ImGui::SliderFloat("light specular", &lightSpecular,  0.0f, 1.f);
+    // ImGui::End();
+    // ImGui::Render();
+    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
@@ -138,11 +174,16 @@ int main()
   vBuffer.destroy();
   lightShader.destroy();
   cubeShader.destroy();
-  texContainer.destroy();
+  texContainerDiffuse.destroy();
+  texContainerSpecular.destroy();
 
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+
   window.terminate();
   return 0;
 }

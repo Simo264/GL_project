@@ -5,9 +5,9 @@
 
 struct vertex_t
 {
-  using posComponent      = glm::vec3;
-  using normalComponent   = glm::vec3;
-  using texcoordComponent = glm::vec2;
+  using posComponent      = glm::vec3;  // 8bytes
+  using normalComponent   = glm::vec3;  // 8bytes
+  using texcoordComponent = glm::vec2;  // 4bytes
   
   posComponent      position;
   normalComponent   normal;

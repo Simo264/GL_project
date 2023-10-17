@@ -1,7 +1,7 @@
 #include "vertex_buffer.hh"
 #include "spdlog/spdlog.h"
 
-VertexBuffer::VertexBuffer(uint32_t size, float* data, uint32_t usage)
+VertexBuffer::VertexBuffer(uint64_t nVertices, VertexDataType* data, int usage)
 {
   glGenBuffers(1, &_buffer);
   if(_buffer == GL_INVALID_VALUE)
@@ -10,6 +10,7 @@ VertexBuffer::VertexBuffer(uint32_t size, float* data, uint32_t usage)
   } 
   else
   {
+    uint64_t size = nVertices * size_t(VertexDataType);
     glBindBuffer(GL_ARRAY_BUFFER, _buffer);
     glNamedBufferData(_buffer, size, data, usage);
   }

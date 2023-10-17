@@ -4,10 +4,15 @@
 #include "glad/glad.h"
 #include <string>
 
+enum class TextureType{ 
+  TEX_DIFFUSE, 
+  TEX_SPECULAR 
+};
+
 class Texture
 {
 public:
-  Texture(const std::string& filename, bool immutable = false);
+  Texture(const std::string& filename, TextureType type, bool immutable = false);
   ~Texture() = default;
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }
@@ -16,19 +21,21 @@ public:
   static void activeTextUnit(uint32_t index) { glActiveTexture(GL_TEXTURE0 + index); }
   void setParameteri(int pname, int param) { glTextureParameteri(_texture, pname, param); }
   
-  uint32_t get() const { return _texture; }
+  uint32_t get() const  { return _texture; }
 
-  int getWidth() const { return _width; }
+  int getWidth() const  { return _width; }
   int getHeight() const { return _height; }
+
+  TextureType getType() const { return _type; }
 
 private:
   uint32_t _texture;
   int _width;
   int _height;
 
-  bool _isImmutable;
+  TextureType _type;
 
-  void load(const std::string& filename);
+  void load(const std::string& filename, bool immutable);
 };
 
 #endif

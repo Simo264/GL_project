@@ -24,7 +24,6 @@ public:
 
 private:
   uint32_t _vertexArray;
-
 };
 
 #endif
