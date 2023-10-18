@@ -2,7 +2,7 @@
 
 #include <string>
 
-Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<uint64_t> indices, std::vector<Texture> textures)
+Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<uint64_t> indices, std::vector<Texture*> textures)
 {
   _vertices = vertices;
   _indices  = indices;
@@ -14,36 +14,40 @@ Mesh::Mesh(std::vector<vertex_t> vertices, std::vector<uint64_t> indices, std::v
 void Mesh::setupMesh()
 {
   _vertexBuffer   = new VertexBuffer(_vertices.size(), _vertices.data());
-  _elementBuffer  = new ElementBuffer(_indices.size(), _indices.data());
-  _vertexArray    = new VertexArray(*vb_ptr);
+  
+  if(!_indices.empty())
+    _elementBuffer  = new ElementBuffer(_indices.size(), _indices.data());
+  
+  _vertexArray    = new VertexArray(*_vertexBuffer);
 
   _vertexArray->unbind();
 }
 
 void Mesh::draw(Shader& shader)
 {
-  for(int i = 0; i < _textures.size(); i++)
-  {
-    std::string samplerName;
-
-    Texture::activeTextUnit(i);
-    TextureType type = _textures[i].getType();
-
-    if(type == TextureType::TEX_DIFFUSE)
-      samplerName = "material.diffuse";
-
-    else if(type == TextureType::TEX_SPECULAR)
-      samplerName = "material.specular";
-
-    shader.setInt(samplerName, i);
-    _textures[i].bind();
-  }
+  // bind textures
+  // for (auto& [texture, unit] : _textures)
+  // {
+  //   Texture::activeTextUnit(unit);
+  //   texture->bind();
+  // }
 
   Texture::activeTextUnit(0);
+  _textures[0]->bind();
+
+  Texture::activeTextUnit(1);
+  _textures[1]->bind();
+
+  shader.setInt("some_attribute", 0);
 
   // draw mesh
   _vertexArray->bind();
-  glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
+  
+  if(!_indices.empty())
+    glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
+  else
+    glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
+  
   _vertexArray->unbind();
 }
 

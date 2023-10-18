@@ -33,7 +33,7 @@ VertexArray::VertexArray(VertexBuffer& vBuffer)
     attribBinding(1, 1);
     enableAttribute(1);
     
-    // 2 -> texture (s,t)
+    // 2 -> texture (u,v)
     offset     = sizeof(vertex_t::posComponent) + sizeof(vertex_t::normalComponent);
     components = vertex_t::texcoordComponent::length();
     vertexSpecification(2, components, GL_FLOAT, offset); 

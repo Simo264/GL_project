@@ -10,10 +10,12 @@
 
 #include <vector>
 
+// A mesh represents a single drawable entity
+// ------------------------------------------------
 class Mesh
 {
 public:
-  Mesh(std::vector<vertex_t> vertices, std::vector<uint64_t> indices, std::vector<Texture> textures);
+  Mesh(std::vector<vertex_t> vertices, std::vector<uint64_t> indices, std::vector<Texture*> textures);
   ~Mesh() = default;
 
   void draw(Shader& shader);
@@ -28,7 +30,7 @@ private:
   // mesh data
   std::vector<vertex_t>   _vertices;
   std::vector<uint64_t>   _indices;
-  std::vector<Texture>    _textures;
+  std::vector<Texture*>   _textures; 
 
   VertexBuffer*    _vertexBuffer;
   ElementBuffer*   _elementBuffer;

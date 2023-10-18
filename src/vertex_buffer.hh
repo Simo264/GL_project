@@ -2,13 +2,14 @@
 #define VERTEX_BUFFER_HH
 
 #include "glad/glad.h"
+#include "vertex.hh"
 
 class VertexBuffer
 {
 public:
-  using VertexDataType = float;
-
-  VertexBuffer(uint64_t nVertices, VertexDataType* data, int usage = GL_STATIC_DRAW);
+  VertexBuffer(uint64_t size, float* rawdata, int usage = GL_STATIC_DRAW);
+  VertexBuffer(uint64_t nVertices, vertex_t* vertices, int usage = GL_STATIC_DRAW);
+  
   ~VertexBuffer() = default;
 
   void bind() const   { glBindBuffer(GL_ARRAY_BUFFER, _buffer); }
