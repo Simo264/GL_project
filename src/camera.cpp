@@ -34,11 +34,11 @@ void Camera::processKeyboardInput(Window& window, double deltaTime)
   if (window.getKey(GLFW_KEY_S) == GLFW_PRESS)
     position -= front * velocity;
   
-  if (window.getKey(GLFW_KEY_A) == GLFW_PRESS)
-    position -= right * velocity;
+  // if (window.getKey(GLFW_KEY_A) == GLFW_PRESS)
+  //   position -= right * velocity;
   
-  if (window.getKey(GLFW_KEY_D) == GLFW_PRESS)
-    position += right * velocity;
+  // if (window.getKey(GLFW_KEY_D) == GLFW_PRESS)
+  //   position += right * velocity;
 
   if (window.getKey(GLFW_KEY_SPACE) == GLFW_PRESS)
     position += up * velocity;

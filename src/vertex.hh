@@ -24,6 +24,13 @@ struct vertex_t
   normalComponent   normal;
   texcoordComponent texCoord;
 
+  vertex_t()
+  {
+    position  = {0.0f, 0.0f, 0.0f}; 
+    normal    = {0.0f, 0.0f, 0.0f}; 
+    texCoord  = {0.0f, 0.0f}; 
+  } 
+
   vertex_t(posComponent pos, normalComponent nor, texcoordComponent tc)
     : position{pos}, normal{nor}, texCoord{tc} 
   { 

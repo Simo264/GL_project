@@ -9,38 +9,33 @@
 #include "vertex_array.hh"
 
 #include <vector>
+#include <memory>
 
 // A mesh represents a single drawable entity
 // ------------------------------------------------
 class Mesh
 {
 public:
-  Mesh(std::vector<vertex_t> vertices, std::vector<uint64_t> indices, std::vector<Texture*> textures);
+  Mesh(std::vector<vertex_t> vertices, std::vector<uint32_t> indices, std::vector<Texture> textures);
+  Mesh()  = default;
   ~Mesh() = default;
+
+  void load(const std::string& filename);
 
   void draw(Shader& shader);
 
   void destroy();
 
-  VertexBuffer*   getVertexBuffer()   const  { return _vertexBuffer; }
-  ElementBuffer*  getElementBuffer()  const  { return _elementBuffer; }
-  VertexArray*    getVertexArray()    const  { return _vertexArray; }
-
 private:
   // mesh data
   std::vector<vertex_t>   _vertices;
-  std::vector<uint64_t>   _indices;
-  std::vector<Texture*>   _textures; 
+  std::vector<uint32_t>   _indices;
+  std::vector<Texture>   _textures;
 
-  VertexBuffer*    _vertexBuffer;
-  ElementBuffer*   _elementBuffer;
-  VertexArray*     _vertexArray;
+  std::unique_ptr<VertexBuffer>  _vertexBuffer;
+  std::unique_ptr<ElementBuffer> _elementBuffer;
+  std::unique_ptr<VertexArray>   _vertexArray;
 
-  void setupMesh();
 };
-
-
-
-
 
 #endif

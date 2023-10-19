@@ -6,9 +6,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
+
 
 #include "vertex.hh"
 #include "window.hh"
@@ -28,7 +26,8 @@
 #define WINDOW_WIDTH 720.0f
 #define WINDOW_HEIGTH 720.0f
 
-void loadVertices(const char* filename, std::vector<vertex_t>& vertices);
+void loadMesh(const std::string& filename);
+void initFromScene(const aiScene* pScene, const std::string& filename);
 
 int main()
 { 
@@ -36,52 +35,73 @@ int main()
   window.create("OpenGL", WINDOW_WIDTH, WINDOW_HEIGTH);
   window.setPosition(200,200);
 
-  // set up vertex data (and buffer(s)) and configure vertex attributes
-  // ------------------------------------------------------------------
-  std::vector<vertex_t> vertices;
-  loadVertices("res/CubeMeshTexture.obj", vertices);
-  VertexBuffer vBuffer    { vertices.size(), vertices.data() };
-  VertexArray vertexArray { vBuffer }; 
 
   // build and compile our shader program
   // ------------------------------------------------------------------------
-  Shader cubeShader  { "shaders/cube.vertex.shader","shaders/cube.fragment.shader" };
+  Shader shader { "shaders/texture.vert","shaders/texture.frag" };
+  
 
   // create texture object
   // ------------------------------------------------------------------------
-  Texture texContainerDiffuse  {"res/container.png", TextureType::TEX_DIFFUSE, true};
-  Texture texContainerSpecular {"res/container_specular.png", TextureType::TEX_SPECULAR, true};
+  Texture texContainer {"res/crate.jpg", TextureType::TEX_DIFFUSE, true};
+  
 
   // create mesh object
-  // ------------------------------------------------------------------
-  // ...
-
+  // ------------------------------------------------------------------------
+  loadMesh("res/Crate.obj");
   
-  glm::vec3   cubePos           = {0.0f, 0.0f, 0.0f};
-  float       materialShininess = 64.0f;
-  glm::vec3   lightColor        = {1.f, 1.f, 1.f}; // white color
-  float       lightAmbient      = 0.05f; 
-  float       lightDiffuse      = 0.5f;            // light intensity
-  float       lightSpecular     = 1.f;
-  glm::vec3   lightPos          = {0.0f,  2.0f, 5.0f};
-  cubeShader.use();
-  cubeShader.setInt("material.diffuse",  0);
-  cubeShader.setInt("material.specular", 1);
-  cubeShader.setFloat("material.shininess", materialShininess);
-  cubeShader.setVec3("light.ambient",       lightColor * lightAmbient); 
-  cubeShader.setVec3("light.diffuse",       lightColor * lightDiffuse);
-  cubeShader.setVec3("light.specular",      lightColor * lightSpecular);
-  cubeShader.setVec3("light.position",      lightPos);
+  std::vector<vertex_t> vertices  = {
+    vertex_t({-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({ 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({ 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({ 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({ 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({ 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({ 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({ 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({ 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({ 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({ 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({ 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f}),
+    vertex_t({ 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f}),
+    vertex_t({ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f}),
+    vertex_t({-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f}),
+    vertex_t({-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0})
+  };
+  std::vector<uint32_t> indices   = { };
+  std::vector<Texture>  textures  = { texContainer };
+  
+  Mesh cubeMesh( vertices, indices, textures );
+
 
 
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera { glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
    
-
-
   // render loop
   // ------------------------------------------------------------------------
+  glm::vec3 cubePos = { 0.0f, 0.0f, 0.0f };
   glm::mat4 model;
   while(window.loop())
   {
@@ -94,7 +114,7 @@ int main()
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
     camera.processKeyboardInput(window, deltaTime); 
-    camera.processMouseMovement(window); 
+    // camera.processMouseMovement(window); 
 
     // Render 
     // ------------------------------------------------------------------------
@@ -105,23 +125,14 @@ int main()
     const glm::mat4 view       = camera.lookAt(cubePos);
     const glm::mat4 projection = glm::perspective(glm::radians(45.f), (WINDOW_WIDTH / WINDOW_HEIGTH), 0.1f, 100.0f);
     
-    // draw the cube object
+    // draw the mesh
     model = glm::mat4(1.0f);
     model = glm::translate(model, cubePos);
-    cubeShader.use();
-    cubeShader.setMat4("view", view);
-    cubeShader.setMat4("projection", projection);
-    cubeShader.setMat4("model", model);
-    cubeShader.setVec3("viewPos", camera.position);
-
-    Texture::activeTextUnit(0);
-    texContainerDiffuse.bind();
-    Texture::activeTextUnit(1);
-    texContainerSpecular.bind();
-    // vertexArray.disableAttribute(2);
-
-    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-
+    shader.use();
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
+    shader.setMat4("model", model);
+    cubeMesh.draw(shader);
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
@@ -130,11 +141,8 @@ int main()
 
   // de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
-  vertexArray.destroy();
-  vBuffer.destroy();
-  cubeShader.destroy();
-  texContainerDiffuse.destroy();
-  texContainerSpecular.destroy();
+  shader.destroy();
+  texContainer.destroy();
 
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -143,89 +151,26 @@ int main()
   return 0;
 }
 
-
-void loadVertices(const char* filename, std::vector<vertex_t>& vertices)
+void loadMesh(const std::string& filename)
 {
-  std::ifstream f(filename);
-  
-  std::string line;
-  std::vector<glm::vec3> positions;
-  std::vector<glm::vec3> normals;
-  std::vector<glm::vec2> texcoords;
-  
-  int nVertices;
-  while(std::getline(f, line))
-  {
-    if(line.find("vertices") != std::string::npos)
-    {
-      std::istringstream iss(line.substr(1));
-      iss >> nVertices;
-      break;
-    }
-  }
+  Assimp::Importer Importer;
+  const aiScene* pScene = Importer.ReadFile(filename.c_str(), aiProcess_Triangulate | 
+                                                              aiProcess_GenSmoothNormals | 
+                                                              aiProcess_FlipUVs | 
+                                                              aiProcess_JoinIdenticalVertices);
 
-  vertices.reserve(nVertices);
-  positions.reserve(nVertices);
-  normals.reserve(nVertices);
-  texcoords.reserve(nVertices);
-
-  f.seekg(0);
-  while(std::getline(f, line))
-  {
-    if(line[0] != 'v' && line[0] != 'f') 
-      continue;
-
-    // position
-    if(line[0] == 'v' && line[1] == ' ')
-    {
-      std::istringstream iss(line.substr(1));
-      glm::vec3 pos;
-      iss >> pos.x;
-      iss >> pos.y;
-      iss >> pos.z;
-      positions.push_back(pos);
-    }
-    // normal
-    else if(line[0] == 'v' && line[1] == 'n')
-    {
-      std::istringstream iss(line.substr(2));
-      glm::vec3 norm;
-      iss >> norm.x;
-      iss >> norm.y;
-      iss >> norm.z;
-      normals.push_back(norm);
-    }
-    // textcoord
-    else if(line[0] == 'v' && line[1] == 't')
-    {
-      std::istringstream iss(line.substr(2));
-      glm::vec2 tc;
-      iss >> tc.x;
-      iss >> tc.y;
-      texcoords.push_back(tc);
-    }
-    // face
-    else if(line[0] == 'f')
-    {
-    }
-  }
-
-  for(int i = 0; i < nVertices; i++)
-  {
-    std::array<float, vertex_t::VERTEX_COMPONENTS> values;
-    values[0] = positions[i].x;
-    values[1] = positions[i].y;
-    values[2] = positions[i].z;
-    values[3] = normals[i].x;
-    values[4] = normals[i].y;
-    values[5] = normals[i].z;
-    values[6] = texcoords[i].x;
-    values[7] = texcoords[i].y;
-    // values = [x,y,z, x,y,z, u,v]
-    vertices.push_back(vertex_t(values));
-  }
-
-  f.close();
+  if(pScene)
+    initFromScene(pScene, filename);
+  else
+    spdlog::error("pScene is nullptr");
 }
 
+
+void initFromScene(const aiScene* pScene, const std::string& filename)
+{
+  (void) filename;
+
+  spdlog::info("pScene->mNumMeshes={}", pScene->mNumMeshes);
+  spdlog::info("pScene->mNumMaterials={}", pScene->mNumMaterials);
+}
 
