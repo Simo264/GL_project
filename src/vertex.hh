@@ -42,6 +42,13 @@ struct vertex_t
     normal   = {l[3], l[4], l[5]};
     texCoord = {l[6], l[7]};
   }
+
+  void print()
+  {
+    spdlog::info("({},{},{}), ({},{},{}), ({},{})", position.x,position.y,position.z,
+                                                    normal.x,normal.y,normal.z,
+                                                    texCoord.x,texCoord.y);
+  }
 };
 
 #endif

@@ -8,8 +8,8 @@
 
 #include <array>
 
-Texture::Texture(const std::string& filename, TextureType type, bool immutable)
-  : _type { type }
+Texture::Texture(const std::string& path, TextureType type, bool immutable)
+  : _path{path}, _type { type }
 {
   glGenTextures(1, &_texture);
   if(_texture == GL_INVALID_VALUE)
@@ -18,8 +18,9 @@ Texture::Texture(const std::string& filename, TextureType type, bool immutable)
   }
   else
   {
-    glBindTexture(GL_TEXTURE_2D, _texture); 
-    load(filename, immutable);
+    bind();
+
+    load(path, immutable);
 
     setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
     setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -27,20 +28,21 @@ Texture::Texture(const std::string& filename, TextureType type, bool immutable)
     setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   }
 
+  unbind();
 }
 
-void Texture::load(const std::string& filename, bool immutable)
+void Texture::load(const std::string& path, bool immutable)
 {
   int nrChannels;
   //stbi_set_flip_vertically_on_load(true); 
-  u_char* data = stbi_load(filename.c_str(), &_width, &_height, &nrChannels, 0);
+  u_char* data = stbi_load(path.c_str(), &_width, &_height, &nrChannels, 0);
   if (data)
   {
     int format         = GL_RGB;
     int internalFormat = GL_RGB8;
 
     const std::array<char, 3> suffix = {'p', 'n', 'g' };
-    bool isPNG = std::equal(suffix.rbegin(), suffix.rend(), filename.rbegin());
+    bool isPNG = std::equal(suffix.rbegin(), suffix.rend(), path.rbegin());
     
     if(isPNG)
     {
