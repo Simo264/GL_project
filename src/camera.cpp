@@ -24,37 +24,37 @@ glm::mat4 Camera::lookAround()
   return glm::lookAt(position, position + front, up);
 }
 
-void Camera::processKeyboardInput(Window& window, double deltaTime)
+void Camera::processKeyboardInput(Window* window, double deltaTime)
 {
   const float velocity = static_cast<float>(speed * deltaTime);
 
-  if (window.getKey(GLFW_KEY_W) == GLFW_PRESS)
+  if (window->getKey(GLFW_KEY_W) == GLFW_PRESS)
     position += front * velocity;
   
-  if (window.getKey(GLFW_KEY_S) == GLFW_PRESS)
+  if (window->getKey(GLFW_KEY_S) == GLFW_PRESS)
     position -= front * velocity;
   
-  // if (window.getKey(GLFW_KEY_A) == GLFW_PRESS)
-  //   position -= right * velocity;
+  if (window->getKey(GLFW_KEY_A) == GLFW_PRESS)
+    position -= right * velocity;
   
-  // if (window.getKey(GLFW_KEY_D) == GLFW_PRESS)
-  //   position += right * velocity;
+  if (window->getKey(GLFW_KEY_D) == GLFW_PRESS)
+    position += right * velocity;
 
-  if (window.getKey(GLFW_KEY_SPACE) == GLFW_PRESS)
+  if (window->getKey(GLFW_KEY_SPACE) == GLFW_PRESS)
     position += up * velocity;
   
-  if (window.getKey(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+  if (window->getKey(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
     position -= up * velocity;
 
   
 }
 
-void Camera::processMouseMovement(Window& window)
+void Camera::processMouseMovement(Window* window)
 {
   double cposx, cposy;
-  window.getCursorPosition(cposx, cposy);
+  window->getCursorPosition(cposx, cposy);
 
-  if(window.getMouseButton(GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS) 
+  if(window->getMouseButton(GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS) 
     return;
 
   // if cursor is outside of window

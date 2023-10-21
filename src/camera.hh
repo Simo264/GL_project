@@ -17,8 +17,8 @@ public:
   glm::mat4 lookAt(glm::vec3 target);
   glm::mat4 lookAround();
 
-  void processKeyboardInput(Window& window, double deltaTime);
-  void processMouseMovement(Window& window);
+  void processKeyboardInput(Window* window, double deltaTime);
+  void processMouseMovement(Window* window);
 
 public:
   glm::vec3 position;

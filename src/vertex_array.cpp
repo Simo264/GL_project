@@ -3,7 +3,7 @@
 
 #include "vertex.hh"
 
-VertexArray::VertexArray(VertexBuffer& vBuffer)
+VertexArray::VertexArray(VertexBuffer* vBuffer)
 {
   glGenVertexArrays(1, &_vertexArray);
   if(_vertexArray == GL_INVALID_VALUE)
@@ -21,7 +21,7 @@ VertexArray::VertexArray(VertexBuffer& vBuffer)
     offset     = 0;
     components = vertex_t::posComponent::length();
     vertexSpecification(0, components, GL_FLOAT, offset); 
-    bindBuffer(0, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
+    bindBuffer(0, vBuffer->get(), 0, vertex_t::VERTEX_LENGTH);
     attribBinding(0, 0);
     enableAttribute(0);
 
@@ -29,7 +29,7 @@ VertexArray::VertexArray(VertexBuffer& vBuffer)
     offset     = sizeof(vertex_t::posComponent);
     components = vertex_t::normalComponent::length();
     vertexSpecification(1, components, GL_FLOAT, offset); 
-    bindBuffer(1, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
+    bindBuffer(1, vBuffer->get(), 0, vertex_t::VERTEX_LENGTH);
     attribBinding(1, 1);
     enableAttribute(1);
     
@@ -37,7 +37,7 @@ VertexArray::VertexArray(VertexBuffer& vBuffer)
     offset     = sizeof(vertex_t::posComponent) + sizeof(vertex_t::normalComponent);
     components = vertex_t::texcoordComponent::length();
     vertexSpecification(2, components, GL_FLOAT, offset); 
-    bindBuffer(2, vBuffer.get(), 0, vertex_t::VERTEX_LENGTH);
+    bindBuffer(2, vBuffer->get(), 0, vertex_t::VERTEX_LENGTH);
     attribBinding(2, 2);
     enableAttribute(2);
   }

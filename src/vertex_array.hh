@@ -7,7 +7,7 @@
 class VertexArray
 {
 public:
-  VertexArray(VertexBuffer& vBuffer);
+  VertexArray(VertexBuffer* vBuffer);
   ~VertexArray() = default;
 
   void bind() const { glBindVertexArray(_vertexArray);}

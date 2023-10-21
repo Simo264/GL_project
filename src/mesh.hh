@@ -8,10 +8,6 @@
 #include "element_buffer.hh"
 #include "vertex_array.hh"
 
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-
 #include <vector>
 #include <memory>
 
@@ -20,19 +16,17 @@
 class Mesh
 {
 public:
-  Mesh(std::vector<vertex_t> vertices, std::vector<uint32_t> indices, std::vector<Texture*> textures);
-  Mesh(const std::string& path);
+  Mesh(std::vector<vertex_t>& vertices, std::vector<uint32_t>& indices, std::vector<Texture*>& textures);
   ~Mesh() = default;
 
-  void draw(Shader& shader);
+  void draw(Shader* shader);
 
   void destroy();
 
 private:
   // mesh data
-  std::vector<vertex_t>   _vertices;
-  std::vector<uint32_t>   _indices;
-  std::vector<Texture*>    _textures;
+  std::vector<uint32_t> _indices;
+  std::vector<Texture*> _textures;
 
   std::unique_ptr<VertexBuffer>  _vertexBuffer;
   std::unique_ptr<ElementBuffer> _elementBuffer;

@@ -12,7 +12,7 @@ enum class TextureType{
 class Texture
 {
 public:
-  Texture(const std::string& path, TextureType type, bool immutable = false);
+  Texture(const std::string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = true);
   ~Texture() = default;
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }
