@@ -33,11 +33,7 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  spdlog::info("create texture...");
-  Texture* t = new Texture("res/textures/Stryker/StrykerEquipments_Mixed_AO.png", TextureType::TEX_NONE, false);
-  (void) t;
-
-  // Model modelObject("models/Stryker/Stryker.obj");
+  Model modelObject("models/Stryker/Stryker.obj");
 
 
   // create camera object

@@ -10,16 +10,18 @@
 Texture::Texture(const std::string& path, TextureType type, bool immutable)
   : _path{path}, _type {type}
 {
+  (void) immutable;
+
   glGenTextures(1, &_texture);
 
   bind();
-
-  load(path, immutable);
 
   setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
   setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
   setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  
+  load(path, immutable);
 
   unbind();
 }
@@ -27,37 +29,30 @@ Texture::Texture(const std::string& path, TextureType type, bool immutable)
 void Texture::load(const std::string& path, bool immutable)
 {
   int nrChannels;
-  //stbi_set_flip_vertically_on_load(true);
+  
   u_char* data = stbi_load(path.c_str(), &_width, &_height, &nrChannels, 0);
   if (data)
   {
-    int format         = GL_RGB;
-    int internalFormat = GL_RGB8;
+    int format = GL_RGB;
 
-    const std::array<char, 3> suffix = {'p', 'n', 'g' };
+    const std::array<char, 3> suffix = {'p', 'n', 'g'};
     bool isPNG = std::equal(suffix.rbegin(), suffix.rend(), path.rbegin());
     
     if(isPNG)
-    {
-      format         = GL_RGBA;
-      internalFormat = GL_RGBA8;
-    }
+      format = GL_RGBA;
 
     if(immutable)
     {
       // immutable object
-      spdlog::info("create mutable texture...");
-      
-      glTextureStorage2D(_texture, 1, internalFormat, _width, _height);
+      glTextureStorage2D(_texture, 1, format, _width, _height);
       glTextureSubImage2D(_texture, 0, 0, 0, _width, _height, format, GL_UNSIGNED_BYTE, data);
     }
     else
     {
       // mutable object
-      spdlog::info("create mutable texture...");
-      glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, format, GL_UNSIGNED_BYTE, data);
+      glTexImage2D(GL_TEXTURE_2D, 0, format, _width, _height, 0, format, GL_UNSIGNED_BYTE, data);
     }
-    spdlog::info("done!");
+    
     glGenerateMipmap(GL_TEXTURE_2D);
   }
   else
