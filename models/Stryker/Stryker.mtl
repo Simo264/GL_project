@@ -1,0 +1,60 @@
+# Blender 3.5.1 MTL File: 'Stryker Old one .blend'
+# www.blender.org
+
+newmtl StrykerBody
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ns Stryker/StrykerBody_Roughness.png
+map_refl Stryker/StrykerBody_Metallic.png
+map_Bump -bm 0.300000 Stryker/StrykerBody_Normal_OpenGL.png
+
+newmtl StrykerEquipments
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ns Stryker/StrykerEquipments_Roughness.png
+map_refl Stryker/StrykerEquipments_Metallic.png
+map_Bump -bm 0.300000 Stryker/StrykerEquipments_Normal_OpenGL.png
+
+newmtl StrykerLights
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Stryker/Lights.001.png
+
+newmtl StrykerTurret
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ns Stryker/StrykerTurret_Roughness.png
+map_refl Stryker/StrykerTurret_Metallic.png
+map_Bump -bm 1.000000 Stryker/StrykerTurret_Normal_OpenGL.png
+
+newmtl StrykerWheel
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ns Stryker/StrykerWheel_Roughness.png
+map_refl Stryker/StrykerWheel_Metallic.png
+map_Bump -bm 1.000000 Stryker/StrykerWheel_Normal_OpenGL.png

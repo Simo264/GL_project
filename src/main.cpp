@@ -33,7 +33,11 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  Model modelCube("res/Crate/Crate.obj");
+  spdlog::info("create texture...");
+  Texture* t = new Texture("res/textures/Stryker/StrykerEquipments_Mixed_AO.png", TextureType::TEX_NONE, false);
+  (void) t;
+
+  // Model modelObject("models/Stryker/Stryker.obj");
 
 
   // create camera object
@@ -79,7 +83,7 @@ int main()
     shaderMesh.setMat4("view", view);
     shaderMesh.setMat4("projection", projection);
     shaderMesh.setMat4("model", model);
-    modelCube.draw(&shaderMesh);
+    // modelObject.draw(&shaderMesh);
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------

@@ -21,10 +21,12 @@ public:
   void destroy();
 
 private:
-  std::vector<Mesh*> _meshes;
+  std::vector<Mesh*>    _meshes;
+  std::vector<Texture*> _textures_loaded;
 
   void loadModel(const std::string& path);
   void loadMesh(const aiScene* scene, aiMesh* mesh);
+  void loadMaterial(std::vector<Texture*>& out, const aiMaterial* material, aiTextureType type);
 };  
 
 #endif

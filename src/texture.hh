@@ -4,15 +4,16 @@
 #include "glad/glad.h"
 #include <string>
 
-enum class TextureType{ 
+enum class TextureType { 
+  TEX_NONE = 0,
   TEX_DIFFUSE, 
-  TEX_SPECULAR 
+  TEX_SPECULAR,
 };
 
 class Texture
 {
 public:
-  Texture(const std::string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = true);
+  Texture(const std::string& path, TextureType type = TextureType::TEX_NONE, bool immutable = true);
   ~Texture() = default;
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }

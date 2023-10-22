@@ -5,6 +5,8 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
+#include <algorithm>   
+
 Model::Model(const std::string& path)
 {
   loadModel(path);
@@ -12,8 +14,10 @@ Model::Model(const std::string& path)
 
 void Model::loadModel(const std::string& path)
 {
+  spdlog::info("loading model...");
+
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_Triangulate | 
+  const aiScene* scene = importer.ReadFile(path.c_str(),  aiProcess_Triangulate | 
                                                           aiProcess_GenSmoothNormals | 
                                                           aiProcess_FlipUVs | 
                                                           aiProcess_JoinIdenticalVertices);
@@ -29,14 +33,14 @@ void Model::loadModel(const std::string& path)
   {
     aiMesh* mesh = scene->mMeshes[i];
     loadMesh(scene, mesh);
-  } 
+  }
 
 }
 
 void Model::loadMesh(const aiScene* scene, aiMesh* mesh)
 {
-  // mNumFaces     = 12  (tells us how many polygons exist)
-  // mNumIndices   = 3   (number of indices in the polygon, in our case triangles)
+  // mNumFaces  : tells us how many polygons exist
+  // mNumIndices: number of indices in the polygon
 
   std::vector<vertex_t> vertices;
   std::vector<uint32_t> indices;
@@ -45,6 +49,7 @@ void Model::loadMesh(const aiScene* scene, aiMesh* mesh)
   vertices.reserve(mesh->mNumVertices);
   indices.reserve(mesh->mNumFaces * 3);
 
+  // load vertices
   for (uint32_t i = 0 ; i < mesh->mNumVertices; i++) 
   {
     vertex_t vertex;
@@ -65,31 +70,64 @@ void Model::loadMesh(const aiScene* scene, aiMesh* mesh)
     vertices.push_back(vertex);
   }
 
+  // load indices
   for (uint32_t i = 0 ; i < mesh->mNumFaces; i++) 
   {
     const aiFace& Face = mesh->mFaces[i];
     indices.push_back(Face.mIndices[0]);
     indices.push_back(Face.mIndices[1]);
     indices.push_back(Face.mIndices[2]);
-  }
+  } 
 
+  // load textures
   for (uint32_t i = 0 ; i < scene->mNumMaterials; i++)
   {
-    const aiMaterial* pMaterial = scene->mMaterials[i];
-    spdlog::info("mesh->mMaterialIndex={}", mesh->mMaterialIndex);
+    const aiMaterial* material = scene->mMaterials[i];
 
-    aiString Path;
+    // 1. load diffuse maps
+    loadMaterial(textures, material, aiTextureType_DIFFUSE);
     
-    if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
-    {
-      char texturePath[20] = "res/";
-      strcat(texturePath, Path.C_Str());
+    // 2. load specular maps
+    loadMaterial(textures, material, aiTextureType_SPECULAR);
 
-      textures.push_back(new Texture(texturePath));
-    }
+    // 3. load normal maps
+    loadMaterial(textures, material, aiTextureType_NORMALS);
+    
+    // 4. load height maps
+    loadMaterial(textures, material, aiTextureType_HEIGHT);
   }
 
   _meshes.push_back(new Mesh(vertices, indices, textures));
+}
+
+void Model::loadMaterial(std::vector<Texture*>& out, const aiMaterial* material, aiTextureType type)
+{
+  for(uint32_t i = 0; i < material->GetTextureCount(type); i++)
+  {
+    aiString path;
+    material->GetTexture(type, i, &path);
+
+    auto it = std::find_if(_textures_loaded.begin(), _textures_loaded.end(), [&path](Texture* t){
+      return t->path() == path.C_Str();
+    });
+
+    if(it != _textures_loaded.end())
+    {
+      spdlog::info("load existing texture");
+      out.push_back(*it);
+    }
+    else
+    {
+      spdlog::info("load new texture");
+
+      std::string texPath = "res/textures/";
+      texPath += path.C_Str();
+      
+      Texture* t = new Texture(texPath);
+      out.push_back(t);
+      _textures_loaded.push_back(t);
+    }
+  }
 }
 
 void Model::draw(Shader* shader)
