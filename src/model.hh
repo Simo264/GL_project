@@ -21,8 +21,7 @@ public:
   void destroy();
 
 private:
-  std::vector<Mesh*>    _meshes;
-  std::vector<Texture*> _textures_loaded;
+  std::vector<Mesh*> _meshes;
 
   void loadModel(const std::string& path);
   void loadMesh(const aiScene* scene, aiMesh* mesh);

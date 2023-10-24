@@ -12,19 +12,22 @@ Mesh::Mesh(std::vector<vertex_t>& vertices, std::vector<uint32_t>& indices, std:
   _vertexBuffer   = std::make_unique<VertexBuffer>(vertices.size(), vertices.data());
   _elementBuffer  = std::make_unique<ElementBuffer>(indices.size(), indices.data());
   _vertexArray    = std::make_unique<VertexArray>(_vertexBuffer.get());
-  _vertexArray.get()->unbind();
 }
 
 void Mesh::draw(Shader* shader)
 {
   (void) shader;
 
-  for(uint32_t i = 0; i < _textures.size(); i++)
-  {
-    Texture::activeTextUnit(i);
-    _textures[i]->bind();
-    shader->setInt("texture_diffuse" + std::to_string(i+1) , i);
-  }
+  // for(uint32_t i = 0; i < _textures.size(); i++)
+  // {
+  //   Texture::activeTextUnit(i);
+  //   shader->setInt("texture_diffuse" + std::to_string(i+1) , i);
+  //   _textures[i]->bind();
+  // }
+
+  Texture::activeTextUnit(0);
+  shader->setInt("texture_diffuse1", 0);
+  _textures[0]->bind();
 
   _vertexArray.get()->bind();
   _elementBuffer.get()->bind();

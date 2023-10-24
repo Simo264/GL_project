@@ -5,7 +5,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
-#include <algorithm>   
+#include <omp.h>
 
 Model::Model(const std::string& path)
 {
@@ -14,8 +14,6 @@ Model::Model(const std::string& path)
 
 void Model::loadModel(const std::string& path)
 {
-  spdlog::info("loading model...");
-
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(path.c_str(),  aiProcess_Triangulate | 
                                                           aiProcess_GenSmoothNormals | 
@@ -28,12 +26,23 @@ void Model::loadModel(const std::string& path)
     return;
   }
 
+  spdlog::info("mNumMeshes={}", scene->mNumMeshes);
+
   _meshes.reserve(scene->mNumMeshes);
+  
+  //#pragma omp parallel for
   for(uint32_t i = 0; i < scene->mNumMeshes; i++)
   {
     aiMesh* mesh = scene->mMeshes[i];
+    spdlog::info("Loading mesh N°{} with mNumVertices={} ", i, mesh->mNumVertices);
     loadMesh(scene, mesh);
   }
+
+  // for(uint32_t i = 0; i < scene->mNumMeshes; i++)
+  // {
+  //   const auto mesh = _meshes[i];
+  //   spdlog::info("mesh {}: indices.size={}  textures.size={}", i, mesh->indices().size(), mesh->textures().size());
+  // }
 
 }
 
@@ -107,26 +116,9 @@ void Model::loadMaterial(std::vector<Texture*>& out, const aiMaterial* material,
     aiString path;
     material->GetTexture(type, i, &path);
 
-    auto it = std::find_if(_textures_loaded.begin(), _textures_loaded.end(), [&path](Texture* t){
-      return t->path() == path.C_Str();
-    });
-
-    if(it != _textures_loaded.end())
-    {
-      spdlog::info("load existing texture");
-      out.push_back(*it);
-    }
-    else
-    {
-      spdlog::info("load new texture");
-
-      std::string texPath = "res/textures/";
-      texPath += path.C_Str();
-      
-      Texture* t = new Texture(texPath);
-      out.push_back(t);
-      _textures_loaded.push_back(t);
-    }
+    std::string texPath = "res/textures/";
+    texPath.append(path.C_Str());
+    out.push_back(new Texture(texPath));
   }
 }
 

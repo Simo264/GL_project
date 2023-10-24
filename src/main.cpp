@@ -6,6 +6,10 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include "assimp/scene.h"
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
+
 #include "window.hh"
 #include "vertex.hh"
 #include "shader.hh"
@@ -18,6 +22,73 @@
 
 #define WINDOW_WIDTH 720.0f
 #define WINDOW_HEIGTH 720.0f
+
+Mesh loadMesh(const std::string& path)
+{
+  Assimp::Importer importer;
+  const aiScene* scene = importer.ReadFile(path.c_str(),  aiProcess_Triangulate | 
+                                                          aiProcess_GenSmoothNormals | 
+                                                          aiProcess_FlipUVs | 
+                                                          aiProcess_JoinIdenticalVertices);
+
+  if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
+  {
+    spdlog::error("ERROR::ASSIMP::{}", importer.GetErrorString());
+  }
+
+  std::vector<vertex_t> vertices;
+  std::vector<uint32_t> indices;
+  std::vector<Texture*> textures;
+
+
+  auto mesh = scene->mMeshes[0];
+
+  // load vertices
+  for (uint32_t i = 0 ; i < mesh->mNumVertices; i++) 
+  {
+    vertex_t vertex;
+
+    vertex.position.x = mesh->mVertices[i].x;
+    vertex.position.y = mesh->mVertices[i].y;
+    vertex.position.z = mesh->mVertices[i].z;
+    vertex.normal.x   = mesh->mNormals[i].x;
+    vertex.normal.y   = mesh->mNormals[i].y;
+    vertex.normal.z   = mesh->mNormals[i].z;
+
+    if(mesh->HasTextureCoords(0))
+    {
+      vertex.texCoord.x = mesh->mTextureCoords[0][i].x;
+      vertex.texCoord.y = mesh->mTextureCoords[0][i].y;
+    }
+
+    vertices.push_back(vertex);
+  }
+
+  // load indices
+  for (uint32_t i = 0 ; i < mesh->mNumFaces; i++) 
+  {
+    const aiFace& Face = mesh->mFaces[i];
+    indices.push_back(Face.mIndices[0]);
+    indices.push_back(Face.mIndices[1]);
+    indices.push_back(Face.mIndices[2]);
+  } 
+
+  // load textures
+  for (uint32_t i = 0 ; i < scene->mNumMaterials; i++)
+  {
+    const aiMaterial* pMaterial = scene->mMaterials[i];
+
+    aiString Path;
+    if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
+    {
+      std::string texPath = "res/textures/";
+      texPath.append(Path.C_Str());
+      textures.push_back(new Texture(texPath));
+    }
+  }
+
+  return Mesh(vertices, indices, textures);
+}
 
 int main()
 { 
@@ -33,7 +104,9 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  Model modelObject("models/Stryker/Stryker.obj");
+  Mesh mesh = loadMesh("models/Crate/Crate.obj");
+  //Model modelObject("models/Backpack/backpack.obj");
+  //Model modelObject("models/Crate/Crate.obj");
 
 
   // create camera object
@@ -72,14 +145,14 @@ int main()
     // draw the mesh
     model = glm::mat4(1.0f);
     model = glm::translate(model, cubePos);
-    model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.f));
-    model = glm::rotate(model, glm::radians((float)glfwGetTime() * 20), glm::vec3(0.f, 1.f, 0.f) ); 
+    // model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.f));
+    // model = glm::rotate(model, glm::radians((float)glfwGetTime() * 20), glm::vec3(0.f, 1.f, 0.f) ); 
   
     shaderMesh.use();
     shaderMesh.setMat4("view", view);
     shaderMesh.setMat4("projection", projection);
     shaderMesh.setMat4("model", model);
-    // modelObject.draw(&shaderMesh);
+    mesh.draw(&shaderMesh);
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------

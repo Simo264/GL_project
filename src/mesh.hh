@@ -31,9 +31,6 @@ private:
   std::unique_ptr<VertexBuffer>  _vertexBuffer;
   std::unique_ptr<ElementBuffer> _elementBuffer;
   std::unique_ptr<VertexArray>   _vertexArray;
-
-  void load(const std::string& path);
-  void setup();
 };
 
 #endif
