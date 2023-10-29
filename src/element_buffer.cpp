@@ -1,6 +1,11 @@
 #include "element_buffer.hh"
 #include "spdlog/spdlog.h"
 
+/* -----------------------------------------------------
+ *          PUBLIC METHODS
+ * -----------------------------------------------------
+*/
+
 ElementBuffer::ElementBuffer(uint64_t nIndices, uint32_t* data, int usage)
 {
   glGenBuffers(1, &_buffer);

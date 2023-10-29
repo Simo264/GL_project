@@ -7,12 +7,12 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-// out vec3 Normal;
+out vec3 Normal;
 out vec3 FragPos;  
 out vec2 TexCoords;
 
 void main()
 {
-  TexCoords = aTexCoord;    
+  TexCoords   = aTexCoord;    
   gl_Position = projection * view * model * vec4(aPos, 1.0);
 } 

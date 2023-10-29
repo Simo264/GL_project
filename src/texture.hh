@@ -13,7 +13,7 @@ enum class TextureType {
 class Texture
 {
 public:
-  Texture(const std::string& path, TextureType type = TextureType::TEX_NONE, bool immutable = true);
+  Texture(const std::string& path, bool immutable = false);
   ~Texture() = default;
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }
@@ -27,7 +27,7 @@ public:
   int getWidth() const  { return _width; }
   int getHeight() const { return _height; }
 
-  TextureType getType() const { return _type; }
+  // TextureType getType() const { return _type; }
 
   std::string path() const { return _path; }
 
@@ -37,9 +37,10 @@ private:
   int _height;
   std::string _path;
 
-  TextureType _type;
+  // TextureType _type;
 
   void load(const std::string& path, bool immutable);
+  bool alpha(const std::string& path);
 };
 
 #endif

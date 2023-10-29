@@ -4,6 +4,19 @@
 #include<iterator> 
 #include<algorithm>
 
+static void errorCallback(int error, const char* description)
+{
+  (void)error; // suppress werror 
+
+  spdlog::error(description);
+}
+
+
+/* -----------------------------------------------------
+ *          PUBLIC METHODS
+ * -----------------------------------------------------
+*/
+
 Window::Window()
 {
   glfwSetErrorCallback(errorCallback);
@@ -64,13 +77,6 @@ void Window::swapBuffersAndProcessEvents()
 {
   glfwSwapBuffers(_window);  
   glfwPollEvents();
-}
-
-void Window::errorCallback(int error, const char* description)
-{
-  (void)error; // suppress werror
-
-  spdlog::error(description);
 }
 
 void Window::processKeyboardInput()

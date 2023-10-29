@@ -1,5 +1,10 @@
 #include "vertex_buffer.hh"
 
+/* -----------------------------------------------------
+ *          PUBLIC METHODS
+ * -----------------------------------------------------
+*/
+
 VertexBuffer::VertexBuffer(uint64_t size, float* rawdata, int usage)
 {
   glGenBuffers(1, &_buffer);

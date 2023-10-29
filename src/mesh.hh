@@ -28,6 +28,8 @@ private:
   std::vector<uint32_t> _indices;
   std::vector<Texture*> _textures;
 
+  uint32_t _drawMode;
+
   std::unique_ptr<VertexBuffer>  _vertexBuffer;
   std::unique_ptr<ElementBuffer> _elementBuffer;
   std::unique_ptr<VertexArray>   _vertexArray;

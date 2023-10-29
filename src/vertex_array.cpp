@@ -3,6 +3,12 @@
 
 #include "vertex.hh"
 
+/* -----------------------------------------------------
+ *          PUBLIC METHODS
+ * -----------------------------------------------------
+*/
+
+
 VertexArray::VertexArray(VertexBuffer* vBuffer)
 {
   glGenVertexArrays(1, &_vertexArray);

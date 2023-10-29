@@ -7,11 +7,15 @@
 
 #include <array>
 
-Texture::Texture(const std::string& path, TextureType type, bool immutable)
-  : _path{path}, _type {type}
-{
-  (void) immutable;
+/* -----------------------------------------------------
+ *          PUBLIC METHODS
+ * -----------------------------------------------------
+*/
 
+
+Texture::Texture(const std::string& path, bool immutable)
+  : _path{path}
+{
   glGenTextures(1, &_texture);
 
   bind();
@@ -26,19 +30,21 @@ Texture::Texture(const std::string& path, TextureType type, bool immutable)
   unbind();
 }
 
+
+/* -----------------------------------------------------
+ *          PRIVATE METHODS
+ * -----------------------------------------------------
+*/
+
+
 void Texture::load(const std::string& path, bool immutable)
 {
   int nrChannels;
-  
-  u_char* data = stbi_load(path.c_str(), &_width, &_height, &nrChannels, 0);
+  auto data = stbi_load(path.c_str(), &_width, &_height, &nrChannels, 0);
   if (data)
   {
     int format = GL_RGB;
-
-    const std::array<char, 3> suffix = {'p', 'n', 'g'};
-    bool isPNG = std::equal(suffix.rbegin(), suffix.rend(), path.rbegin());
-    
-    if(isPNG)
+    if(alpha(path))
       format = GL_RGBA;
 
     if(immutable)
@@ -60,4 +66,16 @@ void Texture::load(const std::string& path, bool immutable)
     spdlog::error("Failed to load texture {}", path);
   }
   stbi_image_free(data);
+}
+
+bool Texture::alpha(const std::string& path)
+{
+  (void) path;
+
+  // const std::array<char, 3> suffix = {'p', 'n', 'g'};
+  // bool isPNG = std::equal(suffix.rbegin(), suffix.rend(), path.rbegin());
+  // if(isPNG)
+  //   format = GL_RGBA;
+
+  return false;
 }

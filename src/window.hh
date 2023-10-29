@@ -74,9 +74,6 @@ private:
   // time
   double prevFrame;
   double currFrame;
-
-  static void errorCallback(int error, const char* description);
-  static void defaultKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
 
