@@ -5,7 +5,9 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
-#include <omp.h>
+#include <map>
+
+static std::map<std::string, Texture*> GLOBAL_TEXTURES;
 
 /* -----------------------------------------------------
  *          PUBLIC METHODS
@@ -53,24 +55,20 @@ void Model::loadModel(const std::string& path)
   }
 
   _meshes.reserve(scene->mNumMeshes);
-  
-  #pragma omp parallel for
+
   for(uint32_t i = 0; i < scene->mNumMeshes; i++)
   {
     spdlog::info("Loading mesh °{}...", i);
     aiMesh* mesh = scene->mMeshes[i];
-    loadMesh(scene, mesh);
+    _meshes.push_back(loadMesh(scene, mesh));
   }
 
   spdlog::info("Done!");
 }
 
-void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
+Mesh* Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
 {
-  (void) scene;
 
-  // mNumFaces  : tells us how many polygons exist
-  // mNumIndices: number of indices in the polygon
 
   std::vector<vertex_t> vertices;
   std::vector<uint32_t> indices;
@@ -86,9 +84,13 @@ void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
   loadIndices(indices, mesh);
 
   // load textures
-  // loadTextures(textures, scene);
-  
-  _meshes.push_back(new Mesh(vertices, indices, textures));
+  const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+  loadTextures(textures, material, aiTextureType_DIFFUSE,  TextureType::TEX_DIFFUSE);
+  loadTextures(textures, material, aiTextureType_NORMALS,  TextureType::TEX_NORMAL);
+  loadTextures(textures, material, aiTextureType_SPECULAR, TextureType::TEX_SPECULAR);
+
+
+  return new Mesh(vertices, indices, textures);
 }
 
 void Model::loadVertices(std::vector<vertex_t>& out, const aiMesh* mesh)
@@ -110,6 +112,7 @@ void Model::loadVertices(std::vector<vertex_t>& out, const aiMesh* mesh)
 
 void Model::loadIndices(std::vector<uint32_t>& out,  const aiMesh* mesh)
 {
+  // mNumFaces  : tells us how many polygons exist
   for (uint32_t i = 0 ; i < mesh->mNumFaces; i++) 
   {
     const aiFace& Face = mesh->mFaces[i];
@@ -119,36 +122,35 @@ void Model::loadIndices(std::vector<uint32_t>& out,  const aiMesh* mesh)
   } 
 }
 
-void Model::loadTextures(std::vector<Texture*>& out, const aiScene* scene)
+void Model::loadTextures(
+  std::vector<Texture*>&  out, 
+  const aiMaterial*       material, 
+  const aiTextureType     aiType,
+  const TextureType       texType
+)
 {
-  for (uint32_t i = 0 ; i < scene->mNumMaterials; i++)
+  for(uint32_t i = 0; i < material->GetTextureCount(aiType); i++)
   {
-    const aiMaterial* material = scene->mMaterials[i];
+    aiString filename;
+    material->GetTexture(aiType, i, &filename);
 
-    // 1. load diffuse maps
-    loadMaterial(out, material, aiTextureType_DIFFUSE);
-    
-    // 2. load specular maps
-    loadMaterial(out, material, aiTextureType_SPECULAR);
+    std::string path = "res/textures/";
+    path.append(filename.C_Str());
 
-    // 3. load normal maps
-    loadMaterial(out, material, aiTextureType_NORMALS);
-    
-    // 4. load height maps
-    loadMaterial(out, material, aiTextureType_HEIGHT);
-  }
-}
+    Texture* texture = nullptr;
 
-void Model::loadMaterial(std::vector<Texture*>& out, const aiMaterial* material, aiTextureType type)
-{
-  for(uint32_t i = 0; i < material->GetTextureCount(type); i++)
-  {
-    aiString path;
-    material->GetTexture(type, i, &path);
+    auto it = GLOBAL_TEXTURES.find(path);
+    if (it == GLOBAL_TEXTURES.end())
+    {
+      texture = new Texture(path, texType);
+      GLOBAL_TEXTURES.insert(std::make_pair(path,texture));
+    }
+    else
+    {
+      texture = it->second;
+    }
 
-    std::string texPath = "res/textures/";
-    texPath.append(path.C_Str());
-    out.push_back(new Texture(texPath));
+    out.push_back(texture);
   }
 }
 

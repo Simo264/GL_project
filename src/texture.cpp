@@ -13,8 +13,8 @@
 */
 
 
-Texture::Texture(const std::string& path, bool immutable)
-  : _path{path}
+Texture::Texture(const std::string& path, TextureType type, bool immutable)
+  : _path{path}, _type{type}
 {
   glGenTextures(1, &_texture);
 
@@ -39,6 +39,8 @@ Texture::Texture(const std::string& path, bool immutable)
 
 void Texture::load(const std::string& path, bool immutable)
 {
+  stbi_set_flip_vertically_on_load(true);
+  
   int nrChannels;
   auto data = stbi_load(path.c_str(), &_width, &_height, &nrChannels, 0);
   if (data)
@@ -70,12 +72,8 @@ void Texture::load(const std::string& path, bool immutable)
 
 bool Texture::alpha(const std::string& path)
 {
-  (void) path;
-
-  // const std::array<char, 3> suffix = {'p', 'n', 'g'};
-  // bool isPNG = std::equal(suffix.rbegin(), suffix.rend(), path.rbegin());
-  // if(isPNG)
-  //   format = GL_RGBA;
-
-  return false;
+  auto pos    = path.find_last_of('.');
+  auto suffix = path.substr(pos).c_str();
+  auto alpha  = (strcmp(suffix, ".png") == 0);
+  return alpha;
 }

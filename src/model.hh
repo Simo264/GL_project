@@ -24,12 +24,16 @@ private:
   std::vector<Mesh*> _meshes;
 
   void loadModel(const std::string& path);
-  void loadMesh(const aiScene* scene, const aiMesh* mesh);
+  Mesh* loadMesh(const aiScene* scene, const aiMesh* mesh);
 
   void loadVertices(std::vector<vertex_t>& out, const aiMesh* mesh);
   void loadIndices(std::vector<uint32_t>& out,  const aiMesh* mesh);
-  void loadTextures(std::vector<Texture*>& out, const aiScene* scene);
-  void loadMaterial(std::vector<Texture*>& out, const aiMaterial* material, const aiTextureType type);
+  void loadTextures(
+    std::vector<Texture*>& out, 
+    const aiMaterial* material, 
+    const aiTextureType aiType, 
+    const TextureType texType
+    );
 };  
 
 #endif

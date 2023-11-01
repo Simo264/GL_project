@@ -5,15 +5,15 @@
 #include <string>
 
 enum class TextureType { 
-  TEX_NONE = 0,
-  TEX_DIFFUSE, 
+  TEX_DIFFUSE = 0, 
+  TEX_NORMAL, 
   TEX_SPECULAR,
 };
 
 class Texture
 {
 public:
-  Texture(const std::string& path, bool immutable = false);
+  Texture(const std::string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = false);
   ~Texture() = default;
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }
@@ -24,20 +24,19 @@ public:
   
   uint32_t get() const  { return _texture; }
 
-  int getWidth() const  { return _width; }
-  int getHeight() const { return _height; }
+  int width() const  { return _width; }
+  int height() const { return _height; }
 
-  // TextureType getType() const { return _type; }
+  TextureType type() const { return _type; }
 
   std::string path() const { return _path; }
 
 private:
   uint32_t _texture;
-  int _width;
-  int _height;
+  int _width, _height;
   std::string _path;
 
-  // TextureType _type;
+  TextureType _type;
 
   void load(const std::string& path, bool immutable);
   bool alpha(const std::string& path);

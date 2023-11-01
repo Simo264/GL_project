@@ -4,18 +4,27 @@ in vec3   Normal;
 in vec2   TexCoords;
 out vec4  FragColor;
 
-uniform sampler2D texture_diffuse1;
+struct Material {
+  sampler2D diffuse;  // texture diffuse
+  sampler2D normal;   // texture normal
+  sampler2D specular; // texture specular
+  float     shininess;
+};
 
-#define DEBUG_MODE 1
+uniform Material material;
 
 void main()
 {
-  vec4 vecTexure = texture(texture_diffuse1, TexCoords);
+  // diffuse
+  vec3 diffuse = vec3(texture(material.diffuse, TexCoords)); 
 
-  #if DEBUG_MODE
-    FragColor = vecTexure + vec4(1,1,1,1);
-  #else
-    FragColor = vecTexure;
-  #endif
+  // normal
+  vec3 normal  = vec3(texture(material.normal, TexCoords)); 
+
+  // specular
+  vec3 specular = vec3(texture(material.specular, TexCoords)); 
+
+  vec3 result = diffuse ;
+  FragColor   = vec4(result, 1.0);
 
 }

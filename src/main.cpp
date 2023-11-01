@@ -29,7 +29,6 @@ int main()
   window.create("OpenGL", WINDOW_WIDTH, WINDOW_HEIGTH);
   window.setPosition(200,200);
 
-
   // build and compile our shader program
   // ------------------------------------------------------------------------
   Shader shaderMesh { "shaders/mesh.vert","shaders/mesh.frag" };
@@ -42,7 +41,7 @@ int main()
 
   // create camera object
   // ------------------------------------------------------------------------
-  Camera camera { glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
+  Camera camera { glm::vec3(0.0f, 0.0f, 7.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
    
    
   // render loop
