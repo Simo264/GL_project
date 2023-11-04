@@ -5,16 +5,14 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
-#include <map>
-
-static std::map<std::string, Texture*> GLOBAL_TEXTURES;
+static map<string, Texture*> GLOBAL_TEXTURES;
 
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
 */
 
-Model::Model(const std::string& path)
+Model::Model(const string& path)
 {
   loadModel(path);
 }
@@ -40,7 +38,7 @@ void Model::destroy()
  * -----------------------------------------------------
 */
 
-void Model::loadModel(const std::string& path)
+void Model::loadModel(const string& path)
 {
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(path.c_str(),  aiProcess_Triangulate | 
@@ -68,11 +66,9 @@ void Model::loadModel(const std::string& path)
 
 Mesh* Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
 {
-
-
-  std::vector<vertex_t> vertices;
-  std::vector<uint32_t> indices;
-  std::vector<Texture*> textures;
+  vector<vertex_t> vertices;
+  vector<uint32_t> indices;
+  vector<Texture*> textures;
 
   vertices.reserve(mesh->mNumVertices);
   indices.reserve(mesh->mNumFaces * 3);
@@ -93,7 +89,7 @@ Mesh* Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
   return new Mesh(vertices, indices, textures);
 }
 
-void Model::loadVertices(std::vector<vertex_t>& out, const aiMesh* mesh)
+void Model::loadVertices(vector<vertex_t>& out, const aiMesh* mesh)
 {
   for (uint32_t i = 0 ; i < mesh->mNumVertices; i++) 
   {
@@ -110,7 +106,7 @@ void Model::loadVertices(std::vector<vertex_t>& out, const aiMesh* mesh)
   }
 }
 
-void Model::loadIndices(std::vector<uint32_t>& out,  const aiMesh* mesh)
+void Model::loadIndices(vector<uint32_t>& out,  const aiMesh* mesh)
 {
   // mNumFaces  : tells us how many polygons exist
   for (uint32_t i = 0 ; i < mesh->mNumFaces; i++) 
@@ -123,7 +119,7 @@ void Model::loadIndices(std::vector<uint32_t>& out,  const aiMesh* mesh)
 }
 
 void Model::loadTextures(
-  std::vector<Texture*>&  out, 
+  vector<Texture*>&  out, 
   const aiMaterial*       material, 
   const aiTextureType     aiType,
   const TextureType       texType
@@ -134,7 +130,7 @@ void Model::loadTextures(
     aiString filename;
     material->GetTexture(aiType, i, &filename);
 
-    std::string path = "res/textures/";
+    string path = "res/textures/";
     path.append(filename.C_Str());
 
     Texture* texture = nullptr;
@@ -143,7 +139,7 @@ void Model::loadTextures(
     if (it == GLOBAL_TEXTURES.end())
     {
       texture = new Texture(path, texType);
-      GLOBAL_TEXTURES.insert(std::make_pair(path,texture));
+      GLOBAL_TEXTURES.insert(make_pair(path,texture));
     }
     else
     {

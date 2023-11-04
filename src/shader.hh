@@ -1,14 +1,12 @@
 #ifndef SHADER_HH
 #define SHADER_HH
 
-#include "glad/glad.h"
-#include "glm/glm.hpp"
-#include <string>
+#include "core.hh"
 
 class Shader
 {
 public:
-  Shader(const std::string& vFilename, const std::string& fFilename);
+  Shader(const string& vFilename, const string& fFilename);
   ~Shader() = default;
 
   void use() const { glUseProgram(_shader); }
@@ -17,26 +15,24 @@ public:
 
   uint32_t get() const { return _shader; }
 
-  void setBool(const std::string& name, bool value) const;
-  void setInt(const std::string& name, int value) const;
-  void setFloat(const std::string& name, float value) const;
+  void setBool(const string& name, bool value) const;
+  void setInt(const string& name, int value) const;
+  void setFloat(const string& name, float value) const;
 
-  void setVec2(const std::string& name, const glm::vec2& value) const;
-  void setVec3(const std::string& name, const glm::vec3& value) const;
-  void setVec4(const std::string& name, const glm::vec4& value) const;
-  void setMat2(const std::string& name, const glm::mat2& mat) const;
-  void setMat3(const std::string& name, const glm::mat3& mat) const;
-  void setMat4(const std::string& name, const glm::mat4& mat) const;
+  void setVec2f(const string& name, const vec2f& value) const;
+  void setVec3f(const string& name, const vec3f& value) const;
+  void setVec4f(const string& name, const vec4f& value) const;
+  void setMat2f(const string& name, const mat2f& mat) const;
+  void setMat3f(const string& name, const mat3f& mat) const;
+  void setMat4f(const string& name, const mat4f& mat) const;
 
 private:
   uint32_t _shader;
   
-  void getSourceFromFile(const std::string& filename, std::string& dest);
+  void getSourceFromFile(const string& filename, string& dest);
   bool compile(uint32_t& shader, const char* src);
   bool createAndLink(uint32_t vShader, uint32_t fShader);
 };
-
-
 
 
 #endif

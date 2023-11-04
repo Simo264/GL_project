@@ -1,8 +1,7 @@
 #ifndef TEXTURE_HH
 #define TEXTURE_HH
 
-#include "glad/glad.h"
-#include <string>
+#include "core.hh"
 
 enum class TextureType { 
   TEX_DIFFUSE = 0, 
@@ -13,7 +12,7 @@ enum class TextureType {
 class Texture
 {
 public:
-  Texture(const std::string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = false);
+  Texture(const string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = false);
   ~Texture() = default;
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }
@@ -29,17 +28,17 @@ public:
 
   TextureType type() const { return _type; }
 
-  std::string path() const { return _path; }
+  string path() const { return _path; }
 
 private:
   uint32_t _texture;
-  int _width, _height;
-  std::string _path;
+  string   _path;
+  int      _width, _height;
 
   TextureType _type;
 
-  void load(const std::string& path, bool immutable);
-  bool alpha(const std::string& path);
+  void load(const string& path, bool immutable);
+  bool alpha(const string& path);
 };
 
 #endif

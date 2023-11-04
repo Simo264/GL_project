@@ -1,8 +1,6 @@
 #include "window.hh"
-#include "spdlog/spdlog.h"
 
-#include<iterator> 
-#include<algorithm>
+#include "spdlog/spdlog.h"
 
 static void errorCallback(int error, const char* description)
 {
@@ -36,7 +34,7 @@ Window::Window()
   currFrame = 0;	
 }
 
-void Window::create(std::string title, uint16_t width, uint16_t heigth, bool fullscreen)
+void Window::create(string title, uint16_t width, uint16_t heigth, bool fullscreen)
 {
   _width = width; 
   _height = heigth;

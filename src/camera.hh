@@ -1,7 +1,7 @@
 #ifndef CAMERA_HH
 #define CAMERA_HH
 
-#include "glm/glm.hpp"
+#include "core.hh"
 
 #include "window.hh"
 
@@ -9,22 +9,22 @@ class Camera
 {
 public:
   Camera(
-    glm::vec3 pos   = glm::vec3(0.0f, 0.0f,  0.0f), 
-    glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f), 
-    glm::vec3 up    = glm::vec3(0.0f, 1.0f,  0.0f));
+    vec3f pos   = vec3f(0.0f, 0.0f,  0.0f), 
+    vec3f front = vec3f(0.0f, 0.0f, -1.0f), 
+    vec3f up    = vec3f(0.0f, 1.0f,  0.0f));
   ~Camera() { }
 
-  glm::mat4 lookAt(glm::vec3 target);
-  glm::mat4 lookAround();
+  mat4f lookAtTarget(vec3f target);
+  mat4f lookAround();
 
   void processKeyboardInput(Window* window, double deltaTime);
   void processMouseMovement(Window* window);
 
 public:
-  glm::vec3 position;
-  glm::vec3 front;
-  glm::vec3 right;
-  glm::vec3 up;
+  vec3f position;
+  vec3f front;
+  vec3f right;
+  vec3f up;
 
   double yaw;
   double pitch;

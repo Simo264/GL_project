@@ -1,5 +1,4 @@
 #include "element_buffer.hh"
-#include "spdlog/spdlog.h"
 
 /* -----------------------------------------------------
  *          PUBLIC METHODS

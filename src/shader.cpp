@@ -1,19 +1,16 @@
 #include "shader.hh"
 #include "spdlog/spdlog.h"
 
-#include <fstream>
-#include <sstream>
-
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
 */
 
 
-Shader::Shader(const std::string& vFilename, const std::string& fFilename)
+Shader::Shader(const string& vFilename, const string& fFilename)
 {
-  std::string vShaderSrc;
-  std::string fShaderSrc;
+  string vShaderSrc;
+  string fShaderSrc;
   getSourceFromFile(vFilename, vShaderSrc);
   getSourceFromFile(fFilename, fShaderSrc);
 
@@ -46,47 +43,47 @@ Shader::Shader(const std::string& vFilename, const std::string& fFilename)
   }
 }
 
-void Shader::setBool(const std::string& name, bool value) const
+void Shader::setBool(const string& name, bool value) const
 {         
   glUniform1i(glGetUniformLocation(_shader, name.c_str()), (int) value); 
 }
 
-void Shader::setInt(const std::string& name, int value) const
+void Shader::setInt(const string& name, int value) const
 { 
   glUniform1i(glGetUniformLocation(_shader, name.c_str()), value); 
 }
 
-void Shader::setFloat(const std::string& name, float value) const
+void Shader::setFloat(const string& name, float value) const
 { 
   glUniform1f(glGetUniformLocation(_shader, name.c_str()), value); 
 }
 
-void Shader::setVec2(const std::string& name, const glm::vec2& value) const
+void Shader::setVec2f(const string& name, const vec2f& value) const
 { 
   glUniform2fv(glGetUniformLocation(_shader, name.c_str()), 1, &value[0]); 
 }
 
-void Shader::setVec3(const std::string& name, const glm::vec3& value) const
+void Shader::setVec3f(const string& name, const vec3f& value) const
 { 
   glUniform3fv(glGetUniformLocation(_shader, name.c_str()), 1, &value[0]); 
 }
 
-void Shader::setVec4(const std::string& name, const glm::vec4& value) const
+void Shader::setVec4f(const string& name, const vec4f& value) const
 { 
   glUniform4fv(glGetUniformLocation(_shader, name.c_str()), 1, &value[0]); 
 }
 
-void Shader::setMat2(const std::string& name, const glm::mat2& mat) const
+void Shader::setMat2f(const string& name, const mat2f& mat) const
 {
   glUniformMatrix2fv(glGetUniformLocation(_shader, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::setMat3(const std::string& name, const glm::mat3& mat) const
+void Shader::setMat3f(const string& name, const mat3f& mat) const
 {
   glUniformMatrix3fv(glGetUniformLocation(_shader, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::setMat4(const std::string& name, const glm::mat4& mat) const
+void Shader::setMat4f(const string& name, const mat4f& mat) const
 {
   glUniformMatrix4fv(glGetUniformLocation(_shader, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
@@ -98,10 +95,10 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const
 */
 
 
-void Shader::getSourceFromFile(const std::string& filename, std::string& dest)
+void Shader::getSourceFromFile(const string& filename, string& dest)
 {
-  std::stringstream buffer;
-  std::ifstream file(filename);
+  stringstream buffer;
+  ifstream file(filename);
   if(!file.is_open())
   {
     spdlog::error("Shader::getSourceFromFile error on opening file in ");

@@ -1,16 +1,13 @@
 #ifndef VERTEX_HH
 #define VERTEX_HH
 
-#include "glm/glm.hpp"
-#include "spdlog/spdlog.h"
-
-#include <array>
+#include "core.hh"
 
 struct vertex_t
 {
-  using posComponent      = glm::vec3;  
-  using normalComponent   = glm::vec3;  
-  using texcoordComponent = glm::vec2;  
+  using posComponent      = vec3f;  
+  using normalComponent   = vec3f;  
+  using texcoordComponent = vec2f;  
   
   static constexpr int VERTEX_COMPONENTS =  posComponent::length()    +   // 3
                                             normalComponent::length() +   // 3
@@ -36,18 +33,11 @@ struct vertex_t
   { 
   }
   
-  vertex_t(std::array<float, vertex_t::VERTEX_COMPONENTS> l)
+  vertex_t(array<float, vertex_t::VERTEX_COMPONENTS> l)
   {
     position = { l[0],l[1],l[2] };
     normal   = { l[3],l[4],l[5] };
     texCoord = { l[6],l[7] };
-  }
-
-  void print()
-  {
-    spdlog::info("({},{},{}), ({},{},{}), ({},{})", position.x,position.y,position.z,
-                                                    normal.x,normal.y,normal.z,
-                                                    texCoord.x,texCoord.y);
   }
 };
 

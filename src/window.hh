@@ -1,10 +1,7 @@
 #ifndef WINDOW_HH
 #define WINDOW_HH
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-
-#include <string>
+#include "core.hh"
 
 class Window
 {
@@ -13,7 +10,7 @@ public:
   ~Window() = default;
   
   // creating a window and context
-  void create(std::string title, uint16_t width=720, uint16_t heigth=720, bool fullscreen = false);
+  void create(string title, uint16_t width=720, uint16_t heigth=720, bool fullscreen = false);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   void terminate();

@@ -1,13 +1,11 @@
 #include "camera.hh"
-#include "spdlog/spdlog.h"
-#include "glm/gtc/matrix_transform.hpp"
 
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
 */
 
-Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up)
+Camera::Camera(vec3f pos, vec3f front, vec3f up)
 : position{pos}, front{front}, up{up} 
 { 
   yaw   = -90;
@@ -19,14 +17,14 @@ Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up)
   _lastY = 0;
 }
 
-glm::mat4 Camera::lookAt(glm::vec3 target)
+mat4f Camera::lookAtTarget(vec3f target)
 {
-  return glm::lookAt(position, target, up);
+  return lookAt(position, target, up);
 }
 
-glm::mat4 Camera::lookAround()
+mat4f Camera::lookAround()
 {
-  return glm::lookAt(position, position + front, up);
+  return lookAt(position, position + front, up);
 }
 
 void Camera::processKeyboardInput(Window* window, double deltaTime)
@@ -74,12 +72,12 @@ void Camera::processMouseMovement(Window* window)
 
   yaw   += (xoffset * sensitivity);
   pitch += (yoffset * sensitivity);
-  front = glm::normalize(glm::vec3(
-    cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
-    sin(glm::radians(pitch)),
-    sin(glm::radians(yaw)) * cos(glm::radians(pitch))
+  front = normalize(vec3f(
+    cos(radians(yaw)) * cos(radians(pitch)),
+    sin(radians(pitch)),
+    sin(radians(yaw)) * cos(radians(pitch))
   ));
 
-  right = glm::normalize(glm::cross(front, {0.f, 1.f, 0.f}));
-  up    = glm::normalize(glm::cross(right, front));
+  right = normalize(cross(front, {0.f, 1.f, 0.f}));
+  up    = normalize(cross(right, front));
 }

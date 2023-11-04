@@ -1,5 +1,4 @@
 #include "vertex_array.hh"
-#include "spdlog/spdlog.h"
 
 #include "vertex.hh"
 

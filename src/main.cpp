@@ -1,24 +1,10 @@
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "spdlog/spdlog.h"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-
-#include "assimp/scene.h"
-#include "assimp/Importer.hpp"
-#include "assimp/postprocess.h"
+#include "core.hh"
 
 #include "window.hh"
-#include "vertex.hh"
 #include "shader.hh"
 #include "texture.hh"
 #include "camera.hh"
-#include "mesh.hh"
 #include "model.hh"
-
-#include <string>
 
 #define WINDOW_WIDTH 720.0f
 #define WINDOW_HEIGTH 720.0f
@@ -41,13 +27,13 @@ int main()
 
   // create camera object
   // ------------------------------------------------------------------------
-  Camera camera { glm::vec3(0.0f, 0.0f, 7.0f), glm::vec3(0.0f, 0.0f, -1.0f) };
+  Camera camera { vec3f(0.0f, 0.0f, 7.0f), vec3f(0.0f, 0.0f, -1.0f) };
    
    
   // render loop
   // ------------------------------------------------------------------------
-  glm::vec3 cubePos = { 0.0f, 0.0f, 0.0f };
-  glm::mat4 model;
+  vec3f cubePos { 0.0f, 0.0f, 0.0f };
+  mat4f model;
   while(window.loop())
   {
     // update delta time
@@ -69,16 +55,16 @@ int main()
     window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // view/projection transformations
-    const glm::mat4 view       = camera.lookAt(cubePos);
-    const glm::mat4 projection = glm::perspective(glm::radians(45.f), (WINDOW_WIDTH / WINDOW_HEIGTH), 0.1f, 100.0f);
+    const mat4f view       = camera.lookAtTarget(cubePos);
+    const mat4f projection = perspective(radians(45.f), (WINDOW_WIDTH / WINDOW_HEIGTH), 0.1f, 100.0f);
     
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, cubePos);
-    model = glm::rotate(model, glm::radians((float)glfwGetTime() * 20), glm::vec3(0.f, 1.f, 0.f) ); 
+    model = mat4f(1.0f);
+    model = translate(model, cubePos);
+    model = rotate(model, radians((float)glfwGetTime() * 20), vec3f(0.f, 1.f, 0.f) ); 
     shaderMesh.use();
-    shaderMesh.setMat4("view",       view);
-    shaderMesh.setMat4("projection", projection);
-    shaderMesh.setMat4("model",      model);
+    shaderMesh.setMat4f("view",       view);
+    shaderMesh.setMat4f("projection", projection);
+    shaderMesh.setMat4f("model",      model);
     modelObject.draw(&shaderMesh);
 
     // Swapping buffers, processing events

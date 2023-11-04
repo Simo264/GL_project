@@ -5,15 +5,13 @@
 
 #include "spdlog/spdlog.h"
 
-#include <array>
-
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
 */
 
 
-Texture::Texture(const std::string& path, TextureType type, bool immutable)
+Texture::Texture(const string& path, TextureType type, bool immutable)
   : _path{path}, _type{type}
 {
   glGenTextures(1, &_texture);
@@ -37,7 +35,7 @@ Texture::Texture(const std::string& path, TextureType type, bool immutable)
 */
 
 
-void Texture::load(const std::string& path, bool immutable)
+void Texture::load(const string& path, bool immutable)
 {
   stbi_set_flip_vertically_on_load(true);
   
@@ -70,7 +68,7 @@ void Texture::load(const std::string& path, bool immutable)
   stbi_image_free(data);
 }
 
-bool Texture::alpha(const std::string& path)
+bool Texture::alpha(const string& path)
 {
   auto pos    = path.find_last_of('.');
   auto suffix = path.substr(pos).c_str();

@@ -1,7 +1,8 @@
 #ifndef VERTEX_ARRAY_HH
 #define VERTEX_ARRAY_HH
 
-#include "glad/glad.h"
+#include "core.hh"
+
 #include "vertex_buffer.hh"
 
 class VertexArray

@@ -1,15 +1,11 @@
 #include "mesh.hh"
 
-#include "spdlog/spdlog.h"
-
-#include <string>
-
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
 */
 
-Mesh::Mesh(std::vector<vertex_t>& vertices, std::vector<uint32_t>& indices, std::vector<Texture*>& textures)
+Mesh::Mesh(vector<vertex_t>& vertices, vector<uint32_t>& indices, vector<Texture*>& textures)
 {
   _indices  = indices;
   _textures = textures;
@@ -18,9 +14,9 @@ Mesh::Mesh(std::vector<vertex_t>& vertices, std::vector<uint32_t>& indices, std:
   if(_textures.empty())
     _drawMode = GL_LINE_STRIP;
 
-  _vertexBuffer   = std::make_unique<VertexBuffer>(vertices.size(), vertices.data());
-  _elementBuffer  = std::make_unique<ElementBuffer>(indices.size(), indices.data());
-  _vertexArray    = std::make_unique<VertexArray>(_vertexBuffer.get());
+  _vertexBuffer   = make_unique<VertexBuffer>(vertices.size(), vertices.data());
+  _elementBuffer  = make_unique<ElementBuffer>(indices.size(), indices.data());
+  _vertexArray    = make_unique<VertexArray>(_vertexBuffer.get());
 }
 
 void Mesh::draw(Shader* shader)

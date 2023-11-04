@@ -1,22 +1,23 @@
 #ifndef MESH_HH
 #define MESH_HH
 
+#include "core.hh"
+
 #include "vertex.hh"
 #include "texture.hh"
 #include "shader.hh"
+
 #include "vertex_buffer.hh"
 #include "element_buffer.hh"
 #include "vertex_array.hh"
 
-#include <vector>
-#include <memory>
 
 // A mesh represents a single drawable entity
 // ------------------------------------------------
 class Mesh
 {
 public:
-  Mesh(std::vector<vertex_t>& vertices, std::vector<uint32_t>& indices, std::vector<Texture*>& textures);
+  Mesh(vector<vertex_t>& vertices, vector<uint32_t>& indices, vector<Texture*>& textures);
   ~Mesh() = default;
 
   void draw(Shader* shader);
@@ -24,15 +25,14 @@ public:
   void destroy();
 
 private:
-  // mesh data
-  std::vector<uint32_t> _indices;
-  std::vector<Texture*> _textures;
+  vector<uint32_t> _indices;
+  vector<Texture*> _textures;
 
   uint32_t _drawMode;
 
-  std::unique_ptr<VertexBuffer>  _vertexBuffer;
-  std::unique_ptr<ElementBuffer> _elementBuffer;
-  std::unique_ptr<VertexArray>   _vertexArray;
+  unique_ptr<VertexBuffer>  _vertexBuffer;
+  unique_ptr<ElementBuffer> _elementBuffer;
+  unique_ptr<VertexArray>   _vertexArray;
 };
 
 #endif
