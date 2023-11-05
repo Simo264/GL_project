@@ -2,6 +2,7 @@
 
 #include "spdlog/spdlog.h"
 
+#include "assimp/scene.h"
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
@@ -17,10 +18,10 @@ Model::Model(const string& path)
   loadModel(path);
 }
 
-void Model::draw(Shader* shader)
+void Model::draw(Shader* shader, uint32_t drawmode)
 {
   for(auto& mesh : _meshes)
-    mesh->draw(shader);
+    mesh->draw(shader, drawmode);
 }
 
 void Model::destroy()
@@ -58,13 +59,13 @@ void Model::loadModel(const string& path)
   {
     spdlog::info("Loading mesh °{}...", i);
     aiMesh* mesh = scene->mMeshes[i];
-    _meshes.push_back(loadMesh(scene, mesh));
+    loadMesh(scene, mesh);
   }
 
   spdlog::info("Done!");
 }
 
-Mesh* Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
+void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
 {
   vector<vertex_t> vertices;
   vector<uint32_t> indices;
@@ -81,12 +82,11 @@ Mesh* Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
 
   // load textures
   const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-  loadTextures(textures, material, aiTextureType_DIFFUSE,  TextureType::TEX_DIFFUSE);
-  loadTextures(textures, material, aiTextureType_NORMALS,  TextureType::TEX_NORMAL);
-  loadTextures(textures, material, aiTextureType_SPECULAR, TextureType::TEX_SPECULAR);
+  loadTextures(textures, material, TextureType::TEX_DIFFUSE);
+  loadTextures(textures, material, TextureType::TEX_NORMAL);
+  loadTextures(textures, material, TextureType::TEX_SPECULAR);
 
-
-  return new Mesh(vertices, indices, textures);
+  _meshes.push_back(new Mesh(vertices, indices, textures));
 }
 
 void Model::loadVertices(vector<vertex_t>& out, const aiMesh* mesh)
@@ -118,13 +118,17 @@ void Model::loadIndices(vector<uint32_t>& out,  const aiMesh* mesh)
   } 
 }
 
-void Model::loadTextures(
-  vector<Texture*>&  out, 
-  const aiMaterial*       material, 
-  const aiTextureType     aiType,
-  const TextureType       texType
-)
+void Model::loadTextures(vector<Texture*>& out, const aiMaterial* material, const TextureType texType)
 {
+  aiTextureType aiType;
+  if(texType == TextureType::TEX_DIFFUSE)
+    aiType = aiTextureType_DIFFUSE; 
+  else if(texType == TextureType::TEX_NORMAL)
+    aiType = aiTextureType_NORMALS; 
+  else if(texType == TextureType::TEX_SPECULAR)
+    aiType = aiTextureType_SPECULAR; 
+
+
   for(uint32_t i = 0; i < material->GetTextureCount(aiType); i++)
   {
     aiString filename;

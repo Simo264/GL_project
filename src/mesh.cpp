@@ -10,16 +10,12 @@ Mesh::Mesh(vector<vertex_t>& vertices, vector<uint32_t>& indices, vector<Texture
   _indices  = indices;
   _textures = textures;
 
-  _drawMode = GL_TRIANGLES;
-  if(_textures.empty())
-    _drawMode = GL_LINE_STRIP;
-
   _vertexBuffer   = make_unique<VertexBuffer>(vertices.size(), vertices.data());
   _elementBuffer  = make_unique<ElementBuffer>(indices.size(), indices.data());
   _vertexArray    = make_unique<VertexArray>(_vertexBuffer.get());
 }
 
-void Mesh::draw(Shader* shader)
+void Mesh::draw(Shader* shader, uint32_t drawmode)
 {
   for(uint32_t i = 0; i < _textures.size(); i++)
   {
@@ -51,7 +47,7 @@ void Mesh::draw(Shader* shader)
   _vertexArray.get()->bind();
   _elementBuffer.get()->bind();
   
-  glDrawElements(_drawMode, _indices.size(), GL_UNSIGNED_INT, 0);
+  glDrawElements(drawmode, _indices.size(), GL_UNSIGNED_INT, 0);
 
   _elementBuffer.get()->unbind();
   _vertexArray.get()->unbind();
@@ -61,9 +57,7 @@ void Mesh::destroy()
 {
   _vertexArray.get()->destroy();
   _vertexBuffer.get()->destroy();
-  
-  if(_elementBuffer)
-    _elementBuffer.get()->destroy();
+  _elementBuffer.get()->destroy();
 
   for(auto& texture : _textures)
   {

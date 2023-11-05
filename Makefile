@@ -1,5 +1,5 @@
-CXXFLAGS 	 = -g -std=c++20 -Wall -Werror -Wextra -Wpedantic -fopenmp
-LDFLAGS 	 = -lX11 -lassimp -fopenmp
+CXXFLAGS 	 = -g -std=c++20 -Wall -Werror -Wextra -Wpedantic
+LDFLAGS 	 = -lX11 -lassimp
 
 EXECUTABLE = main.exe
 

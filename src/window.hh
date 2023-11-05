@@ -10,7 +10,7 @@ public:
   ~Window() = default;
   
   // creating a window and context
-  void create(string title, uint16_t width=720, uint16_t heigth=720, bool fullscreen = false);
+  void create(vec2u dim, string title="", bool fullscreen = false);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   void terminate();
@@ -40,19 +40,19 @@ public:
   int getMouseButton(uint32_t key) const { return glfwGetMouseButton(_window, key); }
 
 
-  // window size
-  uint16_t width() const { return _width; }
-  uint16_t height() const { return _height; }
+  // window dimension
+  uint32_t width() const  { return _width; }
+  uint32_t height() const { return _height; }
 
   // keyboard input
   void processKeyboardInput();
 
   // window position
-  void setPosition(int x, int y) { glfwSetWindowPos(_window, x, y); }
-  void getPosition(int& x, int& y) { glfwGetWindowPos(_window, &x, &y); }
+  void setPosition(vec2i pos) { glfwSetWindowPos(_window, pos.x, pos.y); }
+  void getPosition(vec2i& pos) { glfwGetWindowPos(_window, &pos.x, &pos.y); }
 
   // cursor position
-  void getCursorPosition(double& x, double& y) { glfwGetCursorPos(_window, &x, &y); }
+  void getCursorPosition(vec2d& pos) { glfwGetCursorPos(_window, &pos.x, &pos.y); }
 
   // value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
   void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
@@ -65,12 +65,12 @@ public:
 private:
   GLFWwindow* _window;
   
-  uint16_t _width;
-  uint16_t _height;
+  uint32_t _width;
+  uint32_t _height;
 
-  // time
-  double prevFrame;
-  double currFrame;
+  // delta time
+  double _prevFrame;
+  double _currFrame;
 };
 
 

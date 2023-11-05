@@ -7,16 +7,13 @@
 #include "shader.hh"
 #include "texture.hh"
 
-#include "assimp/scene.h"
-
 class Model
 {
-
 public:
   Model(const string& path);
   ~Model() = default;
 
-  void draw(Shader* shader);	
+  void draw(Shader* shader, uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
   
   void destroy();
 
@@ -24,14 +21,13 @@ private:
   vector<Mesh*> _meshes;
 
   void loadModel(const string& path);
-  Mesh* loadMesh(const aiScene* scene, const aiMesh* mesh);
+  void loadMesh(const struct aiScene* scene, const struct aiMesh* mesh);
 
-  void loadVertices(vector<vertex_t>& out, const aiMesh* mesh);
-  void loadIndices(vector<uint32_t>& out,  const aiMesh* mesh);
+  void loadVertices(vector<vertex_t>& out, const struct aiMesh* mesh);
+  void loadIndices(vector<uint32_t>& out,  const struct aiMesh* mesh);
   void loadTextures(
     vector<Texture*>& out, 
-    const aiMaterial* material, 
-    const aiTextureType aiType, 
+    const struct aiMaterial* material, 
     const TextureType texType
   );
 };  

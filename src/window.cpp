@@ -30,21 +30,21 @@ Window::Window()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   
 
-  prevFrame = 0;
-  currFrame = 0;	
+  _prevFrame = 0;
+  _currFrame = 0;	
 }
 
-void Window::create(string title, uint16_t width, uint16_t heigth, bool fullscreen)
+void Window::create(vec2u dim, string title, bool fullscreen)
 {
-  _width = width; 
-  _height = heigth;
+  _width = dim.x; 
+  _height = dim.y;
 
   GLFWmonitor* monitor = nullptr;
 
   if(fullscreen)
     monitor = glfwGetPrimaryMonitor();
 
-  _window = glfwCreateWindow(width, heigth, title.c_str(), monitor, NULL);
+  _window = glfwCreateWindow(_width, _height, title.c_str(), monitor, NULL);
   if (!_window)
   {
     spdlog::error("Failed to create GLFW window");
@@ -85,13 +85,13 @@ void Window::processKeyboardInput()
 
 double Window::delta() const
 {
-  return currFrame - prevFrame;
+  return _currFrame - _prevFrame;
 }
 
 void Window::update()
 {
-  prevFrame = currFrame;
-  currFrame = glfwGetTime();
+  _prevFrame = _currFrame;
+  _currFrame = glfwGetTime();
 }
 
 

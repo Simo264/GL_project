@@ -20,7 +20,6 @@ public:
   void processKeyboardInput(Window* window, double deltaTime);
   void processMouseMovement(Window* window);
 
-public:
   vec3f position;
   vec3f front;
   vec3f right;

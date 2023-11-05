@@ -20,15 +20,13 @@ public:
   Mesh(vector<vertex_t>& vertices, vector<uint32_t>& indices, vector<Texture*>& textures);
   ~Mesh() = default;
 
-  void draw(Shader* shader);
+  void draw(Shader* shader, uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
 
   void destroy();
 
 private:
   vector<uint32_t> _indices;
   vector<Texture*> _textures;
-
-  uint32_t _drawMode;
 
   unique_ptr<VertexBuffer>  _vertexBuffer;
   unique_ptr<ElementBuffer> _elementBuffer;
