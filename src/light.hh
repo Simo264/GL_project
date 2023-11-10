@@ -3,24 +3,12 @@
 
 #include "core.hh"
 
-class Light
+struct light_t
 {
-public:
-  Light();
-  ~Light();
-
-private:
-
-
+  vec3f position;
+  vec3f ambient;
+  vec3f diffuse;
+  vec3f specular;
 };
-
-Light::Light()
-{
-}
-
-Light::~Light()
-{
-}
-
 
 #endif

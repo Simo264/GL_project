@@ -18,7 +18,7 @@ public:
   mat4f lookAround();
 
   void processKeyboardInput(Window* window, double deltaTime);
-  void processMouseMovement(Window* window);
+  // void processMouseMovement(Window* window);
 
   vec3f position;
   vec3f front;
@@ -29,11 +29,6 @@ public:
   double pitch;
   double speed;
   double sensitivity;
-
-private:
-  double _lastX;
-  double _lastY;
-
 };
 
 #endif

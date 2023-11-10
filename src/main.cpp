@@ -5,6 +5,8 @@
 #include "texture.hh"
 #include "camera.hh"
 #include "model.hh"
+#include "light.hh"
+#include "material.hh"
 
 #include "spdlog/spdlog.h"
 
@@ -24,12 +26,30 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  Model modelObject("models/Backpack/Backpack.obj");
+  //Model modelObject("models/Backpack/Backpack.obj");
+  Model modelObject("models/Crate/Crate.obj");
   
 
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera { vec3f(0.0f, 0.0f, 7.0f), vec3f(0.0f, 0.0f, -1.0f) };
+
+
+  // light object
+  // ------------------------------------------------------------------------
+  light_t light { 
+    .position = vec3f(0.2f, 0.2f, 0.2f),
+    .ambient  = vec3f(0.2f, 0.2f, 0.2f),
+    .diffuse  = vec3f(0.5f, 0.5f, 0.5f),
+    .specular = vec3f(1.0f, 1.0f, 1.0f)
+  };
+
+  material_t material {
+    .diffuse = 0,
+    .normal = 1,
+    .specular = 2,
+    .shininess = 64.f 
+  };
 
    
   // render loop
@@ -48,7 +68,7 @@ int main()
     // input
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
-    // camera.processKeyboardInput(window, deltaTime); 
+    camera.processKeyboardInput(&window, deltaTime);
     // camera.processMouseMovement(window); 
 
 
@@ -63,7 +83,7 @@ int main()
     
     model = mat4f(1.0f);
     model = translate(model, targetPosition);
-    model = rotate(model, radians((float)glfwGetTime() * 20), vec3f(0.f, 1.f, 0.f)); 
+    //model = rotate(model, radians((float)glfwGetTime() * 20), vec3f(0.f, 1.f, 0.f)); 
     model = scale(model, vec3f(0.50, 0.50, 0.50));
     shaderMesh.use();
     shaderMesh.setMat4f("view",       view);
@@ -71,22 +91,27 @@ int main()
     shaderMesh.setMat4f("model",      model);
 
     // material properties
-    shaderMesh.setInt("material.diffuse", 0);
-    shaderMesh.setInt("material.specular", 1);
-    shaderMesh.setFloat("material.shininess", 64.0f);
+    shaderMesh.setInt("material.diffuse",     material.diffuse);
+    shaderMesh.setInt("material.normal",      material.normal);
+    shaderMesh.setInt("material.specular",    material.specular);
+    shaderMesh.setFloat("material.shininess", material.shininess);
 
     // light properties
-    static const vec3f lightPosition { 0.2f, 0.2f, 0.2f };
-    static const vec3f lightAmbient  { 0.2f, 0.2f, 0.2f };
-    static const vec3f lightDiffuse  { 0.5f, 0.5f, 0.5f };
-    static const vec3f lightSpecular { 1.0f, 1.0f, 1.0f };
-    shaderMesh.setVec3f("light.position",  lightPosition);
-    shaderMesh.setVec3f("light.ambient",  lightAmbient);
-    shaderMesh.setVec3f("light.diffuse",  lightDiffuse);
-    shaderMesh.setVec3f("light.specular", lightSpecular);
+    shaderMesh.setVec3f("light.position", light.position);
+    shaderMesh.setVec3f("light.ambient",  light.ambient);
+    shaderMesh.setVec3f("light.diffuse",  light.diffuse);
+    shaderMesh.setVec3f("light.specular", light.specular);
     shaderMesh.setVec3f("viewPos", camera.position);
 
     modelObject.draw(&shaderMesh, GL_TRIANGLES);
+
+    // const float time = (float) glfwGetTime();
+    // const float senx = glm::sin(time);
+    // const float cosx = glm::cos(time);
+    // spdlog::info("{}, {}, {}", time, senx, cosx);
+
+    // camera.position.x = senx * 90.f * 0.1f;
+    // camera.position.z = cosx * 90.f * 0.1f;
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
