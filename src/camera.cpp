@@ -30,19 +30,32 @@ void Camera::processKeyboardInput(Window* window, double deltaTime)
 {
   (void) deltaTime;
 
-  //const float velocity = static_cast<float>(speed * deltaTime);
-  static float rotation = 0.f;
+  const float sensitivity = 1.f;
+  static float rotation   = 0.f;
+  
+  const float angle = radians(90.f);
+  const float distance = 1.f;
+  
  
   if (window->getKey(GLFW_KEY_A) == GLFW_PRESS)
-  {
-    rotation += 0.01f;
-    const float senx = glm::sin(rotation);
-    const float cosx = glm::cos(rotation);
-    spdlog::info("{}, {}, {}", rotation, senx, cosx);
+  { 
+    rotation -= deltaTime * sensitivity;
 
-    position.x = (senx * 90 * 0.01f) + 1.f;
-    position.z = (cosx * 90 * 0.01f) + 1.f;
+    const float senx  = glm::sin(rotation);
+    const float cosx  = glm::cos(rotation);
+    position.x = (senx * angle * distance);
+    position.z = (cosx * angle * distance);
   }
+  if (window->getKey(GLFW_KEY_D) == GLFW_PRESS)
+  { 
+    rotation += deltaTime * sensitivity;
+
+    const float senx  = glm::sin(rotation);
+    const float cosx  = glm::cos(rotation);
+    position.x = (senx * angle * distance);
+    position.z = (cosx * angle * distance);
+  }
+
 }
 
 #if 0

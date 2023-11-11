@@ -69,7 +69,7 @@ int main()
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
     camera.processKeyboardInput(&window, deltaTime);
-    // camera.processMouseMovement(window); 
+    // camera.processMouseMovement(window);
 
 
     // Render 
