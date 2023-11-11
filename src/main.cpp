@@ -26,13 +26,13 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  //Model modelObject("models/Backpack/Backpack.obj");
+  // Model modelObject("models/Backpack/Backpack.obj");
   Model modelObject("models/Crate/Crate.obj");
-  
+  vec3f modelPosition { 0.0f, 0.0f, 0.0f };
 
   // create camera object
   // ------------------------------------------------------------------------
-  Camera camera { vec3f(0.0f, 0.0f, 7.0f), vec3f(0.0f, 0.0f, -1.0f) };
+  Camera camera { &modelPosition, 3.f };
 
 
   // light object
@@ -43,7 +43,6 @@ int main()
     .diffuse  = vec3f(0.5f, 0.5f, 0.5f),
     .specular = vec3f(1.0f, 1.0f, 1.0f)
   };
-
   material_t material {
     .diffuse = 0,
     .normal = 1,
@@ -54,7 +53,7 @@ int main()
    
   // render loop
   // ------------------------------------------------------------------------
-  vec3f targetPosition { 0.0f, 0.0f, 0.0f };
+  
   mat4f model;
   mat4f projection = perspective(radians(45.f), (WINDOW_WIDTH / WINDOW_HEIGTH), 0.1f, 100.0f);
   while(window.loop())
@@ -63,13 +62,11 @@ int main()
     // ------------------------------------------------------------------------
     window.update();
     const double deltaTime = window.delta();
-    (void) deltaTime;
 
     // input
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
     camera.processKeyboardInput(&window, deltaTime);
-    // camera.processMouseMovement(window);
 
 
     // Render 
@@ -77,14 +74,13 @@ int main()
     window.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
     window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    // view/projection transformations
-    const mat4f view  = camera.lookAtTarget(targetPosition);
-    
+    // model/view transformations
+    const mat4f view  = camera.getViewMatrix();
     
     model = mat4f(1.0f);
-    model = translate(model, targetPosition);
-    //model = rotate(model, radians((float)glfwGetTime() * 20), vec3f(0.f, 1.f, 0.f)); 
-    model = scale(model, vec3f(0.50, 0.50, 0.50));
+    model = translate(model, modelPosition);
+    // model = rotate(model, radians((float)glfwGetTime() * 20), vec3f(0.f, 1.f, 0.f)); 
+    // model = scale(model, vec3f(0.50, 0.50, 0.50));
     shaderMesh.use();
     shaderMesh.setMat4f("view",       view);
     shaderMesh.setMat4f("projection", projection);
@@ -101,17 +97,9 @@ int main()
     shaderMesh.setVec3f("light.ambient",  light.ambient);
     shaderMesh.setVec3f("light.diffuse",  light.diffuse);
     shaderMesh.setVec3f("light.specular", light.specular);
-    shaderMesh.setVec3f("viewPos", camera.position);
+    shaderMesh.setVec3f("viewPos",        camera.position);
 
     modelObject.draw(&shaderMesh, GL_TRIANGLES);
-
-    // const float time = (float) glfwGetTime();
-    // const float senx = glm::sin(time);
-    // const float cosx = glm::cos(time);
-    // spdlog::info("{}, {}, {}", time, senx, cosx);
-
-    // camera.position.x = senx * 90.f * 0.1f;
-    // camera.position.z = cosx * 90.f * 0.1f;
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
