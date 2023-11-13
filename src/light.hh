@@ -5,7 +5,8 @@
 
 struct light_t
 {
-  vec3f position;
+  vec3f direction;
+  
   vec3f ambient;
   vec3f diffuse;
   vec3f specular;

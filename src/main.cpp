@@ -20,28 +20,30 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  // Model modelObject("models/Backpack/Backpack.obj");
-  Model modelObject("models/Crate/Crate.obj");
-  
+  Model modelCrate("assets/Crate/Crate.obj");
+  Model modelCrate_2("assets/Crate/Crate.obj");
+  vec3f pos = modelCrate_2.position();
+  pos.z = 2.7f;
+  modelCrate_2.setPosition(pos);
+
 
   // create camera object
   // ------------------------------------------------------------------------
-  vec3f* target  = &modelObject.position();
-  Camera camera(target, 5.0f);
+  pos = modelCrate.position();
+  Camera camera(&pos, 5.0f);
 
 
   // light object
   // ------------------------------------------------------------------------
   light_t light { 
-    .position = vec3f(0.0f, 2.0f, 5.0f),
-    .ambient  = vec3f(0.1f, 0.1f, 0.1f),
-    .diffuse  = vec3f(0.1f, 0.1f, 0.1f),
-    .specular = vec3f(0.25f, 0.25f, 0.25f)
+    .direction = vec3f(-0.2f, -1.0f, -0.3f),
+    .ambient   = vec3f(0.1f, 0.1f, 0.1f),
+    .diffuse   = vec3f(0.1f, 0.1f, 0.1f),
+    .specular  = vec3f(0.25f, 0.25f, 0.25f)
   };
 
    
-  const mat4f projection = 
-    perspective(radians(45.f), (float)window.width()/window.height, 0.1f, 100.0f);
+  const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
   
   // render loop
   // ------------------------------------------------------------------------
@@ -66,21 +68,20 @@ int main()
     shaderMesh.use();
     shaderMesh.setMat4f("view",       camera.getViewMatrix());
     shaderMesh.setMat4f("projection", projection);
-    shaderMesh.setMat4f("model",      modelObject.getModelMatrix());
     shaderMesh.setVec3f("viewPos",    camera.position);
 
     // light properties
-    shaderMesh.setVec3f("light.position", light.position);
-    shaderMesh.setVec3f("light.ambient",  light.ambient);
-    shaderMesh.setVec3f("light.diffuse",  light.diffuse);
-    shaderMesh.setVec3f("light.specular", light.specular);
+    shaderMesh.setVec3f("light.direction", light.direction);
+    shaderMesh.setVec3f("light.ambient",   light.ambient);
+    shaderMesh.setVec3f("light.diffuse",   light.diffuse);
+    shaderMesh.setVec3f("light.specular",  light.specular);
     
+    modelCrate.draw(&shaderMesh, GL_TRIANGLES);
+    modelCrate_2.draw(&shaderMesh, GL_TRIANGLES);
 
-    modelObject.draw(&shaderMesh, GL_TRIANGLES);
-
-    const auto time = glfwGetTime();
-    light.position.x = glm::sin(time) * 10.0f;
-    light.position.z = glm::cos(time) * 10.0f;
+    const auto time = glfwGetTime() / 2;
+    light.direction.x = glm::sin(time) * 10.0f;
+    light.direction.z = glm::cos(time) * 10.0f;
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------

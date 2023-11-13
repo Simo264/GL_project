@@ -17,23 +17,19 @@ Model::Model(const string& path)
 {
   loadModel(path);
 
-#if 0
-  // model  = rotate(model, radians((float)glfwGetTime() * 20), vec3f(0.f, 1.f, 0.f)); 
-  _translationMatrix = translate(mat4f(1.f), vec3f(0.f,0.f,0.f));
-  _scalingMatrix     = scale(mat4f(1.f), vec3f(1.f,1.f,1.f));
-  _rotationMatrix    = mat4f(1.f); // no rotation
-#endif
-  
-  _position = vec3f(0.f,0.f,0.f);
-  _size     = vec3f(1.f,1.f,1.f);
+  _position = vec3f(0.f,0.f,0.f); // default on origin
+  _size     = vec3f(1.f,1.f,1.f); // default size
 
-  _modelMatrix = mat4f(1.f);
-  _modelMatrix = translate(_modelMatrix, _position);
-  _modelMatrix = scale(_modelMatrix, _size);
+  _translationMatrix = translate(mat4f(1.f), _position);
+  _scalingMatrix     = scale(mat4f(1.f), _size);
+  _rotationMatrix    = mat4f(1.f); // no rotation
+  
+  updateModelMatrix();
 }
 
 void Model::draw(Shader* shader, uint32_t drawmode)
 {
+  shader->setMat4f("model", _modelMatrix);
   for(auto& mesh : _meshes)
     mesh->draw(shader, drawmode);
 }
@@ -47,19 +43,17 @@ void Model::destroy()
   }
 }
 
-#if 0
 void Model::setPosition(vec3f newPos)
 {
   _translationMatrix = translate(mat4f(1.f), newPos);
-  _modelMatrix       = _translationMatrix * _rotationMatrix * _scalingMatrix;
-
+  updateModelMatrix();
 }
+
 void Model::setSize(vec3f newSz)
 {
   _scalingMatrix = scale(mat4f(1.f), newSz);
-  _modelMatrix   = _translationMatrix * _rotationMatrix * _scalingMatrix;
+  updateModelMatrix();
 }
-#endif
 
 /* -----------------------------------------------------
  *          PRIVATE METHODS
@@ -161,7 +155,7 @@ void Model::loadTextures(vector<Texture*>& out, const aiMaterial* material, cons
     aiString filename;
     material->GetTexture(aiType, i, &filename);
 
-    string path = "res/textures/";
+    string path = "assets/";
     path.append(filename.C_Str());
 
     Texture* texture = nullptr;
