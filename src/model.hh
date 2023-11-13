@@ -17,12 +17,36 @@ public:
   
   void destroy();
 
+  vec3f& position() { return _position;}
+  vec3f& size() { return _size; }
+
+  mat4f getModelMatrix() const { return _modelMatrix; }
+
+
+#if 0
+  vec3f position() const { return _position;}
+  void setPosition(vec3f newPos);
+  vec3f size() const { return _size; }
+  void setSize(vec3f newSz);
+
+  vec3f _position;
+  vec3f _size;
+
+  mat4f _translationMatrix;
+  mat4f _scalingMatrix;
+  mat4f _rotationMatrix;
+#endif
+
 private:
   vector<Mesh*> _meshes;
 
+  vec3f _position;
+  vec3f _size;
+
+  mat4f _modelMatrix;
+
   void loadModel(const string& path);
   void loadMesh(const struct aiScene* scene, const struct aiMesh* mesh);
-
   void loadVertices(vector<vertex_t>& out, const struct aiMesh* mesh);
   void loadIndices(vector<uint32_t>& out,  const struct aiMesh* mesh);
   void loadTextures(

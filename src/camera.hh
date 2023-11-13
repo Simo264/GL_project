@@ -9,6 +9,7 @@ class Camera
 {
 public:
   Camera(vec3f* target, float distance);
+  Camera(vec3f position);
   ~Camera() { }
 
   mat4f getViewMatrix() const;
@@ -17,7 +18,6 @@ public:
 
   vec3f position;
   vec3f front;
-  vec3f right;
   vec3f up;
 
   vec3f* target;

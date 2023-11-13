@@ -11,7 +11,6 @@
 #include "element_buffer.hh"
 #include "vertex_array.hh"
 
-
 // A mesh represents a single drawable entity
 // ------------------------------------------------
 class Mesh

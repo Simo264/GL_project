@@ -16,6 +16,20 @@ static map<string, Texture*> GLOBAL_TEXTURES;
 Model::Model(const string& path)
 {
   loadModel(path);
+
+#if 0
+  // model  = rotate(model, radians((float)glfwGetTime() * 20), vec3f(0.f, 1.f, 0.f)); 
+  _translationMatrix = translate(mat4f(1.f), vec3f(0.f,0.f,0.f));
+  _scalingMatrix     = scale(mat4f(1.f), vec3f(1.f,1.f,1.f));
+  _rotationMatrix    = mat4f(1.f); // no rotation
+#endif
+  
+  _position = vec3f(0.f,0.f,0.f);
+  _size     = vec3f(1.f,1.f,1.f);
+
+  _modelMatrix = mat4f(1.f);
+  _modelMatrix = translate(_modelMatrix, _position);
+  _modelMatrix = scale(_modelMatrix, _size);
 }
 
 void Model::draw(Shader* shader, uint32_t drawmode)
@@ -33,6 +47,19 @@ void Model::destroy()
   }
 }
 
+#if 0
+void Model::setPosition(vec3f newPos)
+{
+  _translationMatrix = translate(mat4f(1.f), newPos);
+  _modelMatrix       = _translationMatrix * _rotationMatrix * _scalingMatrix;
+
+}
+void Model::setSize(vec3f newSz)
+{
+  _scalingMatrix = scale(mat4f(1.f), newSz);
+  _modelMatrix   = _translationMatrix * _rotationMatrix * _scalingMatrix;
+}
+#endif
 
 /* -----------------------------------------------------
  *          PRIVATE METHODS
@@ -57,12 +84,12 @@ void Model::loadModel(const string& path)
 
   for(uint32_t i = 0; i < scene->mNumMeshes; i++)
   {
-    spdlog::info("Loading mesh °{}...", i);
+    // spdlog::info("Loading mesh °{}...", i);
     aiMesh* mesh = scene->mMeshes[i];
     loadMesh(scene, mesh);
   }
 
-  spdlog::info("Done!");
+  // spdlog::info("Done!");
 }
 
 void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)

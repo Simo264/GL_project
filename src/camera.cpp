@@ -7,6 +7,17 @@
  * -----------------------------------------------------
 */
 
+Camera::Camera(vec3f position)
+{
+  this->position = position;
+  front = vec3f(0.0f, 0.0f, -1.0f), 
+  up    = vec3f(0.0f, 1.0f,  0.0f);
+
+  sensitivity = 1.f;
+  distanceToTarget = -1.f;
+  target = nullptr;
+}
+
 Camera::Camera(vec3f* target, float distance)
 {
   position.x = target->x + distance;
@@ -25,34 +36,39 @@ mat4f Camera::getViewMatrix() const
 {
   return lookAt(position, *target, up);
 
-  #if 0
+#if 0
   if(target)
-    return lookAt(position, target, up);
+    return lookAt(position, *target, up);
   else
     return lookAt(position, position + front, up);
-  #endif
+#endif
 }
 
 void Camera::processKeyboardInput(Window* window, double deltaTime)
 {
-  (void) deltaTime;
-
-  static float rotation   = 0.f;
+  const float velocity     = deltaTime * sensitivity;
+  static float rotation    = 0.f;
   static const float angle = radians(90.f);
-  
   if (window->getKey(GLFW_KEY_A) == GLFW_PRESS)
   { 
-    rotation -= deltaTime * sensitivity;
+    rotation -= velocity;
     position.x = glm::sin(rotation) * angle * distanceToTarget;
     position.z = glm::cos(rotation) * angle * distanceToTarget;
   }
-
-  if (window->getKey(GLFW_KEY_D) == GLFW_PRESS)
+  else if (window->getKey(GLFW_KEY_D) == GLFW_PRESS)
   { 
-    rotation += deltaTime * sensitivity;
+    rotation += velocity;
     position.x = glm::sin(rotation) * angle * distanceToTarget;
     position.z = glm::cos(rotation) * angle * distanceToTarget;
   }
 
+  if (window->getKey(GLFW_KEY_W) == GLFW_PRESS)
+  { 
+    position.y += velocity*10;
+  }
+  else if (window->getKey(GLFW_KEY_S) == GLFW_PRESS)
+  { 
+    position.y -= velocity*10;
+  }
 }
 
