@@ -30,6 +30,8 @@ public:
 
   string path() const { return _path; }
 
+  static Texture* create(const string& path, TextureType type, bool immutable){ return new Texture(path,type,immutable);}
+
 private:
   uint32_t _texture;
   string   _path;

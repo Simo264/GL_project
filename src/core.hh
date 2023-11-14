@@ -1,15 +1,16 @@
 #ifndef CORE_HH
 #define CORE_HH
 
-#include <cstdint>
 #include <array>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <vector>
 #include <algorithm>
+#include <cstdint>
+#include <fstream>
+#include <filesystem>
 #include <map>
 #include <memory>
+#include <string>
+#include <sstream>
+#include <vector>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"

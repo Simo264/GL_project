@@ -6,7 +6,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 
-static map<string, Texture*> GLOBAL_TEXTURES;
+#include "pool/texture_pool.hh"
 
 /* -----------------------------------------------------
  *          PUBLIC METHODS
@@ -158,17 +158,11 @@ void Model::loadTextures(vector<Texture*>& out, const aiMaterial* material, cons
     string path = "assets/";
     path.append(filename.C_Str());
 
-    Texture* texture = nullptr;
-
-    auto it = GLOBAL_TEXTURES.find(path);
-    if (it == GLOBAL_TEXTURES.end())
+    Texture* texture = pool::TexturePool::getTexture(path);
+    if(!texture)
     {
-      texture = new Texture(path, texType);
-      GLOBAL_TEXTURES.insert(make_pair(path,texture));
-    }
-    else
-    {
-      texture = it->second;
+      texture = Texture::create(path, texType, false);
+      pool::TexturePool::loadTexture(path,texture);
     }
 
     out.push_back(texture);

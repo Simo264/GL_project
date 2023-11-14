@@ -13,6 +13,8 @@ Mesh::Mesh(vector<vertex_t>& vertices, vector<uint32_t>& indices, vector<Texture
   _vertexBuffer   = make_unique<VertexBuffer>(vertices.size(), vertices.data());
   _elementBuffer  = make_unique<ElementBuffer>(indices.size(), indices.data());
   _vertexArray    = make_unique<VertexArray>(_vertexBuffer.get());
+  
+  
 }
 
 void Mesh::draw(Shader* shader, uint32_t drawmode)
@@ -44,6 +46,8 @@ void Mesh::draw(Shader* shader, uint32_t drawmode)
     texture->bind();
   }
 
+  shader->setFloat("material.shininess", 32.0f);
+
   _vertexArray.get()->bind();
   _elementBuffer.get()->bind();
   
@@ -58,11 +62,5 @@ void Mesh::destroy()
   _vertexArray.get()->destroy();
   _vertexBuffer.get()->destroy();
   _elementBuffer.get()->destroy();
-
-  for(auto& texture : _textures)
-  {
-    texture->destroy();
-    delete texture;
-  }
 }
 

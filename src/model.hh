@@ -23,13 +23,6 @@ public:
   vec3f size() const { return _size; }
   void setSize(vec3f newSz);
   
-
-#if 0
-  mat4f getModelMatrix() const { return _modelMatrix; } 
-  vec3f& position() { return _position;}
-  vec3f& size() { return _size; }
-#endif
-
 private:
   vector<Mesh*> _meshes;
 

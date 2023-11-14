@@ -6,6 +6,10 @@
 #include "model.hh"
 #include "light.hh"
 
+#include "pool/texture_pool.hh"
+
+#include "spdlog/spdlog.h"
+
 int main()
 { 
   Window window;
@@ -20,31 +24,36 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
+  Model modelFloor("assets/Floor/Floor.obj");
   Model modelCrate("assets/Crate/Crate.obj");
-  Model modelCrate_2("assets/Crate/Crate.obj");
-  vec3f pos = modelCrate_2.position();
-  pos.z = 2.7f;
-  modelCrate_2.setPosition(pos);
+  modelFloor.setPosition(vec3f(0.0f, -1.0f, 0.0f));
+  modelFloor.setSize(vec3f(0.5f, 1.0f, 0.5f));
+
+  // Model modelCrate_2("assets/Crate/Crate.obj");
+  // vec3f pos = modelCrate_2.position();
+  // pos.z = 2.7f;
+  // modelCrate_2.setPosition(pos);
 
 
   // create camera object
   // ------------------------------------------------------------------------
-  pos = modelCrate.position();
+  vec3f pos = modelCrate.position();
   Camera camera(&pos, 5.0f);
 
 
   // light object
   // ------------------------------------------------------------------------
   light_t light { 
+    .position  = vec3f(0.0f, 3.0f, 0.0f),
     .direction = vec3f(-0.2f, -1.0f, -0.3f),
-    .ambient   = vec3f(0.1f, 0.1f, 0.1f),
-    .diffuse   = vec3f(0.1f, 0.1f, 0.1f),
-    .specular  = vec3f(0.25f, 0.25f, 0.25f)
+    .ambient   = vec3f(0.25f, 0.25f, 0.25f),
+    .diffuse   = vec3f(0.5f, 0.5f, 0.5f),
+    .specular  = vec3f(0.5f, 0.5f, 0.5f),
+    .linear    = 0.09f,
+    .quadratic = 0.032f
   };
-
    
   const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
-  
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
@@ -71,17 +80,22 @@ int main()
     shaderMesh.setVec3f("viewPos",    camera.position);
 
     // light properties
+    shaderMesh.setVec3f("light.position",  light.position);
     shaderMesh.setVec3f("light.direction", light.direction);
     shaderMesh.setVec3f("light.ambient",   light.ambient);
     shaderMesh.setVec3f("light.diffuse",   light.diffuse);
     shaderMesh.setVec3f("light.specular",  light.specular);
-    
-    modelCrate.draw(&shaderMesh, GL_TRIANGLES);
-    modelCrate_2.draw(&shaderMesh, GL_TRIANGLES);
+    shaderMesh.setFloat("light.constant",  light.constant);
+    shaderMesh.setFloat("light.linear",    light.linear);
+    shaderMesh.setFloat("light.quadratic", light.quadratic);
 
-    const auto time = glfwGetTime() / 2;
-    light.direction.x = glm::sin(time) * 10.0f;
-    light.direction.z = glm::cos(time) * 10.0f;
+    modelFloor.draw(&shaderMesh, GL_TRIANGLES);
+    modelCrate.draw(&shaderMesh, GL_TRIANGLES);
+
+    // modelCrate_2.draw(&shaderMesh, GL_TRIANGLES);
+
+    const auto time  = glfwGetTime();
+    light.position.z = glm::sin(time) * 10.0f;
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
@@ -91,6 +105,7 @@ int main()
   // de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
   shaderMesh.destroy();
+  pool::TexturePool::clear();
 
 
   // glfw: terminate, clearing all previously allocated GLFW resources.

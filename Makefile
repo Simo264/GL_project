@@ -15,6 +15,7 @@ STATIC_LIBS = ${STATIC_LIBS_DIR}libglad.a \
 
 SOURCES 	= 	$(wildcard src/*.cpp)
 SOURCES  += 	$(wildcard src/imgui/*.cpp)
+SOURCES  += 	$(wildcard src/pool/*.cpp)
 
 OBJDIR 		= debug/
 OBJECTS 	= $(patsubst %.cpp, $(OBJDIR)%.o, $(SOURCES))
