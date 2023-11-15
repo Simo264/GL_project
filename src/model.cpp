@@ -161,7 +161,7 @@ void Model::loadTextures(vector<Texture*>& out, const aiMaterial* material, cons
     Texture* texture = pool::TexturePool::getTexture(path);
     if(!texture)
     {
-      texture = Texture::create(path, texType, false);
+      texture = new Texture(path, texType, false);
       pool::TexturePool::loadTexture(path,texture);
     }
 

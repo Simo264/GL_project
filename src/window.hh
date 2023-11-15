@@ -64,7 +64,7 @@ public:
 
 private:
   GLFWwindow* _window;
-  
+ 
   uint32_t _width;
   uint32_t _height;
 

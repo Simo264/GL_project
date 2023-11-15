@@ -4,11 +4,13 @@
 #include "shader.hh"
 #include "camera.hh"
 #include "model.hh"
-#include "light.hh"
+#include "lighting.hh"
 
+#include "pool/shader_pool.hh"
 #include "pool/texture_pool.hh"
 
 #include "spdlog/spdlog.h"
+
 
 int main()
 { 
@@ -19,16 +21,15 @@ int main()
 
   // build and compile our shader program
   // ------------------------------------------------------------------------
-  Shader shaderMesh { "shaders/mesh.vert","shaders/mesh.frag" };  
-
+  Shader shaderMesh("shaders/mesh.vert","shaders/mesh.frag");
+  pool::ShaderPool::loadShader("shader_mesh", &shaderMesh);
+  
 
   // create model objects
   // ------------------------------------------------------------------------
   Model modelFloor("assets/Floor/Floor.obj");
   Model modelCrate("assets/Crate/Crate.obj");
   modelFloor.setPosition(vec3f(0.0f, -1.0f, 0.0f));
-  modelFloor.setSize(vec3f(0.5f, 1.0f, 0.5f));
-
   // Model modelCrate_2("assets/Crate/Crate.obj");
   // vec3f pos = modelCrate_2.position();
   // pos.z = 2.7f;
@@ -43,15 +44,8 @@ int main()
 
   // light object
   // ------------------------------------------------------------------------
-  light_t light { 
-    .position  = vec3f(0.0f, 3.0f, 0.0f),
-    .direction = vec3f(-0.2f, -1.0f, -0.3f),
-    .ambient   = vec3f(0.25f, 0.25f, 0.25f),
-    .diffuse   = vec3f(0.5f, 0.5f, 0.5f),
-    .specular  = vec3f(0.5f, 0.5f, 0.5f),
-    .linear    = 0.09f,
-    .quadratic = 0.032f
-  };
+  lighting::Light light; 
+  light.position = vec3f(0.0f, 3.0f, 0.0f);
    
   const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
   // render loop
@@ -85,17 +79,13 @@ int main()
     shaderMesh.setVec3f("light.ambient",   light.ambient);
     shaderMesh.setVec3f("light.diffuse",   light.diffuse);
     shaderMesh.setVec3f("light.specular",  light.specular);
-    shaderMesh.setFloat("light.constant",  light.constant);
-    shaderMesh.setFloat("light.linear",    light.linear);
-    shaderMesh.setFloat("light.quadratic", light.quadratic);
 
     modelFloor.draw(&shaderMesh, GL_TRIANGLES);
     modelCrate.draw(&shaderMesh, GL_TRIANGLES);
-
     // modelCrate_2.draw(&shaderMesh, GL_TRIANGLES);
 
-    const auto time  = glfwGetTime();
-    light.position.z = glm::sin(time) * 10.0f;
+    // const auto time  = glfwGetTime();
+    // light.position.z = glm::sin(time) * 10.0f;
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
@@ -104,7 +94,7 @@ int main()
 
   // de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
-  shaderMesh.destroy();
+  pool::ShaderPool::clear();
   pool::TexturePool::clear();
 
 
