@@ -4,42 +4,52 @@
 
 namespace pool
 {
-  map<string, Texture*> TexturePool::_textureMapping = map<string, Texture*>();
+  unique_ptr<Texture[]> TexturePool::_textureBuffer;
+  uint32_t              TexturePool::_bufferSz;
+  uint32_t              TexturePool::_bufferCapacity;
 
-  void TexturePool::loadTexture(string path, Texture* texture)
+  void TexturePool::initialize()
   {
-    auto it = _textureMapping.find(path);
-    if(it != _textureMapping.end())
-    {
-      spdlog::warn("Texture {} is already loaded", path);
-      return;
-    } 
+    _bufferSz = 0;
+    _bufferCapacity = MAX_TEXTURE_BUFFER_SIZE;
+    _textureBuffer  = make_unique<Texture[]>(_bufferCapacity);
+  }
 
-    _textureMapping.insert(make_pair(path,texture));
+  Texture* TexturePool::loadTexture(const string& path, TextureType type, bool immutable)
+  {
+    if(_bufferSz >= _bufferCapacity)
+    { 
+      spdlog::warn("Can't load more textures. Buffer is full");
+      return nullptr;
+    }
+
+    auto address = &_textureBuffer.get()[_bufferSz];
+    Texture* texture = new(address) Texture(path, type, immutable);
+    _bufferSz++;
+
+    return texture;
   }
 
   Texture* TexturePool::getTexture(const string& path)
   {
-    auto it = _textureMapping.find(path);
-    
-    if (it == _textureMapping.end())
-      return nullptr;
+    for(uint32_t i = 0; i < _bufferSz; i++)
+    {
+      auto* t = &_textureBuffer.get()[i];
+      if(t->path().compare(path) == 0)
+        return t;
+    }
 
-    return it->second;
+    return nullptr;
   }
 
   void TexturePool::clear()
   {
-    for (auto& [path, texture] : _textureMapping)
+    for(uint32_t i = 0; i < _bufferSz; i++)
     {
+      auto* texture = &_textureBuffer.get()[i];
       texture->destroy();
-      
-      // remove this if Texture objects are not on the heap
-      delete texture;
     }
-
-    _textureMapping.clear();
+    
+    _textureBuffer.release();
   }
 }
-
-

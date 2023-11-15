@@ -4,6 +4,8 @@
 #include "../core.hh"
 #include "../texture.hh"
 
+#define MAX_TEXTURE_BUFFER_SIZE 200
+
 namespace pool
 {
   class TexturePool
@@ -12,13 +14,17 @@ namespace pool
     TexturePool() = default;
     ~TexturePool() = default;
 
-    static void     loadTexture(string path, Texture* texture);
+    static void initialize();
+
+    static Texture* loadTexture(const string& path, TextureType type, bool immutable);
     static Texture* getTexture(const string& path);
 
     static void clear();
 
   private:
-    static map<string, Texture*> _textureMapping; // <path, Texture*>
+    static unique_ptr<Texture[]> _textureBuffer;
+    static uint32_t _bufferSz;
+    static uint32_t _bufferCapacity;
   };
 }
 

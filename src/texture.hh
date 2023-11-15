@@ -13,6 +13,7 @@ class Texture
 {
 public:
   Texture(const string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = false);
+  Texture() = default;
   ~Texture() = default;
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }

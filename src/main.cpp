@@ -18,6 +18,8 @@ int main()
   window.create(vec2u(720, 720), "OpenGL");
   window.setPosition(vec2i(200,200));
 
+  pool::TexturePool::initialize();
+
 
   // build and compile our shader program
   // ------------------------------------------------------------------------
@@ -48,6 +50,12 @@ int main()
   light.position = vec3f(0.0f, 3.0f, 0.0f);
    
   const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
+  
+  #if MEASURE_SPEED 
+  double lastTime = glfwGetTime();
+  int nbFrames = 0;
+  #endif
+  
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
@@ -56,6 +64,18 @@ int main()
     // ------------------------------------------------------------------------
     window.update();
     const double deltaTime = window.delta();
+
+    #if MEASURE_SPEED 
+    // Measure speed
+    double currentTime = glfwGetTime();
+    nbFrames++;
+    if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
+      // printf and reset timer
+      printf("%f ms/frame\n", 1000.0/double(nbFrames));
+      nbFrames = 0;
+      lastTime += 1.0;
+    }
+    #endif
 
     // input
     // ------------------------------------------------------------------------
