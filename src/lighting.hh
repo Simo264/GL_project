@@ -34,6 +34,9 @@ namespace lighting
         ambient   = color * vec3f(0.25f,0.25f,0.25f); // default ambient
         diffuse   = color * vec3f(0.5f,0.50f,0.50f);  // default diffuse
         specular  = color * vec3f(1.0f,1.0f,1.0f);    // default specular
+
+        linear    = 0.14f; // a distance of 32 to 100 is generally enough for most lights
+        quadratic = 0.07f; 
       }
 
       vec3f position;
@@ -44,6 +47,9 @@ namespace lighting
       vec3f ambient;
       vec3f diffuse;
       vec3f specular;
+
+      float linear;
+      float quadratic;
   };
 
 }

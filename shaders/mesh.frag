@@ -19,29 +19,15 @@ struct light_t {
   vec3 ambient;
   vec3 diffuse;
   vec3 specular;
+
+  float linear;
+  float quadratic;
 };
 
 uniform material_t material;
 uniform light_t    light; 
 uniform vec3       viewPos;
 
-
-vec2 calcAttenuation(float distance)
-{
-  if(distance <= 7)
-    return vec2(0.7f,1.8f);
-
-  if(distance <= 13)
-    return vec2(0.35f,0.44f);
-
-  if(distance <= 20)
-    return vec2(0.22f,0.20f);
-
-  if(distance <= 32)
-    return vec2(0.14f,0.07f);
-
-  return vec2(0.09f,0.032f); // distance>32 
-}
 
 void main()
 {
@@ -60,12 +46,8 @@ void main()
   float spec       = pow(max(dot(viewDir, reflectDir), 0.0), 32);
   vec3  specular   = light.specular * spec * texture(material.specular, TexCoords).rgb;
 
-  float distance  = length(light.position - FragPos);
-  vec2  att       = calcAttenuation(distance);
-  float linear    = att.x; // 0.09
-  float quadratic = att.y; // 0.032
-
-  float attenuation = 1.0 / (1 + 0.9 * distance + 0.032 * (distance * distance));
+  float distance    = length(light.position - FragPos);
+  float attenuation = 1.0 / (1 + light.linear * distance + light.quadratic * (distance * distance));
 
   ambient  *= attenuation; 
   diffuse  *= attenuation;

@@ -79,13 +79,15 @@ int main()
     shaderMesh.setVec3f("light.ambient",   light.ambient);
     shaderMesh.setVec3f("light.diffuse",   light.diffuse);
     shaderMesh.setVec3f("light.specular",  light.specular);
+    shaderMesh.setFloat("light.linear",    light.linear);
+    shaderMesh.setFloat("light.quadratic", light.quadratic);
 
     modelFloor.draw(&shaderMesh, GL_TRIANGLES);
     modelCrate.draw(&shaderMesh, GL_TRIANGLES);
     // modelCrate_2.draw(&shaderMesh, GL_TRIANGLES);
 
-    // const auto time  = glfwGetTime();
-    // light.position.z = glm::sin(time) * 10.0f;
+    const auto time  = glfwGetTime();
+    light.position.z = glm::sin(time) * 10.0f;
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
