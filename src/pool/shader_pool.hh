@@ -12,13 +12,17 @@ namespace pool
     ShaderPool() = default;
     ~ShaderPool() = default;
 
-    static void    loadShader(string label, Shader* shader);
+    static void initialize();
+
+    static Shader* loadShader(const string& label, const string& vFilename, const string& fFilename);
     static Shader* getShader(const string& label);
 
     static void clear();
 
   private:
-    static map<string, Shader*> _shaderMapping; // <label, shader>
+    static unique_ptr<Shader[]> _shaderBuffer;
+    static uint32_t _bufferSz;
+    static uint32_t _bufferCapacity;
 
   };
 }

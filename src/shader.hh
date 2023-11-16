@@ -6,7 +6,8 @@
 class Shader
 {
 public:
-  Shader(const string& vFilename, const string& fFilename);
+  Shader(const string& label, const string& vFilename, const string& fFilename);
+  Shader()  = default;
   ~Shader() = default;
 
   void use() const { glUseProgram(_shader); }
@@ -14,6 +15,8 @@ public:
   void destroy() { glDeleteProgram(_shader); }
 
   uint32_t get() const { return _shader; }
+
+  const string& label() const { return _label; }
 
   void setBool(const string& name, bool value) const;
   void setInt(const string& name, int value) const;
@@ -28,6 +31,7 @@ public:
 
 private:
   uint32_t _shader;
+  string   _label;
   
   void getSourceFromFile(const string& filename, string& dest);
   bool compile(uint32_t& shader, const char* src);

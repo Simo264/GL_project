@@ -18,13 +18,13 @@ int main()
   window.create(vec2u(720, 720), "OpenGL");
   window.setPosition(vec2i(200,200));
 
+  pool::ShaderPool::initialize();
   pool::TexturePool::initialize();
 
 
-  // build and compile our shader program
+  // load shaders
   // ------------------------------------------------------------------------
-  Shader shaderMesh("shaders/mesh.vert","shaders/mesh.frag");
-  pool::ShaderPool::loadShader("shader_mesh", &shaderMesh);
+  auto shaderMesh = pool::ShaderPool::loadShader("shaderMesh", "shaders/mesh.vert","shaders/mesh.frag");
   
 
   // create model objects
@@ -88,22 +88,22 @@ int main()
     window.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
     window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    shaderMesh.use();
-    shaderMesh.setMat4f("view",       camera.getViewMatrix());
-    shaderMesh.setMat4f("projection", projection);
-    shaderMesh.setVec3f("viewPos",    camera.position);
+    shaderMesh->use();
+    shaderMesh->setMat4f("view",       camera.getViewMatrix());
+    shaderMesh->setMat4f("projection", projection);
+    shaderMesh->setVec3f("viewPos",    camera.position);
 
     // light properties
-    shaderMesh.setVec3f("light.position",  light.position);
-    shaderMesh.setVec3f("light.direction", light.direction);
-    shaderMesh.setVec3f("light.ambient",   light.ambient);
-    shaderMesh.setVec3f("light.diffuse",   light.diffuse);
-    shaderMesh.setVec3f("light.specular",  light.specular);
-    shaderMesh.setFloat("light.linear",    light.linear);
-    shaderMesh.setFloat("light.quadratic", light.quadratic);
+    shaderMesh->setVec3f("light.position",  light.position);
+    shaderMesh->setVec3f("light.direction", light.direction);
+    shaderMesh->setVec3f("light.ambient",   light.ambient);
+    shaderMesh->setVec3f("light.diffuse",   light.diffuse);
+    shaderMesh->setVec3f("light.specular",  light.specular);
+    shaderMesh->setFloat("light.linear",    light.linear);
+    shaderMesh->setFloat("light.quadratic", light.quadratic);
 
-    modelFloor.draw(&shaderMesh, GL_TRIANGLES);
-    modelCrate.draw(&shaderMesh, GL_TRIANGLES);
+    modelFloor.draw(shaderMesh, GL_TRIANGLES);
+    modelCrate.draw(shaderMesh, GL_TRIANGLES);
     // modelCrate_2.draw(&shaderMesh, GL_TRIANGLES);
 
     const auto time  = glfwGetTime();

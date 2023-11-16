@@ -7,7 +7,8 @@
 */
 
 
-Shader::Shader(const string& vFilename, const string& fFilename)
+Shader::Shader(const string& label, const string& vFilename, const string& fFilename)
+  : _label{label}
 {
   string vShaderSrc;
   string fShaderSrc;

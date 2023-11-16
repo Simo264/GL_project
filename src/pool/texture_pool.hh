@@ -4,8 +4,6 @@
 #include "../core.hh"
 #include "../texture.hh"
 
-#define MAX_TEXTURE_BUFFER_SIZE 200
-
 namespace pool
 {
   class TexturePool

@@ -2,6 +2,8 @@
 
 #include "spdlog/spdlog.h"
 
+#define MAX_TEXTURE_BUFFER_SIZE 200
+
 namespace pool
 {
   unique_ptr<Texture[]> TexturePool::_textureBuffer;
