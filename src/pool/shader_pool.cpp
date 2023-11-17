@@ -12,9 +12,11 @@ namespace pool
 
   void ShaderPool::initialize()
   {
+    // preallocate a bunch of memory on the heap big enougth to
+    // contain 10 contiguous shader objects
     _bufferSz = 0;
     _bufferCapacity = MAX_SHADER_BUFFER_SIZE;
-    _shaderBuffer  = make_unique<Shader[]>(_bufferCapacity);
+    _shaderBuffer   = make_unique<Shader[]>(_bufferCapacity);
   }
 
   Shader* ShaderPool::loadShader(const string& label, const string& vFilename, const string& fFilename)

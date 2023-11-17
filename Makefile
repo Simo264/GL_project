@@ -12,22 +12,22 @@ STATIC_LIBS = ${STATIC_LIBS_DIR}libglad.a \
 							${STATIC_LIBS_DIR}libspdlog.a \
 							${STATIC_LIBS_DIR}libglm.a 
 
-
 SOURCES 	= 	$(wildcard src/*.cpp)
 SOURCES  += 	$(wildcard src/imgui/*.cpp)
 SOURCES  += 	$(wildcard src/pool/*.cpp)
+SOURCES  += 	$(wildcard src/lighting/*.cpp)
 
 OBJDIR 		= debug/
 OBJECTS 	= $(patsubst %.cpp, $(OBJDIR)%.o, $(SOURCES))
 
 all: $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS)
+$(EXECUTABLE): $(OBJECTS) 
 	g++ -o ${EXECUTABLE} $^ ${STATIC_LIBS} \
 	-L${SHARED_LIBS_DIR} -Wl,-rpath=${SHARED_LIBS_DIR} ${LDFLAGS}
 
 
-$(OBJDIR)%.o: %.cpp
+$(OBJDIR)%.o: %.cpp %.hh
 	@mkdir -p '$(@D)'
 	g++ -o $@ -c $< -I${INCLUDE_DIR} ${CXXFLAGS}
 

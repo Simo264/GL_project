@@ -12,6 +12,8 @@ namespace pool
 
   void TexturePool::initialize()
   {
+    // preallocate a bunch of memory on the heap big enougth to
+    // contain 200 contiguous texture objects
     _bufferSz = 0;
     _bufferCapacity = MAX_TEXTURE_BUFFER_SIZE;
     _textureBuffer  = make_unique<Texture[]>(_bufferCapacity);

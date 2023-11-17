@@ -13,8 +13,6 @@ Mesh::Mesh(vector<vertex_t>& vertices, vector<uint32_t>& indices, vector<Texture
   _vertexBuffer   = make_unique<VertexBuffer>(vertices.size(), vertices.data());
   _elementBuffer  = make_unique<ElementBuffer>(indices.size(), indices.data());
   _vertexArray    = make_unique<VertexArray>(_vertexBuffer.get());
-  
-  
 }
 
 void Mesh::draw(Shader* shader, uint32_t drawmode)
@@ -26,17 +24,17 @@ void Mesh::draw(Shader* shader, uint32_t drawmode)
     {
     case TextureType::TEX_DIFFUSE:
       Texture::activeTextUnit(0);
-      shader->setInt("material.diffuse" , 0);
+      shader->setInt("material.diffuse", 0);
       break;
     
     case TextureType::TEX_NORMAL:
       Texture::activeTextUnit(1);
-      shader->setInt("material.normal" , 1);
+      shader->setInt("material.normal", 1);
       break;
     
     case TextureType::TEX_SPECULAR:
       Texture::activeTextUnit(2);
-      shader->setInt("material.specular" , 2);
+      shader->setInt("material.specular", 2);
       break;
 
     default:

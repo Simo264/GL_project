@@ -4,7 +4,9 @@
 #include "shader.hh"
 #include "camera.hh"
 #include "model.hh"
-#include "lighting.hh"
+
+#include "lighting/directional_light.hh"
+#include "lighting/point_light.hh"
 
 #include "pool/shader_pool.hh"
 #include "pool/texture_pool.hh"
@@ -24,18 +26,18 @@ int main()
 
   // load shaders
   // ------------------------------------------------------------------------
-  auto shaderMesh = pool::ShaderPool::loadShader("shaderMesh", "shaders/mesh.vert","shaders/mesh.frag");
+  auto shaderScene = pool::ShaderPool::loadShader("shaderMesh", "shaders/mesh.vert","shaders/mesh.frag");
   
 
   // create model objects
   // ------------------------------------------------------------------------
-  Model modelFloor("assets/Floor/Floor.obj");
+  // Model modelFloor("assets/Floor/Floor.obj");
+  // modelFloor.setPosition(vec3f(0.0f, -1.0f, 0.0f));
+  // modelFloor.setSize(vec3f(10.0f, 1.0f, 10.0f));
+
   Model modelCrate("assets/Crate/Crate.obj");
-  modelFloor.setPosition(vec3f(0.0f, -1.0f, 0.0f));
-  // Model modelCrate_2("assets/Crate/Crate.obj");
-  // vec3f pos = modelCrate_2.position();
-  // pos.z = 2.7f;
-  // modelCrate_2.setPosition(pos);
+  Model modelCrate_2("assets/Crate/Crate.obj");
+  modelCrate_2.setPosition(vec3f(0.0f, 0.0f, 2.70f));
 
 
   // create camera object
@@ -46,9 +48,9 @@ int main()
 
   // light object
   // ------------------------------------------------------------------------
-  lighting::Light light; 
-  light.position = vec3f(0.0f, 3.0f, 0.0f);
-   
+  lighting::DirectionalLight dirLight; (void) dirLight;
+  lighting::PointLight pointLight; (void) pointLight;
+
   const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
   
   #if MEASURE_SPEED 
@@ -88,26 +90,21 @@ int main()
     window.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
     window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    shaderMesh->use();
-    shaderMesh->setMat4f("view",       camera.getViewMatrix());
-    shaderMesh->setMat4f("projection", projection);
-    shaderMesh->setVec3f("viewPos",    camera.position);
+    shaderScene->use();
+    shaderScene->setMat4f("view",       camera.getViewMatrix());
+    shaderScene->setMat4f("projection", projection);
+    shaderScene->setVec3f("viewPos",    camera.position);
 
-    // light properties
-    shaderMesh->setVec3f("light.position",  light.position);
-    shaderMesh->setVec3f("light.direction", light.direction);
-    shaderMesh->setVec3f("light.ambient",   light.ambient);
-    shaderMesh->setVec3f("light.diffuse",   light.diffuse);
-    shaderMesh->setVec3f("light.specular",  light.specular);
-    shaderMesh->setFloat("light.linear",    light.linear);
-    shaderMesh->setFloat("light.quadratic", light.quadratic);
+    // lighting
+    // dirLight.render(shaderScene);
+    pointLight.render(shaderScene);
 
-    modelFloor.draw(shaderMesh, GL_TRIANGLES);
-    modelCrate.draw(shaderMesh, GL_TRIANGLES);
-    // modelCrate_2.draw(&shaderMesh, GL_TRIANGLES);
+    // modelFloor.draw(shaderScene, GL_TRIANGLES);
+    modelCrate.draw(shaderScene, GL_TRIANGLES);
+    modelCrate_2.draw(shaderScene, GL_TRIANGLES);
 
-    const auto time  = glfwGetTime();
-    light.position.z = glm::sin(time) * 10.0f;
+    // const auto time  = glfwGetTime();
+    // light.position.x = glm::sin(time) * 10.0f;
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
