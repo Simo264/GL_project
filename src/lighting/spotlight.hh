@@ -12,14 +12,6 @@ namespace lighting
       SpotLight();
       
       void render(Shader* shader);
-
-      vec3f direction;
-
-      vec3f color;
-
-      vec3f ambient;
-      vec3f diffuse;
-      vec3f specular;
   };
 
 }

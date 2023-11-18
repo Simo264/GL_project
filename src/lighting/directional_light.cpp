@@ -2,21 +2,23 @@
 
 namespace lighting
 {
-  DirectionalLight::DirectionalLight()
+  DirectionalLight::DirectionalLight(string uniformName)
   {
-    direction = vec3f(0.0f,-1.0f,0.0f);             // default from top to bottom
-    
-    color     = vec3f(1.0f,1.0f,1.0f);                // default white color
-    ambient   = color * vec3f(0.125f,0.125f,0.125f);  // default ambient
-    diffuse   = color * vec3f(0.125f,0.125f,0.125f);  // default diffuse
-    specular  = color * vec3f(0.250,0.250,0.250);     // default specular
+    this->uniformName = uniformName;
+
+    direction = vec3f(0.0f,-1.0f,0.0f);   // default from top to bottom
+    color     = vec3f(1.0f,1.0f,1.0f);    // default white color
+    ambient   = 0.25f;                    // default ambient intensity
+    diffuse   = 0.50f;                    // default diffuse intensity
+    specular  = 1.0f;                     // default specular intensity
   }
 
   void DirectionalLight::render(Shader* shader)
   {
-    shader->setVec3f("light.direction", direction);
-    shader->setVec3f("light.ambient",   ambient);
-    shader->setVec3f("light.diffuse",   diffuse);
-    shader->setVec3f("light.specular",  specular);
+    // char shaderUName[50] = { uniformName.c_str() };
+    shader->setVec3f("dirLight.direction", direction);
+    shader->setVec3f("dirLight.ambient",   color * ambient);
+    shader->setVec3f("dirLight.diffuse",   color * diffuse);
+    shader->setVec3f("dirLight.specular",  color * specular);
   }
 }

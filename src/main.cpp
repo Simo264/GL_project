@@ -17,10 +17,9 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-
 int main()
 { 
-  Window window(vec2i(720, 720), vec2i(400,200), "OpenGL");
+  Window window(vec2u(720, 720), vec2u(400,200), "OpenGL");
 
 
   // Setup Dear ImGui context
@@ -39,18 +38,18 @@ int main()
 
   // load shaders
   // ------------------------------------------------------------------------
-  auto shaderScene = pool::ShaderPool::loadShader("shaderMesh", "shaders/mesh.vert","shaders/mesh.frag");
+  auto shaderScene = pool::ShaderPool::loadShader("shaderMesh", "shaders/scene.vert","shaders/scene.frag");
   
 
   // create model objects
   // ------------------------------------------------------------------------
-  // Model modelFloor("assets/Floor/Floor.obj");
-  // modelFloor.setPosition(vec3f(0.0f, -1.0f, 0.0f));
-  // modelFloor.setSize(vec3f(10.0f, 1.0f, 10.0f));
+  Model modelFloor("assets/Floor/Floor.obj");
+  modelFloor.setPosition(vec3f(0.0f, -1.0f, 0.0f));
+  modelFloor.setSize(vec3f(5.0f, 1.0f, 5.0f));
 
   Model modelCrate("assets/Crate/Crate.obj");
   Model modelCrate_2("assets/Crate/Crate.obj");
-  modelCrate_2.setPosition(vec3f(0.0f, 0.0f, 2.70f));
+  modelCrate_2.setPosition(vec3f(0.0f, 0.0f, 3.0f));
 
 
   // create camera object
@@ -61,8 +60,9 @@ int main()
 
   // light object
   // ------------------------------------------------------------------------
-  lighting::DirectionalLight dirLight; (void) dirLight;
-  lighting::PointLight pointLight; (void) pointLight;
+  lighting::DirectionalLight dirLight ("dirLight");
+  lighting::PointLight pointLight ("pointLight"); 
+  pointLight.position.y = 10.f;
 
   const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
   
@@ -74,9 +74,7 @@ int main()
     // ------------------------------------------------------------------------
     window.update();
     const double deltaTime = window.delta();
-
-    window.msPerFrame();
-
+    // window.msPerFrame();
 
 
     // input
@@ -96,23 +94,37 @@ int main()
     shaderScene->setVec3f("viewPos",    camera.position);
 
     // lighting
-    // dirLight.render(shaderScene);
+    dirLight.render(shaderScene);
     pointLight.render(shaderScene);
-
-    // modelFloor.draw(shaderScene, GL_TRIANGLES);
+    
     modelCrate.draw(shaderScene, GL_TRIANGLES);
     modelCrate_2.draw(shaderScene, GL_TRIANGLES);
-
-    // const auto time  = glfwGetTime();
-    // light.position.x = glm::sin(time) * 10.0f;
+    modelFloor.draw(shaderScene, GL_TRIANGLES);
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::Begin("Hello, world!");    
-    ImGui::Text("Hello from another window!");
+    if(ImGui::Begin("Directional light"))
+    {
+      ImGui::SliderFloat3("Direction", (float*) &dirLight.direction, -10.f, 10.f);
+      ImGui::SliderFloat3("Color",   (float*) &dirLight.color,         0.f, 1.f);
+      ImGui::SliderFloat("Ambient",  (float*) &dirLight.ambient,       0.f, 1.f);
+      ImGui::SliderFloat("Diffuse",  (float*) &dirLight.diffuse,       0.f, 1.f);
+      ImGui::SliderFloat("Specular", (float*) &dirLight.specular,      0.f, 1.f);
+    }
     ImGui::End();
+
+    if(ImGui::Begin("Point light"))
+    {
+      ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);
+      ImGui::SliderFloat3("Color",    (float*) &pointLight.color,      0.f, 1.f);
+      ImGui::SliderFloat("Ambient",   (float*) &pointLight.ambient,    0.f, 1.f);
+      ImGui::SliderFloat("Diffuse",   (float*) &pointLight.diffuse,    0.f, 1.f);
+      ImGui::SliderFloat("Specular",  (float*) &pointLight.specular,   0.f, 1.f);
+    }
+    ImGui::End();
+    
     
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -6,7 +6,7 @@
 class Window
 {
 public:
-  Window(vec2i dim, vec2i pos, string title, bool fullscreen = false);
+  Window(vec2u dim, vec2u pos, string title, bool fullscreen = false);
   ~Window() = default;
 
   // glfw: terminate, clearing all previously allocated GLFW resources.

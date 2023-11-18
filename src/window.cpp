@@ -15,7 +15,7 @@ static void errorCallback(int error, const char* description)
  * -----------------------------------------------------
 */
 
-Window::Window(vec2i dim, vec2i pos, string title, bool fullscreen)
+Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   : _width {dim.x}, _height{dim.y}
 {
   glfwSetErrorCallback(errorCallback);
