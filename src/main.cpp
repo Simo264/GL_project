@@ -13,12 +13,25 @@
 
 #include "spdlog/spdlog.h"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 
 int main()
 { 
-  Window window;
-  window.create(vec2u(720, 720), "OpenGL");
-  window.setPosition(vec2i(200,200));
+  Window window(vec2i(720, 720), vec2i(400,200), "OpenGL");
+
+
+  // Setup Dear ImGui context
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+  ImGui::StyleColorsDark();
+  ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
+  ImGui_ImplOpenGL3_Init("#version 130");
 
   pool::ShaderPool::initialize();
   pool::TexturePool::initialize();
@@ -53,11 +66,6 @@ int main()
 
   const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
   
-  #if MEASURE_SPEED 
-  double lastTime = glfwGetTime();
-  int nbFrames = 0;
-  #endif
-  
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
@@ -67,17 +75,9 @@ int main()
     window.update();
     const double deltaTime = window.delta();
 
-    #if MEASURE_SPEED 
-    // Measure speed
-    double currentTime = glfwGetTime();
-    nbFrames++;
-    if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
-      // printf and reset timer
-      printf("%f ms/frame\n", 1000.0/double(nbFrames));
-      nbFrames = 0;
-      lastTime += 1.0;
-    }
-    #endif
+    window.msPerFrame();
+
+
 
     // input
     // ------------------------------------------------------------------------
@@ -106,6 +106,17 @@ int main()
     // const auto time  = glfwGetTime();
     // light.position.x = glm::sin(time) * 10.0f;
 
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    ImGui::Begin("Hello, world!");    
+    ImGui::Text("Hello from another window!");
+    ImGui::End();
+    
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------
     window.swapBuffersAndProcessEvents();
@@ -117,9 +128,9 @@ int main()
   pool::TexturePool::clear();
 
 
-  // glfw: terminate, clearing all previously allocated GLFW resources.
+  // clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------
-  window.terminate();
+  window.destroy();
   return 0;
 }
 

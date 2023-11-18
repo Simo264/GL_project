@@ -27,7 +27,7 @@ $(EXECUTABLE): $(OBJECTS)
 	-L${SHARED_LIBS_DIR} -Wl,-rpath=${SHARED_LIBS_DIR} ${LDFLAGS}
 
 
-$(OBJDIR)%.o: %.cpp %.hh
+$(OBJDIR)%.o: %.cpp
 	@mkdir -p '$(@D)'
 	g++ -o $@ -c $< -I${INCLUDE_DIR} ${CXXFLAGS}
 

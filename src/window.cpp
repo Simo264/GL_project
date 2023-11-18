@@ -15,7 +15,8 @@ static void errorCallback(int error, const char* description)
  * -----------------------------------------------------
 */
 
-Window::Window()
+Window::Window(vec2i dim, vec2i pos, string title, bool fullscreen)
+  : _width {dim.x}, _height{dim.y}
 {
   glfwSetErrorCallback(errorCallback);
 
@@ -28,42 +29,21 @@ Window::Window()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  create(title, fullscreen);
+
+  setPosition(pos);
   
+  _prevFrame = 0; 
+  _currFrame = 0;
 
-  _prevFrame = 0;
-  _currFrame = 0;	
+  _lastTime  = glfwGetTime();
+  _nbFrames  = 0;
 }
 
-void Window::create(vec2u dim, string title, bool fullscreen)
-{
-  _width = dim.x; 
-  _height = dim.y;
 
-  GLFWmonitor* monitor = nullptr;
 
-  if(fullscreen)
-    monitor = glfwGetPrimaryMonitor();
-
-  _window = glfwCreateWindow(_width, _height, title.c_str(), monitor, NULL);
-  if (!_window)
-  {
-    spdlog::error("Failed to create GLFW window");
-    glfwTerminate();
-    exit(EXIT_FAILURE);
-  }
-
-  glfwMakeContextCurrent(_window);
-  glfwSetWindowUserPointer(_window, this);
-  glfwSwapInterval(1); // Enable vsync
-
-  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-  // configure global opengl state
-  // -----------------------------
-  glEnable(GL_DEPTH_TEST);
-}
-
-void Window::terminate()
+void Window::destroy()
 {
   if (_window)
     glfwDestroyWindow(_window);
@@ -94,5 +74,46 @@ void Window::update()
   _currFrame = glfwGetTime();
 }
 
+void Window::msPerFrame()
+{
+  double currentTime = glfwGetTime();
+  _nbFrames++;
 
+  if ( currentTime - _lastTime >= 1.0 )
+  {
+    spdlog::info("{} ms/frame", 1000.0/double(_nbFrames));
+    _nbFrames = 0;
+    _lastTime += 1.0f;
+  }
 
+}
+
+/* -----------------------------------------------------
+ *          PRIVATE METHODS
+ * -----------------------------------------------------
+*/
+
+void Window::create(string title, bool fullscreen)
+{
+  GLFWmonitor* monitor = nullptr;
+  if(fullscreen)
+    monitor = glfwGetPrimaryMonitor();
+
+  _window = glfwCreateWindow(_width, _height, title.c_str(), monitor, NULL);
+  if (!_window)
+  {
+    spdlog::error("Failed to create GLFW window");
+    glfwTerminate();
+    exit(EXIT_FAILURE);
+  }
+
+  glfwMakeContextCurrent(_window);
+  glfwSetWindowUserPointer(_window, this);
+  glfwSwapInterval(1); // Enable vsync
+
+  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+  // configure global opengl state
+  // -----------------------------
+  glEnable(GL_DEPTH_TEST);
+}

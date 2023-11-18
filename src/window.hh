@@ -6,14 +6,11 @@
 class Window
 {
 public:
-  Window();
+  Window(vec2i dim, vec2i pos, string title, bool fullscreen = false);
   ~Window() = default;
-  
-  // creating a window and context
-  void create(vec2u dim, string title="", bool fullscreen = false);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
-  void terminate();
+  void destroy();
   
   // set close flag TRUE
   void close() { glfwSetWindowShouldClose(_window, GLFW_TRUE); }
@@ -39,7 +36,6 @@ public:
   // mouse input
   int getMouseButton(uint32_t key) const { return glfwGetMouseButton(_window, key); }
 
-
   // window dimension
   uint32_t width() const  { return _width; }
   uint32_t height() const { return _height; }
@@ -59,18 +55,27 @@ public:
 
   // update delta time
   void update();
-
   double delta() const;
+
+  // display milliseconds-per-frames
+  void msPerFrame();
 
 private:
   GLFWwindow* _window;
- 
+  
   uint32_t _width;
   uint32_t _height;
 
   // delta time
   double _prevFrame;
   double _currFrame;
+
+  // measure speed per frame
+  double _lastTime;
+  int    _nbFrames;
+
+  // creating a window and context
+  void create(string title="", bool fullscreen = false);
 };
 
 
