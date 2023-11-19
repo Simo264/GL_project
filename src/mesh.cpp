@@ -1,5 +1,7 @@
 #include "mesh.hh"
 
+#include "spdlog/spdlog.h"
+
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
@@ -24,17 +26,17 @@ void Mesh::draw(Shader* shader, uint32_t drawmode)
     {
     case TextureType::TEX_DIFFUSE:
       Texture::activeTextUnit(0);
-      shader->setInt("material.diffuse", 0);
+      shader->setInt("material.texDiffuse", 0);
       break;
     
     case TextureType::TEX_NORMAL:
       Texture::activeTextUnit(1);
-      shader->setInt("material.normal", 1);
+      shader->setInt("material.texNormal", 1);
       break;
     
     case TextureType::TEX_SPECULAR:
       Texture::activeTextUnit(2);
-      shader->setInt("material.specular", 2);
+      shader->setInt("material.texSpecular", 2);
       break;
 
     default:

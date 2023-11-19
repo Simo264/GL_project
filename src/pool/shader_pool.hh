@@ -9,15 +9,15 @@ namespace pool
   class ShaderPool
   {
   public:
-    ShaderPool() = default;
-    ~ShaderPool() = default;
+    ShaderPool() = delete;
+    ~ShaderPool() = delete;
 
-    static void initialize();
+    static void initBuffer();
 
     static Shader* loadShader(const string& label, const string& vFilename, const string& fFilename);
     static Shader* getShader(const string& label);
 
-    static void clear();
+    static void freeBuffer();
 
   private:
     static unique_ptr<Shader[]> _shaderBuffer;

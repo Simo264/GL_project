@@ -76,18 +76,19 @@ void Model::loadModel(const string& path)
 
   _meshes.reserve(scene->mNumMeshes);
 
+  //spdlog::info("Loading meshes {}", scene->mNumMeshes);
   for(uint32_t i = 0; i < scene->mNumMeshes; i++)
   {
-    // spdlog::info("Loading mesh °{}...", i);
     aiMesh* mesh = scene->mMeshes[i];
     loadMesh(scene, mesh);
   }
-
-  // spdlog::info("Done!");
+  //spdlog::info("Done!");
 }
 
 void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
 {
+  (void) scene;
+
   vector<vertex_t> vertices;
   vector<uint32_t> indices;
   vector<Texture*> textures;

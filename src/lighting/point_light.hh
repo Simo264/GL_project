@@ -27,6 +27,6 @@ namespace lighting
 
       float linear;
       float quadratic;
-
+  };
 }
 #endif

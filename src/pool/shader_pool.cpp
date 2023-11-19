@@ -10,7 +10,7 @@ namespace pool
   uint32_t ShaderPool::_bufferSz;
   uint32_t ShaderPool::_bufferCapacity;
 
-  void ShaderPool::initialize()
+  void ShaderPool::initBuffer()
   {
     // preallocate a bunch of memory on the heap big enougth to
     // contain 10 contiguous shader objects
@@ -46,8 +46,7 @@ namespace pool
     return nullptr;
   }
 
-
-  void ShaderPool::clear()
+  void ShaderPool::freeBuffer()
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {

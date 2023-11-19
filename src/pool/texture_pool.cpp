@@ -10,7 +10,7 @@ namespace pool
   uint32_t              TexturePool::_bufferSz;
   uint32_t              TexturePool::_bufferCapacity;
 
-  void TexturePool::initialize()
+  void TexturePool::initBuffer()
   {
     // preallocate a bunch of memory on the heap big enougth to
     // contain 200 contiguous texture objects
@@ -46,7 +46,7 @@ namespace pool
     return nullptr;
   }
 
-  void TexturePool::clear()
+  void TexturePool::freeBuffer()
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {

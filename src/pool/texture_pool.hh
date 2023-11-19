@@ -9,15 +9,15 @@ namespace pool
   class TexturePool
   {
   public:
-    TexturePool() = default;
-    ~TexturePool() = default;
+    TexturePool() = delete;
+    ~TexturePool() = delete;
 
-    static void initialize();
+    static void initBuffer();
 
     static Texture* loadTexture(const string& path, TextureType type, bool immutable);
     static Texture* getTexture(const string& path);
 
-    static void clear();
+    static void freeBuffer();
 
   private:
     static unique_ptr<Texture[]> _textureBuffer;
