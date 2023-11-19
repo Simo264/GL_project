@@ -42,17 +42,18 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  // Model modelFloor("assets/Floor/Floor.obj");
   Model modelCrate("assets/Crate/Crate.obj");
-  
-  Model modelFloor("assets/Floor/Floor.obj");
-  modelFloor.setSize(vec3f(0.25f,0.25f,0.25f));
-  modelFloor.setPosition(vec3f(0.0,-1.0f,0.f));
+  // Model modelFloor("assets/Floor/Floor.obj");
+  // modelFloor.setSize(vec3f(0.25f,0.25f,0.25f));
+  // modelFloor.setPosition(vec3f(0.0,-1.0f,0.f));
 
   // create camera object
   // ------------------------------------------------------------------------
   vec3f target = modelCrate.position();
-  Camera camera(&target, 5.0f);
+
+  Camera camera(modelCrate.position());
+  camera.position.z = 10.f;
+  camera.target = &target;
 
   // light object
   // ------------------------------------------------------------------------
@@ -60,7 +61,7 @@ int main()
   //lighting::PointLight pointLight("pointLight");
   //pointLight.position.y = 10.f;
 
-  const mat4f projection = perspective(radians(45.f), (float)window.width()/(float)window.height(), 0.1f, 100.0f);
+  
   
   // render loop
   // ------------------------------------------------------------------------
@@ -69,13 +70,13 @@ int main()
     // update delta time
     // ------------------------------------------------------------------------
     window.update();
-    const double deltaTime = window.delta();
-    
 
     // input
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
-    camera.processKeyboardInput(&window, deltaTime);
+    camera.processInput(&window);
+    //camera.processKeyboardInput(&window);
+    //camera.processMouseScrollInput(&window);
 
 
     // Render 
@@ -83,6 +84,7 @@ int main()
     window.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
     window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    mat4f projection = perspective(radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
     shaderScene->use();
     shaderScene->setMat4f("view",       camera.getViewMatrix());
     shaderScene->setMat4f("projection", projection);
@@ -93,8 +95,9 @@ int main()
     // pointLight.render(shaderScene);
     
     modelCrate.draw(shaderScene, GL_TRIANGLES);
-    modelFloor.draw(shaderScene, GL_TRIANGLES);
+    // modelFloor.draw(shaderScene, GL_TRIANGLES);
 
+#if 0
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -109,19 +112,19 @@ int main()
     }
     ImGui::End();
 
-    // if(ImGui::Begin("Point light"))
-    // {
-    //   ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);
-    //   ImGui::SliderFloat3("Color",    (float*) &pointLight.color,      0.f, 1.f);
-    //   ImGui::SliderFloat("Ambient",   (float*) &pointLight.ambient,    0.f, 1.f);
-    //   ImGui::SliderFloat("Diffuse",   (float*) &pointLight.diffuse,    0.f, 1.f);
-    //   ImGui::SliderFloat("Specular",  (float*) &pointLight.specular,   0.f, 1.f);
-    // }
-    // ImGui::End();
-    
-    
+    if(ImGui::Begin("Point light"))
+    {
+      ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);
+      ImGui::SliderFloat3("Color",    (float*) &pointLight.color,      0.f, 1.f);
+      ImGui::SliderFloat("Ambient",   (float*) &pointLight.ambient,    0.f, 1.f);
+      ImGui::SliderFloat("Diffuse",   (float*) &pointLight.diffuse,    0.f, 1.f);
+      ImGui::SliderFloat("Specular",  (float*) &pointLight.specular,   0.f, 1.f);
+    }
+    ImGui::End();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
 
     // Swapping buffers, processing events
     // ------------------------------------------------------------------------

@@ -30,28 +30,27 @@ public:
   // clear buffers to preset values
   void clearBuffers(uint32_t mask) { glClear(mask); }
 
-  // keyboard input
-  int getKey(uint32_t key) const { return glfwGetKey(_window, key); }
-
-  // mouse input
-  int getMouseButton(uint32_t key) const { return glfwGetMouseButton(_window, key); }
-
   // window dimension
   uint32_t width() const  { return _width; }
   uint32_t height() const { return _height; }
 
-  // keyboard input
-  void processKeyboardInput();
+  // keyboard key
+  int getKey(uint32_t key) const { return glfwGetKey(_window, key); }
+
+  // mouse Key
+  int getMouseKey(uint32_t key) const { return glfwGetMouseButton(_window, key); }
+
+  // mouse position 
+  void getCursorPosition(vec2d& pos) { glfwGetCursorPos(_window, &pos.x, &pos.y); }
+  
+  // value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
+  void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
 
   // window position
   void setPosition(vec2i pos) { glfwSetWindowPos(_window, pos.x, pos.y); }
   void getPosition(vec2i& pos) { glfwGetWindowPos(_window, &pos.x, &pos.y); }
 
-  // cursor position
-  void getCursorPosition(vec2d& pos) { glfwGetCursorPos(_window, &pos.x, &pos.y); }
-
-  // value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
-  void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
+  void processKeyboardInput();
 
   // update delta time
   void update();

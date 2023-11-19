@@ -18,10 +18,10 @@ public:
   void destroy();
 
   vec3f position() const { return _position;}
-  void setPosition(vec3f newPos);
+  void  setPosition(vec3f newPos);
   
   vec3f size() const { return _size; }
-  void setSize(vec3f newSz);
+  void  setSize(vec3f newSz);
   
 private:
   vector<Mesh*> _meshes;

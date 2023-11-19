@@ -8,22 +8,26 @@
 class Camera
 {
 public:
-  Camera(vec3f* target, float distance);
-  Camera(vec3f position);
-  ~Camera() { }
+  Camera(vec3f position = vec3f(0.0f,0.0f,0.0f));
+  ~Camera() = default;
 
   mat4f getViewMatrix() const;
 
-  void processKeyboardInput(Window* window, double deltaTime);
+  void processInput(Window* window);
 
-  vec3f position;
-  vec3f front;
-  vec3f up;
-
-  vec3f* target;
+  // void processKeyboardInput(Window* window, double deltaTime);
+  // void processMouseScrollInput(Window* window, double deltaTime);
+  
+  vec3f   position;
+  vec3f*  target;
 
   float sensitivity;
-  float distanceToTarget;
+  float targetDistance;
+  float fov;
+
+private:
+  vec3f   _front;
+  vec3f   _up;
 };
 
 #endif
