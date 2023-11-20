@@ -89,7 +89,7 @@ void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
 {
   (void) scene;
 
-  vector<vertex_t> vertices;
+  vector<Vertex> vertices;
   vector<uint32_t> indices;
   vector<Texture*> textures;
 
@@ -111,11 +111,11 @@ void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
   _meshes.push_back(new Mesh(vertices, indices, textures));
 }
 
-void Model::loadVertices(vector<vertex_t>& out, const aiMesh* mesh)
+void Model::loadVertices(vector<Vertex>& out, const aiMesh* mesh)
 {
   for (uint32_t i = 0 ; i < mesh->mNumVertices; i++) 
   {
-    vertex_t vertex;
+    Vertex vertex;
     vertex.position.x = mesh->mVertices[i].x;
     vertex.position.y = mesh->mVertices[i].y;
     vertex.position.z = mesh->mVertices[i].z;

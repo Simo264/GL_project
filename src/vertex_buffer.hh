@@ -9,7 +9,7 @@ class VertexBuffer
 {
 public:
   VertexBuffer(uint64_t size, float* rawdata, int usage = GL_STATIC_DRAW);
-  VertexBuffer(uint64_t nVertices, vertex_t* vertices, int usage = GL_STATIC_DRAW);
+  VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage = GL_STATIC_DRAW);
   
   ~VertexBuffer() = default;
 

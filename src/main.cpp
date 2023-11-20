@@ -53,17 +53,17 @@ int main()
   vec3f target = modelCrate.position();
   Camera camera(modelCrate.position());
   camera.position.z = 10.f;
+  camera.targetDistance = 10.f;
   camera.target = &target;
 
   // light object
   // ------------------------------------------------------------------------
-  lighting::DirectionalLight dirLight("dirLight");
-  lighting::SpotLight spotLight("spotLight");
-  spotLight.position.y = 10.0f;
-  // lighting::PointLight pointLight("pointLight");
-  // pointLight.position.y = 10.f;
+  lighting::DirectionalLight dirLight("dirLight");  (void) dirLight;
+  lighting::PointLight pointLight("pointLight");    (void) pointLight;
+  // lighting::SpotLight spotLight("spotLight");     (void)spotLight;
 
-  
+  // pointLight.color = vec3f(1.0f, 0.0f, 0.0f);
+  // pointLight.position.y = 10.0f;
   
   // render loop
   // ------------------------------------------------------------------------
@@ -89,9 +89,9 @@ int main()
 
     // Render lights
     // ------------------------------------------------------------------------
-    dirLight.render(shaderScene);
-    spotLight.render(shaderScene);
+    // dirLight.render(shaderScene);
     // pointLight.render(shaderScene);
+    //spotLight.render(shaderScene);
     
 
     // Render models
@@ -115,7 +115,7 @@ int main()
     }
     ImGui::End();
 #endif
-#if 1
+#if 0
     if(ImGui::Begin("Spot light"))
     {
       ImGui::SliderFloat3("Position", (float*) &spotLight.position,  -10.f, 10.f);
@@ -128,7 +128,7 @@ int main()
     }
     ImGui::End();
 #endif
-#if 0
+#if 1
     if(ImGui::Begin("Point light"))
     {
       ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);

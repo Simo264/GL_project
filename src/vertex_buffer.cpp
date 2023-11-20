@@ -14,13 +14,13 @@ VertexBuffer::VertexBuffer(uint64_t size, float* rawdata, int usage)
   glNamedBufferData(_buffer, size, rawdata, usage);
 }
 
-VertexBuffer::VertexBuffer(uint64_t nVertices, vertex_t* vertices, int usage)
+VertexBuffer::VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage)
 {
   glGenBuffers(1, &_buffer);
   
   bind();
 
-  uint64_t size = nVertices * sizeof(vertex_t);
+  uint64_t size = nVertices * sizeof(Vertex);
   glNamedBufferData(_buffer, size, (void*) vertices, usage);
 }
 

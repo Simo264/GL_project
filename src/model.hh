@@ -39,7 +39,7 @@ private:
 
   void loadModel(const string& path);
   void loadMesh(const struct aiScene* scene, const struct aiMesh* mesh);
-  void loadVertices(vector<vertex_t>& out, const struct aiMesh* mesh);
+  void loadVertices(vector<Vertex>& out, const struct aiMesh* mesh);
   void loadIndices(vector<uint32_t>& out,  const struct aiMesh* mesh);
   void loadTextures(
     vector<Texture*>& out, 

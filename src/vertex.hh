@@ -3,7 +3,7 @@
 
 #include "core.hh"
 
-struct vertex_t
+struct Vertex
 {
   using posComponent      = vec3f;  
   using normalComponent   = vec3f;  
@@ -21,19 +21,19 @@ struct vertex_t
   normalComponent   normal;
   texcoordComponent texCoord;
 
-  vertex_t()
+  Vertex()
   {
     position  = { 0.0f,0.0f,0.0f }; 
     normal    = { 0.0f,0.0f,0.0f }; 
     texCoord  = { 0.0f,0.0f }; 
   } 
 
-  vertex_t(posComponent pos, normalComponent nor, texcoordComponent tc)
+  Vertex(posComponent pos, normalComponent nor, texcoordComponent tc)
     : position{pos}, normal{nor}, texCoord{tc} 
   { 
   }
   
-  vertex_t(array<float, vertex_t::VERTEX_COMPONENTS> l)
+  Vertex(array<float, Vertex::VERTEX_COMPONENTS> l)
   {
     position = { l[0],l[1],l[2] };
     normal   = { l[3],l[4],l[5] };

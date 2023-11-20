@@ -1,16 +1,12 @@
 #include "point_light.hh"
 
+#include "spdlog/spdlog.h"
+
 namespace lighting
 {
-  PointLight::PointLight(string uniformName) : uniformName{uniformName}
+  PointLight::PointLight(string uniformName) : BaseLight(), uniformName{uniformName}
   {
     position  = vec3f(0.0f,0.0f,0.0f);  // default on origin
-    color     = vec3f(1.0f,1.0f,1.0f);  // default white color
-    ambient   = 0.25f; // default ambient intensity
-    diffuse   = 0.50f; // default diffuse intensity
-    specular  = 0.75f; // default specular intensity
-    linear    = 0.14f; // a distance of 32 to 100 is generally enough for most lights
-    quadratic = 0.07f; 
   }
 
   void PointLight::render(Shader* shader)
@@ -33,9 +29,9 @@ namespace lighting
     shader->setVec3f(shaderUName, color * specular);
     
     strcpy(shaderUName+uniformNameSz, ".linear");     // shaderUName = "{uniformName}.linear"
-    shader->setFloat(shaderUName, linear);
+    shader->setFloat(shaderUName, attenuation.linear);
 
     strcpy(shaderUName+uniformNameSz, ".quadratic");  // shaderUName = "{uniformName}.quadratic"
-    shader->setFloat(shaderUName, quadratic);
+    shader->setFloat(shaderUName, attenuation.quadratic);
   }
 }

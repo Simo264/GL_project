@@ -7,7 +7,7 @@
  * -----------------------------------------------------
 */
 
-Mesh::Mesh(vector<vertex_t>& vertices, vector<uint32_t>& indices, vector<Texture*>& textures)
+Mesh::Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices, vector<Texture*>& textures)
 {
   _indices  = indices;
   _textures = textures;
