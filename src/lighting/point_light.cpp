@@ -8,7 +8,7 @@ namespace lighting
     color     = vec3f(1.0f,1.0f,1.0f);  // default white color
     ambient   = 0.25f; // default ambient intensity
     diffuse   = 0.50f; // default diffuse intensity
-    specular  = 1.0f;  // default specular intensity
+    specular  = 0.75f; // default specular intensity
     linear    = 0.14f; // a distance of 32 to 100 is generally enough for most lights
     quadratic = 0.07f; 
   }

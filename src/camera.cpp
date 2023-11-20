@@ -36,7 +36,7 @@ void Camera::processInput(Window* window)
   const double delta    = window->delta(); (void)delta;
   const float velocity  = delta * sensitivity; (void)velocity;
 
-  if(window->getMouseKey(GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+  if(window->getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
   {
     static float rotationX = 0.0f;
     static float rotationY = 0.0f;

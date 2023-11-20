@@ -35,10 +35,50 @@ struct PointLight {
   float quadratic;
 };
 
+struct SpotLight {
+  vec3 position;
+  vec3 direction;
+
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+
+  float cutOff;
+  float outCutOff;
+
+  float linear;
+  float quadratic;
+};
+
 uniform Material    material;
 uniform DirLight    dirLight; 
 uniform PointLight  pointLight; 
+uniform SpotLight   spotLight; 
 uniform vec3        viewPos;
+
+vec3 CalcDirLight(DirLight dirLight, vec3 normal, vec3 viewDir);
+vec3 CalcPointLight(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcSpotLight(SpotLight spotLight, vec3 normal, vec3 fragPos, vec3 viewDir);
+
+void main()
+{
+  // properties
+  vec3 norm    = normalize(Normal);
+  vec3 viewDir = normalize(viewPos - FragPos);
+
+  // phase 1: Directional lighting
+  vec3 result = CalcDirLight(dirLight, norm, viewDir);
+
+  // phase 2: Point lights
+  // for(int i = 0; i < NR_POINT_LIGHTS; i++)
+  //  result += CalcPointLight(pointLights[i], norm, FragPos, viewDir); 
+  // result += CalcPointLight(pointLight, norm, FragPos, viewDir); 
+
+  // phase 3: Spot light
+  result += CalcSpotLight(spotLight, norm, FragPos, viewDir);  
+
+  FragColor = vec4(result, 1.0);
+}
 
 vec3 CalcDirLight(DirLight dirLight, vec3 normal, vec3 viewDir)
 {
@@ -84,26 +124,50 @@ vec3 CalcPointLight(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewD
   return (ambient + diffuse + specular);
 }
 
-void main()
+vec3 CalcSpotLight(SpotLight spotLight, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-  // properties
-  vec3 norm    = normalize(Normal);
-  vec3 viewDir = normalize(viewPos - FragPos);
+  vec3 lightDir = normalize(spotLight.position - fragPos);
 
-  // phase 1: Directional lighting
-  vec3 result = CalcDirLight(dirLight, norm, viewDir);
+  // check if lighting is inside the spotlight cone
+  float theta = dot(lightDir, normalize(-spotLight.direction));
 
-  // phase 2: Point lights
-  // for(int i = 0; i < NR_POINT_LIGHTS; i++)
-  //  result += CalcPointLight(pointLights[i], norm, FragPos, viewDir); 
-  result += CalcPointLight(pointLight, norm, FragPos, viewDir); 
+  // remember that we're working with angles as cosines instead of degrees so a '>' is used.
+  if(theta > spotLight.cutOff) 
+  {
+    // ambient
+    vec3 ambient = spotLight.ambient * texture(material.texDiffuse, TexCoords).rgb;
+    
+    // diffuse 
+    vec3 norm     = normalize(normal);
+    float diff    = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse  = spotLight.diffuse * diff * texture(material.texDiffuse, TexCoords).rgb;  
+    
+    // specular
+    vec3 reflectDir = reflect(-lightDir, norm);  
+    float spec      = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    vec3 specular   = spotLight.specular * spec * texture(material.texSpecular, TexCoords).rgb;  
+    
+    // spotlight (soft edges)
+    float intensity = 1.0 - (1.0 - theta) / (1.0 - spotLight.cutOff);
+    diffuse  *= intensity;
+    specular *= intensity;
 
-  // phase 3: Spot light
-  // result += CalcSpotLight(spotLight, norm, FragPos, viewDir);  
 
-  FragColor = vec4(result, 1.0);
+
+    // attenuation
+    float distance    = length(spotLight.position - fragPos);
+    float attenuation = 1.0 / (1.0 + spotLight.linear * distance + spotLight.quadratic * (distance * distance));    
+
+    // remove attenuation from ambient, as otherwise at large distances the light would be 
+    // darker inside than outside the spotlight due the ambient term in the else branch
+    // ambient  *= attenuation; 
+    diffuse  *= attenuation;
+    specular *= attenuation;   
+    
+    return vec3(ambient + diffuse + specular);
+  }
+  else 
+  {
+    return vec3(0.f,0.f,0.f);
+  }
 }
-
-
-
-
