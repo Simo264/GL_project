@@ -28,6 +28,8 @@ public:
 private:
   vec3f   _front;
   vec3f   _up;
+
+  void rotateAroundTarget(const vec2d& mousePos, float velocity);
 };
 
 #endif

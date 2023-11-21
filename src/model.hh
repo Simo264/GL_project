@@ -13,7 +13,7 @@ public:
   Model(const string& path);
   ~Model() = default;
 
-  void draw(Shader* shader, uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
+  void draw(Shader* shader, uint32_t drawmode = GL_TRIANGLES); // GL_TRIANGLES | GL_LINE_STRIP
   
   void destroy();
 

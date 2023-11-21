@@ -44,6 +44,11 @@ int main()
   // create model objects
   // ------------------------------------------------------------------------
   Model modelCrate("assets/Crate/Crate.obj");
+  modelCrate.setPosition(vec3f(0.0f, 0.0125f, 0.0f));
+
+  Model modelCrate2("assets/Crate/Crate.obj");
+  modelCrate2.setPosition(vec3f(0.0f, 0.0125f, 3.0f));
+  
   Model modelFloor("assets/Floor/Floor.obj");
   modelFloor.setSize(vec3f(0.25f,0.25f,0.25f));
   modelFloor.setPosition(vec3f(0.0,-1.0f,0.f));
@@ -52,9 +57,9 @@ int main()
   // ------------------------------------------------------------------------
   vec3f target = modelCrate.position();
   Camera camera(modelCrate.position());
-  camera.position.z = 10.f;
   camera.targetDistance = 10.f;
-  camera.target = &target;
+  camera.position.z     = 10.f;
+  camera.target         = &target;
 
   // light object
   // ------------------------------------------------------------------------
@@ -78,7 +83,9 @@ int main()
     
     // View/Projection matrices
     // ------------------------------------------------------------------------
-    mat4f projection = perspective(radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
+    const mat4f projection = perspective(
+      radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
+    
     shaderScene->use();
     shaderScene->setMat4f("view",       camera.getViewMatrix());
     shaderScene->setMat4f("projection", projection);
@@ -93,15 +100,16 @@ int main()
 
     // Render models
     // ------------------------------------------------------------------------
-    modelCrate.draw(shaderScene, GL_TRIANGLES);
-    modelFloor.draw(shaderScene, GL_TRIANGLES);
+    modelCrate.draw(shaderScene);
+    modelCrate2.draw(shaderScene);
+    modelFloor.draw(shaderScene);
 
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-#ifdef 1
+#if 0
     if(ImGui::Begin("Directional light"))
     {
       ImGui::SliderFloat3("Direction", (float*) &dirLight.direction, -10.f, 10.f);
@@ -112,7 +120,7 @@ int main()
     }
     ImGui::End();
 #endif
-#ifdef 0
+#if 0
     if(ImGui::Begin("Spot light"))
     {
       ImGui::SliderFloat3("Position", (float*) &spotLight.position,  -10.f, 10.f);
@@ -125,7 +133,7 @@ int main()
     }
     ImGui::End();
 #endif
-#ifdef 0
+#if 0
     if(ImGui::Begin("Point light"))
     {
       ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);

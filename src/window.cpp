@@ -29,8 +29,21 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_SAMPLES, 4); // anti-aliasing
 
   create(title, fullscreen);
+
+  glfwMakeContextCurrent(_window);
+  glfwSetWindowUserPointer(_window, this);
+  glfwSwapInterval(1); // Enable vsync
+
+  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+  // configure global opengl state
+  // -----------------------------
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_MULTISAMPLE);  
+ 
 
   setPosition(pos);
   
@@ -40,8 +53,6 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   _lastTime  = glfwGetTime();
   _nbFrames  = 0;
 }
-
-
 
 void Window::destroy()
 {
@@ -105,14 +116,4 @@ void Window::create(string title, bool fullscreen)
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
-
-  glfwMakeContextCurrent(_window);
-  glfwSetWindowUserPointer(_window, this);
-  glfwSwapInterval(1); // Enable vsync
-
-  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-  // configure global opengl state
-  // -----------------------------
-  glEnable(GL_DEPTH_TEST);
 }

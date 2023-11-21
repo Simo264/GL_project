@@ -78,6 +78,12 @@ void main()
   result += CalcSpotLight(spotLight, norm, FragPos, viewDir);  
 
   FragColor = vec4(result, 1.0);
+
+  // float near  = 0.1; 
+  // float far   = 100.0; 
+  // float z     = gl_FragCoord.z * 2.0 - 1.0;
+  // float depth = ((2.0 * near * far) / (far + near - z * (far - near)))	 / far;
+  // FragColor   = vec4(vec3(depth), 1.0);
 }
 
 vec3 CalcDirLight(DirLight dirLight, vec3 normal, vec3 viewDir)
