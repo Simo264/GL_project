@@ -58,13 +58,10 @@ int main()
 
   // light object
   // ------------------------------------------------------------------------
-  lighting::DirectionalLight dirLight("dirLight");  (void) dirLight;
-  lighting::PointLight pointLight("pointLight");    (void) pointLight;
-  // lighting::SpotLight spotLight("spotLight");     (void)spotLight;
+  lighting::DirectionalLight dirLight("dirLight");    (void)dirLight;
+  lighting::PointLight pointLight("pointLight");      (void)pointLight;
+  lighting::SpotLight spotLight("spotLight");         (void)spotLight;
 
-  // pointLight.color = vec3f(1.0f, 0.0f, 0.0f);
-  // pointLight.position.y = 10.0f;
-  
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
@@ -89,9 +86,9 @@ int main()
 
     // Render lights
     // ------------------------------------------------------------------------
-    // dirLight.render(shaderScene);
-    // pointLight.render(shaderScene);
-    //spotLight.render(shaderScene);
+    dirLight.render(shaderScene);
+    pointLight.render(shaderScene);
+    spotLight.render(shaderScene);
     
 
     // Render models
@@ -104,7 +101,7 @@ int main()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-#if 1
+#ifdef 1
     if(ImGui::Begin("Directional light"))
     {
       ImGui::SliderFloat3("Direction", (float*) &dirLight.direction, -10.f, 10.f);
@@ -115,7 +112,7 @@ int main()
     }
     ImGui::End();
 #endif
-#if 0
+#ifdef 0
     if(ImGui::Begin("Spot light"))
     {
       ImGui::SliderFloat3("Position", (float*) &spotLight.position,  -10.f, 10.f);
@@ -128,7 +125,7 @@ int main()
     }
     ImGui::End();
 #endif
-#if 1
+#ifdef 0
     if(ImGui::Begin("Point light"))
     {
       ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);
