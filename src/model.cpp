@@ -29,6 +29,7 @@ Model::Model(const string& path)
 
 void Model::draw(Shader* shader, uint32_t drawmode)
 {
+  shader->use();
   shader->setMat4f("model", _modelMatrix);
   for(auto& mesh : _meshes)
     mesh->draw(shader, drawmode);

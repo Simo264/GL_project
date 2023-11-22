@@ -111,13 +111,12 @@ int main()
 
     // Render models
     // ------------------------------------------------------------------------
-    modelFloor.draw(shaderScene);
     // modelCrate.draw(shaderScene);
     // modelCrate2.draw(shaderScene);
+    modelFloor.draw(shaderScene);
     
     stencil.drawOutline(&modelCrate, shaderScene);
     stencil.drawOutline(&modelCrate2, shaderScene);
-
     
 
     ImGui_ImplOpenGL3_NewFrame();

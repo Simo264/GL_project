@@ -9,6 +9,8 @@ namespace lighting
 
   void DirectionalLight::render(Shader* shader)
   {
+    shader->use();
+    
     const int uniformNameSz = uniformName.size();
     char shaderUName[50] = { };
 

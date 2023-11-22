@@ -11,6 +11,8 @@ namespace lighting
 
   void PointLight::render(Shader* shader)
   {
+    shader->use();
+
     const int uniformNameSz = uniformName.size();
     char shaderUName[50] = { };
     
