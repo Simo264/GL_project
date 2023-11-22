@@ -31,7 +31,7 @@ Shader::Shader(const string& label, const string& vFilename, const string& fFile
   if(!compile(fragmentShader, fShaderSrc.c_str()))
   {
     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED [{}]", infoLog);
+    spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED [{}]", infoLog);
     return;
   }
 

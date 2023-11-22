@@ -4,6 +4,7 @@
 #include "shader.hh"
 #include "camera.hh"
 #include "model.hh"
+#include "stencil.hh"
 
 #include "pool/shader_pool.hh"
 #include "pool/texture_pool.hh"
@@ -38,8 +39,8 @@ int main()
 
   // load shaders
   // ------------------------------------------------------------------------
-  auto shaderScene = pool::ShaderPool::loadShader("shaderMesh", "shaders/scene.vert","shaders/scene.frag");
-  
+  auto shaderScene   = pool::ShaderPool::loadShader("shaderMesh", "shaders/scene.vert","shaders/scene.frag");
+  auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
 
   // create model objects
   // ------------------------------------------------------------------------
@@ -67,6 +68,11 @@ int main()
   lighting::PointLight pointLight("pointLight");      (void)pointLight;
   lighting::SpotLight spotLight("spotLight");         (void)spotLight;
 
+  
+  // stencil object
+  // ------------------------------------------------------------------------
+  Stencil stencil(shaderOutline);
+
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
@@ -79,33 +85,41 @@ int main()
     camera.processInput(&window);
 
     window.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
     // View/Projection matrices
     // ------------------------------------------------------------------------
-    const mat4f projection = perspective(
-      radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
-    
+    const mat4f projection = perspective(radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
+    const mat4f view = camera.getViewMatrix();
+
     shaderScene->use();
-    shaderScene->setMat4f("view",       camera.getViewMatrix());
+    shaderScene->setMat4f("view",       view);
     shaderScene->setMat4f("projection", projection);
     shaderScene->setVec3f("viewPos",    camera.position);
+
+    shaderOutline->use();
+    shaderOutline->setMat4f("view",       view);
+    shaderOutline->setMat4f("projection", projection);
+    shaderOutline->setVec3f("viewPos",    camera.position);
 
     // Render lights
     // ------------------------------------------------------------------------
     dirLight.render(shaderScene);
-    pointLight.render(shaderScene);
-    spotLight.render(shaderScene);
+    // pointLight.render(shaderScene);
+    // spotLight.render(shaderScene);
     
 
     // Render models
     // ------------------------------------------------------------------------
-    modelCrate.draw(shaderScene);
-    modelCrate2.draw(shaderScene);
     modelFloor.draw(shaderScene);
+    // modelCrate.draw(shaderScene);
+    // modelCrate2.draw(shaderScene);
+    
+    stencil.drawOutline(&modelCrate, shaderScene);
+    stencil.drawOutline(&modelCrate2, shaderScene);
 
+    
 
-    // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();

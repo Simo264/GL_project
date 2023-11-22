@@ -12,7 +12,7 @@ Camera::Camera(vec3f position) : position{position}
   _front = vec3f(0.0f, 0.0f, -1.0f), 
   _up    = vec3f(0.0f, 1.0f,  0.0f);
 
-  sensitivity    = 0.75f;
+  sensitivity    = 1.0f;
   targetDistance = 10.f;
   fov            = 45.0f;
   target         = nullptr;
