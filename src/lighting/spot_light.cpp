@@ -38,6 +38,6 @@ namespace lighting
     shader->setFloat(shaderUName, attenuation.quadratic);
     
     strcpy(shaderUName+uniformNameSz, ".cutOff");     // shaderUName = "{uniformName}.cutOff"
-    shader->setFloat(shaderUName, glm::cos(radians(cutOff)));
+    shader->setFloat(shaderUName, glm::cos(glm::radians(cutOff)));
   }
 }

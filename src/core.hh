@@ -60,13 +60,4 @@ using mat4i = glm::imat4x4;
 using mat4d = glm::dmat4x4;
 using mat4u = glm::umat4x4;
 
-using glm::radians;
-using glm::translate;
-using glm::rotate;
-using glm::scale;
-using glm::perspective;
-using glm::lookAt;
-using glm::cross;
-using glm::normalize;
-
 #endif

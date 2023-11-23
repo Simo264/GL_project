@@ -22,14 +22,23 @@ public:
   vec3f*  target;
 
   float sensitivity;
-  float targetDistance;
+  float speed;
   float fov;
 
 private:
+  // camera vectors
   vec3f   _front;
   vec3f   _up;
+  vec3f   _right;
+
+  // Euler angles
+  float _pitch; // y-axis
+  float _yaw;   // x-axis
 
   void rotateAroundTarget(const vec2d& mousePos, float velocity);
+
+  void freeCameraWalk(const Window* window, float delta);
+  void freeCameraRotation(vec2d& mousePos, float delta);
 };
 
 #endif

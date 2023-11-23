@@ -56,11 +56,10 @@ int main()
 
   // create camera object
   // ------------------------------------------------------------------------
-  vec3f target = modelCrate.position();
-  Camera camera(modelCrate.position());
-  camera.targetDistance = 10.f;
-  camera.position.z     = 10.f;
-  camera.target         = &target;
+  //vec3f target = modelCrate.position();
+  Camera camera;
+  // camera.position.z = 10.f;
+  // camera.target     = &target;
 
   // light object
   // ------------------------------------------------------------------------
@@ -89,7 +88,8 @@ int main()
     
     // View/Projection matrices
     // ------------------------------------------------------------------------
-    const mat4f projection = perspective(radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
+    const mat4f projection = glm::perspective(
+      glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
     const mat4f view = camera.getViewMatrix();
 
     shaderScene->use();
@@ -111,12 +111,9 @@ int main()
 
     // Render models
     // ------------------------------------------------------------------------
-    // modelCrate.draw(shaderScene);
-    // modelCrate2.draw(shaderScene);
     modelFloor.draw(shaderScene);
-    
-    stencil.drawOutline(&modelCrate, shaderScene);
-    stencil.drawOutline(&modelCrate2, shaderScene);
+    //modelCrate.draw(shaderScene);
+    //stencil.drawOutline(&modelCrate2, shaderScene);
     
 
     ImGui_ImplOpenGL3_NewFrame();
