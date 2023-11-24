@@ -20,6 +20,11 @@ Camera::Camera(vec3f position) : position{position}
   speed          = 8.0f;
   fov            = 45.0f;
   target         = nullptr;
+
+  _rotationX = 0.0f;
+  _rotationY = 0.0f;
+  _prevXPos = 0.0f;
+  _prevYPos = 0.0f;
 }
 
 mat4f Camera::getViewMatrix() const
@@ -66,49 +71,43 @@ void Camera::rotateAroundTarget(const vec2d& mousePos, float delta)
 {
   const float velocity = delta;
 
-  static float rotationX = 0.0f;
-  static float rotationY = 0.0f;
-  static double prevXPos = 0.0f;
-  static double prevYPos = 0.0f;
-
   // rotate X axis
-  auto diffX = prevXPos - mousePos.x;
+  auto diffX = _prevXPos - mousePos.x;
   if (diffX > 0) // left
   {
-    rotationX += velocity; 
-    position.x = glm::sin(rotationX) * distance;
-    position.z = glm::cos(rotationX) * distance;
-    
-    prevXPos = mousePos.x;
+    _rotationX += velocity; 
+    position.x  = glm::sin(_rotationX) * distance;
+    position.z  = glm::cos(_rotationX) * distance;
+    _prevXPos   = mousePos.x;
   }
   else if(diffX < 0) // right
   {
-    rotationX -= velocity;
-    position.x = glm::sin(rotationX) * distance;
-    position.z = glm::cos(rotationX) * distance;
-    prevXPos = mousePos.x;
+    _rotationX -= velocity;
+    position.x  = glm::sin(_rotationX) * distance;
+    position.z  = glm::cos(_rotationX) * distance;
+    _prevXPos   = mousePos.x;
   }
 
   // rotate Y axis
-  auto diffY = prevYPos - mousePos.y;
+  auto diffY = _prevYPos - mousePos.y;
   const float rads = glm::radians(85.0f);
   if (diffY > 0) // up
   {
-    if(rotationY < -rads) 
+    if(_rotationY < -rads) 
       return;
 
-    rotationY -= velocity;
-    position.y = glm::sin(rotationY) * (distance/2);
-    prevYPos = mousePos.y;
+    _rotationY -= velocity;
+    position.y  = glm::sin(_rotationY) * (distance/2);
+    _prevYPos   = mousePos.y;
   }
   else if(diffY < 0) // down
   {
-    if(rotationY > rads) 
+    if(_rotationY > rads) 
       return;
 
-    rotationY += velocity;
-    position.y = glm::sin(rotationY) * (distance/2);
-    prevYPos = mousePos.y;
+    _rotationY += velocity;
+    position.y  = glm::sin(_rotationY) * (distance/2);
+    _prevYPos   = mousePos.y;
   }
 
 }
@@ -147,34 +146,32 @@ void Camera::freeCameraWalk(const Window* window, float delta)
 
 void Camera::freeCameraRotation(vec2d& mousePos, float delta)
 {
-  const float cameraSens  = delta * sensitivity;
-  static float prevXPos = 0.0f;
-  static float prevYPos = 0.0f;
+  const float cameraSens = delta * sensitivity;
 
   // rotate X axis
-  float diffX = prevXPos - mousePos.x;
+  float diffX = _prevXPos - mousePos.x;
   if (diffX > 0) // left
   {
     _yaw -= cameraSens;
-    prevXPos = mousePos.x;
+    _prevXPos = mousePos.x;
   }
   else if(diffX < 0) // right
   {
     _yaw += cameraSens; 
-    prevXPos = mousePos.x;
+    _prevXPos = mousePos.x;
   }
 
   // rotate Y axis
-  auto diffY = prevYPos - mousePos.y;
+  auto diffY = _prevYPos - mousePos.y;
   if (diffY > 0) // up
   {
     _pitch += cameraSens;
-    prevYPos = mousePos.y;
+    _prevYPos = mousePos.y;
   }
   else if(diffY < 0) // down
   {
     _pitch -= cameraSens; 
-    prevYPos = mousePos.y;
+    _prevYPos = mousePos.y;
   }
 
   vec3f front;

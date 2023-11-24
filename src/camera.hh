@@ -36,6 +36,12 @@ private:
   float _pitch; // y-axis
   float _yaw;   // x-axis
 
+  // camera rotation 
+  float _rotationX;
+  float _rotationY;
+  float _prevXPos;
+  float _prevYPos;
+
   void rotateAroundTarget(const vec2d& mousePos, float velocity);
 
   void freeCameraWalk(const Window* window, float delta);

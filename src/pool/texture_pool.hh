@@ -14,7 +14,7 @@ namespace pool
 
     static void initBuffer();
 
-    static Texture* loadTexture(const string& path, TextureType type, bool immutable);
+    static Texture* loadTexture(const string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = false);
     static Texture* getTexture(const string& path);
 
     static void freeBuffer();

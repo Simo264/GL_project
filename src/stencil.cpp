@@ -1,12 +1,11 @@
 #include "stencil.hh"
 
-Stencil::Stencil(Shader* shaderOutline) : _shaderOutline{shaderOutline}
+Stencil::Stencil(Shader* stencilShader)
 {
-  color = vec3f(1.0f, 0.0f, 0.0f); // default red
-  thickness = 0.05f;
+  _stencilShader = stencilShader;
 }
 
-void Stencil::drawOutline(Model* model, Shader* shaderScene)
+void Stencil::drawOutline(Model* model, Shader* shaderScene, vec3f color, float thickness)
 {
   // 1st. render pass, draw objects as normal, writing to the stencil buffer
   // --------------------------------------------------------------------
@@ -28,10 +27,10 @@ void Stencil::drawOutline(Model* model, Shader* shaderScene)
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
   glStencilMask(0x00);
   glDisable(GL_DEPTH_TEST);
-  _shaderOutline->use();
-  _shaderOutline->setVec3f("color", color);
-  model->setSize(modelSz+thickness);
-  model->draw(_shaderOutline);
+  _stencilShader->use();
+  _stencilShader->setVec3f("outlineColor", color);
+  model->setSize(modelSz + (thickness / 10));
+  model->draw(_stencilShader);
 
   glStencilMask(0xFF);
   glStencilFunc(GL_ALWAYS, 0, 0xFF);

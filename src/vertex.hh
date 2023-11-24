@@ -25,7 +25,7 @@ struct Vertex
   {
     position  = { 0.0f,0.0f,0.0f }; 
     normal    = { 0.0f,0.0f,0.0f }; 
-    texCoord  = { 0.0f,0.0f }; 
+    texCoord  = { 0.0f,0.0f };
   } 
 
   Vertex(posComponent pos, normalComponent nor, texcoordComponent tc)

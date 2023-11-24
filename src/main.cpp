@@ -36,19 +36,44 @@ int main()
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
 
+  // simple grass
+  // ------------------------------------------------------------------------
+  // positions          // texture Coords 
+  Texture* texTransparentWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
+  Texture* texGrass             = pool::TexturePool::loadTexture("res/grass.png");
+
+  vector<Vertex> vertices = {
+    Vertex{vec3f(5.0f, -0.5f, -5.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(2.0f, 2.0f)}  // top right
+    Vertex{vec3f(5.0f, -0.5f,  5.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(2.0f, 0.0f)}, // bottom right
+    Vertex{vec3f(-5.0f, -0.5f, 5.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 0.0f)}, // bottom left
+    Vertex{vec3f(-5.0f, -0.5f, -5.0f), vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 2.0f)}, // top left 
+  };
+  vector<uint32_t> indices = {
+    0,1,3,
+    1,2,3 
+  };
+  vector<Texture*> textures = {
+    texTransparentWindow,
+    texGrass
+  };
+  
+  Mesh meshGrass(vertices, indices, textures);
+  
+
 
   // load shaders
   // ------------------------------------------------------------------------
   auto shaderScene   = pool::ShaderPool::loadShader("shaderMesh", "shaders/scene.vert","shaders/scene.frag");
   auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
+  auto shaderBlending= pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
 
   // create model objects
   // ------------------------------------------------------------------------
   Model modelCrate("assets/Crate/Crate.obj");
-  modelCrate.setPosition(vec3f(0.0f, 0.0125f, 0.0f));
+  modelCrate.setPosition(vec3f(10.0f, 0.0125f, 0.0f));
 
   Model modelCrate2("assets/Crate/Crate.obj");
-  modelCrate2.setPosition(vec3f(4.0f, 0.0125f, 0.0f));
+  modelCrate2.setPosition(vec3f(0.0f, 0.0125f, 0.0f));
   
   Model modelFloor("assets/Floor/Floor.obj");
   modelFloor.setSize(vec3f(0.25f,0.25f,0.25f));
@@ -56,7 +81,15 @@ int main()
 
   // create camera object
   // ------------------------------------------------------------------------
-  Camera camera(vec3f(0.0f, 0.0f, 10.0f));
+  Camera camera;
+
+#if 0
+  vec3f target = modelCrate.position();
+  Camera camera(target);
+  camera.position.z = 10.0f;
+  camera.distance = 10.0f;
+  camera.target = &target;
+#endif
 
   // light object
   // ------------------------------------------------------------------------
@@ -67,7 +100,7 @@ int main()
   
   // stencil object
   // ------------------------------------------------------------------------
-  Stencil stencil(shaderOutline);
+  Stencil stencil(shaderOutline); 
 
   // render loop
   // ------------------------------------------------------------------------
@@ -97,7 +130,7 @@ int main()
     shaderOutline->use();
     shaderOutline->setMat4f("view",       view);
     shaderOutline->setMat4f("projection", projection);
-    shaderOutline->setVec3f("viewPos",    camera.position);
+  
 
     // Render lights
     // ------------------------------------------------------------------------
@@ -110,7 +143,7 @@ int main()
     // ------------------------------------------------------------------------
     modelFloor.draw(shaderScene);
     modelCrate.draw(shaderScene);
-    stencil.drawOutline(&modelCrate2, shaderScene);
+    stencil.drawOutline(&modelCrate2, shaderScene, vec3f(1.0f, 0.0f, 0.0f), 0.5f);
     
 
     ImGui_ImplOpenGL3_NewFrame();

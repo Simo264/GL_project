@@ -8,16 +8,15 @@
 class Stencil
 {
 public:
-  Stencil(Shader* shaderOutline);
+  Stencil(Shader* stencilShader);
   ~Stencil() = default;
 
-  void drawOutline(Model* model, Shader* shaderScene);
+  void drawOutline(Model* model, Shader* shaderScene, vec3f color, float thickness);
 
-  vec3f color;
-  float thickness;
+  void setStencilShader(Shader* stencilShader) { _stencilShader = stencilShader; }
 
 private:
-  Shader* _shaderOutline;
+  Shader* _stencilShader;
 
 };
 
