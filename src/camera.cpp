@@ -16,6 +16,7 @@ Camera::Camera(vec3f position) : position{position}
   _yaw = 0.0f;
 
   sensitivity    = 64.0f;
+  distance       = 10.0f;
   speed          = 8.0f;
   fov            = 45.0f;
   target         = nullptr;
@@ -23,59 +24,36 @@ Camera::Camera(vec3f position) : position{position}
 
 mat4f Camera::getViewMatrix() const
 {
-  return glm::lookAt(position, position + _front, _up);
-
-#if 0
   if(target)
     return glm::lookAt(position, *target, _up);           // look at target
   else
     return glm::lookAt(position, position + _front, _up); // walk around
-#endif
 }
-
 
 void Camera::processInput(Window* window)
 {
   const double delta = window->delta();     
-  _right = glm::cross(_front, _up);
+  _right = glm::cross(_front, _up); // update right vector
 
-  freeCameraWalk(window, delta);
-
-  if(window->getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-  {
-    vec2d mousePos;
-    window->getCursorPosition(mousePos);
-    freeCameraRotation(mousePos, delta);
-  }
-
-#if 0
-  // move around target
+  vec2d mousePos;
+  window->getCursorPosition(mousePos);
+  
   if(target)
   {
     if(window->getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
-      vec2d mousePos;
-      window->getCursorPosition(mousePos);
-      
-      rotateAroundTarget(mousePos, velocity);    
+      rotateAroundTarget(mousePos, delta);
     }
-  
-    if(window->getKey(GLFW_KEY_W) == GLFW_PRESS)
-    {
-      if(targetDistance > 5)
-      {
-        targetDistance -= velocity*4;
-        position.z     -= velocity*4;
-      }
-    }
-    else if(window->getKey(GLFW_KEY_S) == GLFW_PRESS)
-    {
-      targetDistance += velocity*4;
-      position.z     += velocity*4;
-    }
-
   }
-#endif
+  else
+  {
+    freeCameraWalk(window, delta);
+
+    if(window->getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    {
+      freeCameraRotation(mousePos, delta);
+    }
+  }
 }
 
 
@@ -84,33 +62,30 @@ void Camera::processInput(Window* window)
  * -----------------------------------------------------
 */
 
-void Camera::rotateAroundTarget(const vec2d& mousePos, float velocity)
+void Camera::rotateAroundTarget(const vec2d& mousePos, float delta)
 {
-  (void) mousePos;
-  (void) velocity;
+  const float velocity = delta;
 
-#if 0
   static float rotationX = 0.0f;
   static float rotationY = 0.0f;
   static double prevXPos = 0.0f;
   static double prevYPos = 0.0f;
-  static const float targetDistance = 10.0f;
 
   // rotate X axis
   auto diffX = prevXPos - mousePos.x;
   if (diffX > 0) // left
   {
     rotationX += velocity; 
-    position.x = glm::sin(rotationX) * targetDistance;
-    position.z = glm::cos(rotationX) * targetDistance;
+    position.x = glm::sin(rotationX) * distance;
+    position.z = glm::cos(rotationX) * distance;
     
     prevXPos = mousePos.x;
   }
   else if(diffX < 0) // right
   {
     rotationX -= velocity;
-    position.x = glm::sin(rotationX) * targetDistance;
-    position.z = glm::cos(rotationX) * targetDistance;
+    position.x = glm::sin(rotationX) * distance;
+    position.z = glm::cos(rotationX) * distance;
     prevXPos = mousePos.x;
   }
 
@@ -123,7 +98,7 @@ void Camera::rotateAroundTarget(const vec2d& mousePos, float velocity)
       return;
 
     rotationY -= velocity;
-    position.y = glm::sin(rotationY) * (targetDistance/2);
+    position.y = glm::sin(rotationY) * (distance/2);
     prevYPos = mousePos.y;
   }
   else if(diffY < 0) // down
@@ -132,10 +107,10 @@ void Camera::rotateAroundTarget(const vec2d& mousePos, float velocity)
       return;
 
     rotationY += velocity;
-    position.y = glm::sin(rotationY) * (targetDistance/2);
+    position.y = glm::sin(rotationY) * (distance/2);
     prevYPos = mousePos.y;
   }
-#endif
+
 }
 
 void Camera::freeCameraWalk(const Window* window, float delta)
@@ -208,6 +183,5 @@ void Camera::freeCameraRotation(vec2d& mousePos, float delta)
   front.z = glm::sin(glm::radians(_yaw)) * glm::cos(glm::radians(_pitch));
   _front  = glm::normalize(front);
 }
-
 
 

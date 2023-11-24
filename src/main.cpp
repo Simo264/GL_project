@@ -48,7 +48,7 @@ int main()
   modelCrate.setPosition(vec3f(0.0f, 0.0125f, 0.0f));
 
   Model modelCrate2("assets/Crate/Crate.obj");
-  modelCrate2.setPosition(vec3f(0.0f, 0.0125f, 3.0f));
+  modelCrate2.setPosition(vec3f(4.0f, 0.0125f, 0.0f));
   
   Model modelFloor("assets/Floor/Floor.obj");
   modelFloor.setSize(vec3f(0.25f,0.25f,0.25f));
@@ -56,10 +56,7 @@ int main()
 
   // create camera object
   // ------------------------------------------------------------------------
-  //vec3f target = modelCrate.position();
-  Camera camera;
-  // camera.position.z = 10.f;
-  // camera.target     = &target;
+  Camera camera(vec3f(0.0f, 0.0f, 10.0f));
 
   // light object
   // ------------------------------------------------------------------------
@@ -112,8 +109,8 @@ int main()
     // Render models
     // ------------------------------------------------------------------------
     modelFloor.draw(shaderScene);
-    //modelCrate.draw(shaderScene);
-    //stencil.drawOutline(&modelCrate2, shaderScene);
+    modelCrate.draw(shaderScene);
+    stencil.drawOutline(&modelCrate2, shaderScene);
     
 
     ImGui_ImplOpenGL3_NewFrame();

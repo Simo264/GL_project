@@ -22,14 +22,15 @@ public:
   vec3f*  target;
 
   float sensitivity;
+  float distance;
   float speed;
   float fov;
 
 private:
   // camera vectors
-  vec3f   _front;
-  vec3f   _up;
-  vec3f   _right;
+  vec3f _front;
+  vec3f _up;
+  vec3f _right;
 
   // Euler angles
   float _pitch; // y-axis
