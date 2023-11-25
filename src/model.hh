@@ -38,14 +38,10 @@ private:
   void updateModelMatrix() { _modelMatrix = _translationMatrix * _rotationMatrix * _scalingMatrix; }
 
   void loadModel(const string& path);
-  void loadMesh(const struct aiScene* scene, const struct aiMesh* mesh);
-  void loadVertices(vector<Vertex>& out, const struct aiMesh* mesh);
-  void loadIndices(vector<uint32_t>& out,  const struct aiMesh* mesh);
-  void loadTextures(
-    vector<Texture*>& out, 
-    const struct aiMaterial* material, 
-    const TextureType texType
-  );
+  void loadMesh(const struct aiScene* scene, const struct aiMesh* aimesh);
+  void loadVertices(vector<Vertex>& out, const struct aiMesh* aimesh);
+  void loadIndices(vector<uint32_t>& out,  const struct aiMesh* aimesh);
+  Texture* loadTexture(const struct aiMaterial* material, const TextureType texType);
 };  
 
 #endif

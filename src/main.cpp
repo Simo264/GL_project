@@ -38,27 +38,20 @@ int main()
 
   // simple grass
   // ------------------------------------------------------------------------
-  // positions          // texture Coords 
-  Texture* texTransparentWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
-  Texture* texGrass             = pool::TexturePool::loadTexture("res/grass.png");
+  auto texTransparentWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
+  auto texGrass             = pool::TexturePool::loadTexture("res/grass.png");
 
   vector<Vertex> vertices = {
-    Vertex{vec3f(5.0f, -0.5f, -5.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(2.0f, 2.0f)}  // top right
-    Vertex{vec3f(5.0f, -0.5f,  5.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(2.0f, 0.0f)}, // bottom right
-    Vertex{vec3f(-5.0f, -0.5f, 5.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 0.0f)}, // bottom left
-    Vertex{vec3f(-5.0f, -0.5f, -5.0f), vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 2.0f)}, // top left 
+    Vertex{vec3f(0.5f,  0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(1.0f, 1.0f)}, // top right
+    Vertex{vec3f(0.5f, -0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(1.0f, 0.0f)}, // bottom right
+    Vertex{vec3f(-0.5f, -0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 0.0f)}, // bottom left
+    Vertex{vec3f(-0.5f,  0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 1.0f)}, // top left 
   };
-  vector<uint32_t> indices = {
-    0,1,3,
-    1,2,3 
-  };
-  vector<Texture*> textures = {
-    texTransparentWindow,
-    texGrass
-  };
-  
-  Mesh meshGrass(vertices, indices, textures);
-  
+  vector<uint32_t> indices = {0,1,3, 1,2,3};
+  vector<Texture*> textures = {texTransparentWindow, texGrass}; (void) textures;
+  VertexBuffer  vertexBuffer(vertices.size(), vertices.data());
+  ElementBuffer elementBuffer(indices.size(), indices.data());
+  VertexArray   vertexArray(&vertexBuffer);
 
 
   // load shaders
@@ -66,41 +59,45 @@ int main()
   auto shaderScene   = pool::ShaderPool::loadShader("shaderMesh", "shaders/scene.vert","shaders/scene.frag");
   auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
   auto shaderBlending= pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
-
-  // create model objects
-  // ------------------------------------------------------------------------
-  Model modelCrate("assets/Crate/Crate.obj");
-  modelCrate.setPosition(vec3f(10.0f, 0.0125f, 0.0f));
-
-  Model modelCrate2("assets/Crate/Crate.obj");
-  modelCrate2.setPosition(vec3f(0.0f, 0.0125f, 0.0f));
-  
-  Model modelFloor("assets/Floor/Floor.obj");
-  modelFloor.setSize(vec3f(0.25f,0.25f,0.25f));
-  modelFloor.setPosition(vec3f(0.0,-1.0f,0.f));
+  (void) shaderScene;
+  (void) shaderOutline;
+  (void) shaderBlending;
 
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera;
 
+
+  // create model objects
+  // ------------------------------------------------------------------------
+  Model modelFloor("assets/Floor/Floor.obj");
+  modelFloor.setSize(vec3f(0.25f,0.25f,0.25f));
+  modelFloor.setPosition(vec3f(0.0,-1.0f,0.f));
+
+  Model modelCrate("assets/Crate/Crate.obj");
+  modelCrate.setPosition(vec3f(10.0f, 0.0125f, 0.0f));
+
 #if 0
-  vec3f target = modelCrate.position();
-  Camera camera(target);
-  camera.position.z = 10.0f;
-  camera.distance = 10.0f;
-  camera.target = &target;
+  Model modelCrate2("assets/Crate/Crate.obj");
+  modelCrate2.setPosition(vec3f(0.0f, 0.0125f, 0.0f));
 #endif
+
+
 
   // light object
   // ------------------------------------------------------------------------
   lighting::DirectionalLight dirLight("dirLight");    (void)dirLight;
+#if 0
   lighting::PointLight pointLight("pointLight");      (void)pointLight;
   lighting::SpotLight spotLight("spotLight");         (void)spotLight;
-
+#endif
   
+
+#if 0
   // stencil object
   // ------------------------------------------------------------------------
-  Stencil stencil(shaderOutline); 
+  Stencil stencil(shaderOutline); (void) stencil;
+#endif
 
   // render loop
   // ------------------------------------------------------------------------
@@ -122,33 +119,63 @@ int main()
       glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
     const mat4f view = camera.getViewMatrix();
 
+#if 0
+    shaderOutline->use();
+    shaderOutline->setMat4f("view",       view);
+    shaderOutline->setMat4f("projection", projection);
+#endif
+  
     shaderScene->use();
     shaderScene->setMat4f("view",       view);
     shaderScene->setMat4f("projection", projection);
     shaderScene->setVec3f("viewPos",    camera.position);
 
-    shaderOutline->use();
-    shaderOutline->setMat4f("view",       view);
-    shaderOutline->setMat4f("projection", projection);
-  
-
     // Render lights
     // ------------------------------------------------------------------------
     dirLight.render(shaderScene);
-    // pointLight.render(shaderScene);
-    // spotLight.render(shaderScene);
-    
+#if 0
+    pointLight.render(shaderScene);
+    spotLight.render(shaderScene);
+#endif
 
     // Render models
     // ------------------------------------------------------------------------
     modelFloor.draw(shaderScene);
     modelCrate.draw(shaderScene);
+#if 0    
     stencil.drawOutline(&modelCrate2, shaderScene, vec3f(1.0f, 0.0f, 0.0f), 0.5f);
+#endif
+
+#if 0
+    auto model = mat4f(1.0f);
+    model = glm::translate(model, vec3f(8.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(90.0f), vec3f(0.0f, 1.0f, 0.0f));
+
+    shaderBlending->use();
+    shaderBlending->setMat4f("view", view);
+    shaderBlending->setMat4f("projection", projection);
+    shaderBlending->setMat4f("model", model);
+    shaderBlending->setInt("texture1", 0);
+
+    vertexArray.bind();
+    elementBuffer.bind();
     
+    glEnable(GL_BLEND); 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);   
+    
+    Texture::activeTextUnit(0);
+    texGrass->bind();
+    //texTransparentWindow->bind();
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+    vertexArray.unbind();
+    elementBuffer.unbind();
+#endif
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
 #if 0
     if(ImGui::Begin("Directional light"))
     {
@@ -184,6 +211,7 @@ int main()
     }
     ImGui::End();
 #endif
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -195,6 +223,10 @@ int main()
 
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();
+
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
 
   window.destroy();
 

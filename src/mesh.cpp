@@ -7,10 +7,13 @@
  * -----------------------------------------------------
 */
 
-Mesh::Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices, vector<Texture*>& textures)
+Mesh::Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices)
 {
   _indices  = indices;
-  _textures = textures;
+  
+  diffuse   = nullptr;
+  normal    = nullptr;
+  specular  = nullptr;
 
   _vertexBuffer   = make_unique<VertexBuffer>(vertices.size(), vertices.data());
   _elementBuffer  = make_unique<ElementBuffer>(indices.size(), indices.data());
@@ -19,31 +22,23 @@ Mesh::Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices, vector<Texture*>
 
 void Mesh::draw(Shader* shader, uint32_t drawmode)
 {
-  for(uint32_t i = 0; i < _textures.size(); i++)
+  if(diffuse)
   {
-    auto texture = _textures[i];
-    switch (texture->type())
-    {
-    case TextureType::TEX_DIFFUSE:
-      Texture::activeTextUnit(0);
-      shader->setInt("material.texDiffuse", 0);
-      break;
-    
-    case TextureType::TEX_NORMAL:
-      Texture::activeTextUnit(1);
-      shader->setInt("material.texNormal", 1);
-      break;
-    
-    case TextureType::TEX_SPECULAR:
-      Texture::activeTextUnit(2);
-      shader->setInt("material.texSpecular", 2);
-      break;
-
-    default:
-      break;
-    }
-
-    texture->bind();
+    Texture::activeTextUnit(0);
+    shader->setInt("material.diffuse", 0);
+    diffuse->bind();
+  }
+  if(normal)
+  {
+    Texture::activeTextUnit(1);
+    shader->setInt("material.normal", 1);
+    normal->bind();
+  }
+  if(specular)
+  {
+    Texture::activeTextUnit(2);
+    shader->setInt("material.specular", 2);
+    specular->bind();
   }
 
   shader->setFloat("material.shininess", 32.0f);

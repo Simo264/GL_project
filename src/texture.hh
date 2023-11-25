@@ -4,15 +4,15 @@
 #include "core.hh"
 
 enum class TextureType { 
-  TEX_DIFFUSE = 0, 
-  TEX_NORMAL, 
-  TEX_SPECULAR,
+  DIFFUSE = 0, 
+  NORMAL, 
+  SPECULAR,
 };
 
 class Texture
 {
 public:
-  Texture(const string& path, TextureType type = TextureType::TEX_DIFFUSE, bool immutable = false);
+  Texture(const string& path, TextureType type = TextureType::DIFFUSE, bool immutable = false);
   Texture() = default;
   ~Texture() = default;
 

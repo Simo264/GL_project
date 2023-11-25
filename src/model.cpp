@@ -80,78 +80,101 @@ void Model::loadModel(const string& path)
   //spdlog::info("Loading meshes {}", scene->mNumMeshes);
   for(uint32_t i = 0; i < scene->mNumMeshes; i++)
   {
-    aiMesh* mesh = scene->mMeshes[i];
-    loadMesh(scene, mesh);
+    aiMesh* aimesh = scene->mMeshes[i];
+    loadMesh(scene, aimesh);
   }
   //spdlog::info("Done!");
 }
 
-void Model::loadMesh(const aiScene* scene, const aiMesh* mesh)
+void Model::loadMesh(const aiScene* scene, const aiMesh* aimesh)
 {
-  (void) scene;
-
-  vector<Vertex> vertices;
+  vector<Vertex>   vertices;
   vector<uint32_t> indices;
-  vector<Texture*> textures;
 
-  vertices.reserve(mesh->mNumVertices);
-  indices.reserve(mesh->mNumFaces * 3);
+  vertices.reserve(aimesh->mNumVertices);
+  indices.reserve(aimesh->mNumFaces * 3);
 
   // load vertices
-  loadVertices(vertices, mesh);
+  loadVertices(vertices, aimesh);
 
   // load indices
-  loadIndices(indices, mesh);
+  loadIndices(indices, aimesh);
+
+  Mesh* mesh = new Mesh(vertices, indices);
 
   // load textures
-  const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-  loadTextures(textures, material, TextureType::TEX_DIFFUSE);
-  loadTextures(textures, material, TextureType::TEX_NORMAL);
-  loadTextures(textures, material, TextureType::TEX_SPECULAR);
+  const aiMaterial* material = scene->mMaterials[aimesh->mMaterialIndex];
+  Texture* diffuse  = loadTexture(material, TextureType::DIFFUSE);
+  Texture* normal   = loadTexture(material, TextureType::NORMAL);
+  Texture* specular = loadTexture(material, TextureType::SPECULAR);
+  mesh->diffuse  = diffuse;
+  mesh->normal   = normal;
+  mesh->specular = specular;
 
-  _meshes.push_back(new Mesh(vertices, indices, textures));
+  _meshes.push_back(mesh);
 }
 
-void Model::loadVertices(vector<Vertex>& out, const aiMesh* mesh)
+void Model::loadVertices(vector<Vertex>& out, const aiMesh* aimesh)
 {
-  for (uint32_t i = 0 ; i < mesh->mNumVertices; i++) 
+  for (uint32_t i = 0 ; i < aimesh->mNumVertices; i++) 
   {
     Vertex vertex;
-    vertex.position.x = mesh->mVertices[i].x;
-    vertex.position.y = mesh->mVertices[i].y;
-    vertex.position.z = mesh->mVertices[i].z;
-    vertex.normal.x   = mesh->mNormals[i].x;
-    vertex.normal.y   = mesh->mNormals[i].y;
-    vertex.normal.z   = mesh->mNormals[i].z;
-    vertex.texCoord.x = mesh->mTextureCoords[0][i].x;
-    vertex.texCoord.y = mesh->mTextureCoords[0][i].y;
+    vertex.position.x = aimesh->mVertices[i].x;
+    vertex.position.y = aimesh->mVertices[i].y;
+    vertex.position.z = aimesh->mVertices[i].z;
+    vertex.normal.x   = aimesh->mNormals[i].x;
+    vertex.normal.y   = aimesh->mNormals[i].y;
+    vertex.normal.z   = aimesh->mNormals[i].z;
+    vertex.texCoord.x = aimesh->mTextureCoords[0][i].x;
+    vertex.texCoord.y = aimesh->mTextureCoords[0][i].y;
     out.push_back(vertex);
   }
 }
 
-void Model::loadIndices(vector<uint32_t>& out,  const aiMesh* mesh)
+void Model::loadIndices(vector<uint32_t>& out,  const aiMesh* aimesh)
 {
   // mNumFaces  : tells us how many polygons exist
-  for (uint32_t i = 0 ; i < mesh->mNumFaces; i++) 
+  for (uint32_t i = 0 ; i < aimesh->mNumFaces; i++) 
   {
-    const aiFace& Face = mesh->mFaces[i];
+    const aiFace& Face = aimesh->mFaces[i];
     out.push_back(Face.mIndices[0]);
     out.push_back(Face.mIndices[1]);
     out.push_back(Face.mIndices[2]);
   } 
 }
 
-void Model::loadTextures(vector<Texture*>& out, const aiMaterial* material, const TextureType texType)
+Texture* Model::loadTexture(const aiMaterial* material, const TextureType texType)
 {
   aiTextureType aiType;
-  if(texType == TextureType::TEX_DIFFUSE)
-    aiType = aiTextureType_DIFFUSE; 
-  else if(texType == TextureType::TEX_NORMAL)
-    aiType = aiTextureType_NORMALS; 
-  else if(texType == TextureType::TEX_SPECULAR)
-    aiType = aiTextureType_SPECULAR; 
+  switch (texType)
+  {
+  case TextureType::DIFFUSE:  aiType = aiTextureType_DIFFUSE; 
+    break;
+  case TextureType::NORMAL:   aiType = aiTextureType_NORMALS; 
+    break;
+  case TextureType::SPECULAR: aiType = aiTextureType_SPECULAR; 
+    break;
+  default:
+    break;
+  }
 
+  if (material->GetTextureCount(aiType) <= 0)
+    return nullptr; 
+  
+  aiString filename;
+  if(material->GetTexture(aiType, 0, &filename) != AI_SUCCESS)
+    return nullptr;
 
+  string path = "assets/";
+  path.append(filename.C_Str());
+
+  Texture* texture = pool::TexturePool::getTexture(path);
+  if(!texture)  
+    texture = pool::TexturePool::loadTexture(path, texType, false);
+  
+  return texture;
+
+#if 0
   for(uint32_t i = 0; i < material->GetTextureCount(aiType); i++)
   {
     aiString filename;
@@ -164,9 +187,10 @@ void Model::loadTextures(vector<Texture*>& out, const aiMaterial* material, cons
     if(!texture)
     {
       texture = pool::TexturePool::loadTexture(path, texType, false);
+      return texture;
     }
-
-    out.push_back(texture);
   }
+  return nullptr;
+#endif
 }
 

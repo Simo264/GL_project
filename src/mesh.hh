@@ -18,16 +18,19 @@
 class Mesh
 {
 public:
-  Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices, vector<Texture*>& textures);
+  Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices);
   ~Mesh() = default;
 
   void draw(Shader* shader, uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
 
   void destroy();
 
+  Texture* diffuse;
+  Texture* normal;
+  Texture* specular;
+
 private:
   vector<uint32_t> _indices;
-  vector<Texture*> _textures;
 
   unique_ptr<VertexBuffer>  _vertexBuffer;
   unique_ptr<ElementBuffer> _elementBuffer;
