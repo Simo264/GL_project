@@ -8,8 +8,12 @@
 class VertexBuffer
 {
 public:
+  VertexBuffer() = default;
   VertexBuffer(uint64_t size, float* rawdata, int usage = GL_STATIC_DRAW);
   VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage = GL_STATIC_DRAW);
+
+  VertexBuffer(const VertexBuffer&) = delete;            // delete copy constructor
+  VertexBuffer& operator=(const VertexBuffer&) = delete; // delete assign op
   
   ~VertexBuffer() = default;
 

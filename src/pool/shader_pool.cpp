@@ -12,7 +12,7 @@ namespace pool
 
   void ShaderPool::initBuffer()
   {
-    // preallocate a bunch of memory on the heap big enougth to
+    // allocate a bunch of memory on the heap big enough to
     // contain 10 contiguous shader objects
     _bufferSz = 0;
     _bufferCapacity = MAX_SHADER_BUFFER_SIZE;
@@ -27,8 +27,7 @@ namespace pool
       return nullptr;
     }
 
-    auto address = &_shaderBuffer.get()[_bufferSz];
-    Shader* shader = new(address) Shader(label, vFilename, fFilename);
+    Shader* shader = new(&_shaderBuffer[_bufferSz]) Shader(label, vFilename, fFilename);
     _bufferSz++;
 
     return shader;
@@ -38,7 +37,7 @@ namespace pool
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {
-      auto* s = &_shaderBuffer.get()[i];
+      auto* s = &_shaderBuffer[i];
       if(s->label().compare(label) == 0)
         return s;
     }
@@ -50,11 +49,11 @@ namespace pool
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {
-      auto* shader = &_shaderBuffer.get()[i];
+      auto* shader = &_shaderBuffer[i];
       shader->destroy();
     }
     
-    _shaderBuffer.release();
+    _shaderBuffer.reset();
   }
 
 }

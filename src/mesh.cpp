@@ -15,9 +15,12 @@ Mesh::Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices)
   normal    = nullptr;
   specular  = nullptr;
 
-  _vertexBuffer   = make_unique<VertexBuffer>(vertices.size(), vertices.data());
-  _elementBuffer  = make_unique<ElementBuffer>(indices.size(), indices.data());
-  _vertexArray    = make_unique<VertexArray>(_vertexBuffer.get());
+
+  // reserve memory for VB, EB, VA and allocate them sequentially
+  _ptrData       = make_unique<char[]>(sizeof(VertexBuffer) + sizeof(ElementBuffer) + sizeof(VertexArray));
+  _vertexBuffer  = new(&_ptrData[0]) VertexBuffer(vertices.size(), vertices.data());
+  _elementBuffer = new(&_ptrData[0] + sizeof(VertexBuffer)) ElementBuffer(indices.size(), indices.data());
+  _vertexArray   = new(&_ptrData[0] + sizeof(VertexBuffer) + sizeof(ElementBuffer)) VertexArray(_vertexBuffer);
 }
 
 void Mesh::draw(Shader* shader, uint32_t drawmode)
@@ -43,19 +46,20 @@ void Mesh::draw(Shader* shader, uint32_t drawmode)
 
   shader->setFloat("material.shininess", 32.0f);
 
-  _vertexArray.get()->bind();
-  _elementBuffer.get()->bind();
+  _vertexArray->bind();
+  _elementBuffer->bind();
   
   glDrawElements(drawmode, _indices.size(), GL_UNSIGNED_INT, 0);
 
-  _elementBuffer.get()->unbind();
-  _vertexArray.get()->unbind();
+  _vertexArray->unbind();
+  _elementBuffer->unbind();
 }
 
 void Mesh::destroy()
 {
-  _vertexArray.get()->destroy();
-  _vertexBuffer.get()->destroy();
-  _elementBuffer.get()->destroy();
+  _vertexArray->destroy();
+  _vertexBuffer->destroy();
+  _elementBuffer->destroy();
+  _ptrData.reset(); // deallocate memory 
 }
 

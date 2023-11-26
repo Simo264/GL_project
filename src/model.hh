@@ -6,39 +6,27 @@
 #include "mesh.hh"
 #include "shader.hh"
 #include "texture.hh"
+#include "actor.hh"
 
-class Model
+class Model : public Actor
 {
 public:
   Model(const string& path);
   ~Model() = default;
+  
+  Model(const Model&) = delete;            // delete copy constructor
+  Model& operator=(const Model&) = delete; // delete assign op
 
   void draw(Shader* shader, uint32_t drawmode = GL_TRIANGLES); // GL_TRIANGLES | GL_LINE_STRIP
   
   void destroy();
-
-  vec3f position() const { return _position;}
-  void  setPosition(vec3f newPos);
-  
-  vec3f size() const { return _size; }
-  void  setSize(vec3f newSz);
   
 private:
-  vector<Mesh*> _meshes;
-
-  mat4f _translationMatrix;
-  mat4f _scalingMatrix;
-  mat4f _rotationMatrix;
-
-  mat4f _modelMatrix;
-
-  vec3f _position;
-  vec3f _size;
-
-  void updateModelMatrix() { _modelMatrix = _translationMatrix * _rotationMatrix * _scalingMatrix; }
+  unique_ptr<Mesh[]> _meshPool;
+  uint32_t           _numMeshes;
 
   void loadModel(const string& path);
-  void loadMesh(const struct aiScene* scene, const struct aiMesh* aimesh);
+  void loadMesh(uint32_t index, const struct aiScene* scene, const struct aiMesh* aimesh);
   void loadVertices(vector<Vertex>& out, const struct aiMesh* aimesh);
   void loadIndices(vector<uint32_t>& out,  const struct aiMesh* aimesh);
   Texture* loadTexture(const struct aiMaterial* material, const TextureType texType);

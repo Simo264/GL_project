@@ -7,6 +7,12 @@ Stencil::Stencil(Shader* stencilShader)
 
 void Stencil::drawOutline(Model* model, Shader* shaderScene, vec3f color, float thickness)
 {
+  (void) model;
+  (void) shaderScene;
+  (void) color;
+  (void) thickness;
+
+#if 0
   // 1st. render pass, draw objects as normal, writing to the stencil buffer
   // --------------------------------------------------------------------
   glEnable(GL_STENCIL_TEST);
@@ -37,5 +43,6 @@ void Stencil::drawOutline(Model* model, Shader* shaderScene, vec3f color, float 
   glEnable(GL_DEPTH_TEST);
 
   model->setSize(modelSz);
+#endif
 }
 

@@ -12,7 +12,7 @@ namespace pool
 
   void TexturePool::initBuffer()
   {
-    // preallocate a bunch of memory on the heap big enougth to
+    // allocate a bunch of memory on the heap big enough to
     // contain 200 contiguous texture objects
     _bufferSz = 0;
     _bufferCapacity = MAX_TEXTURE_BUFFER_SIZE;
@@ -27,8 +27,7 @@ namespace pool
       return nullptr;
     }
 
-    auto address = &_textureBuffer.get()[_bufferSz];
-    Texture* texture = new(address) Texture(path, type, immutable);
+    Texture* texture = new(&_textureBuffer[_bufferSz]) Texture(path, type, immutable);
     _bufferSz++;
 
     return texture;
@@ -38,7 +37,7 @@ namespace pool
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {
-      auto* t = &_textureBuffer.get()[i];
+      auto* t = &_textureBuffer[i];
       if(t->path().compare(path) == 0)
         return t;
     }
@@ -50,10 +49,10 @@ namespace pool
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {
-      auto* texture = &_textureBuffer.get()[i];
+      auto* texture = &_textureBuffer[i];
       texture->destroy();
     }
     
-    _textureBuffer.release();
+    _textureBuffer.reset();
   }
 }

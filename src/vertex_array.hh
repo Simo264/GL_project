@@ -8,8 +8,13 @@
 class VertexArray
 {
 public:
+  VertexArray() = default;
+
   VertexArray(VertexBuffer* vBuffer);
   ~VertexArray() = default;
+
+  VertexArray(const VertexArray&) = delete;            // delete copy constructor
+  VertexArray& operator=(const VertexArray&) = delete; // delete assign op
 
   void bind() const { glBindVertexArray(_vertexArray);}
   void unbind() const { glBindVertexArray(0);}

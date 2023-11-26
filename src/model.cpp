@@ -13,48 +13,33 @@
  * -----------------------------------------------------
 */
 
-Model::Model(const string& path)
+Model::Model(const string& path) : Actor()  
 {
   loadModel(path);
-
-  _position = vec3f(0.f,0.f,0.f); // default on origin
-  _size     = vec3f(1.f,1.f,1.f); // default size
-
-  _translationMatrix = translate(mat4f(1.f), _position);
-  _scalingMatrix     = scale(mat4f(1.f), _size);
-  _rotationMatrix    = mat4f(1.f); // no rotation
-  
-  updateModelMatrix();
 }
 
 void Model::draw(Shader* shader, uint32_t drawmode)
 {
   shader->use();
-  shader->setMat4f("model", _modelMatrix);
-  for(auto& mesh : _meshes)
-    mesh->draw(shader, drawmode);
+  shader->setMat4f("model", _model);
+  for(uint32_t i = 0; i < _numMeshes; i++)
+  {
+    auto& mesh = _meshPool.get()[i];
+    mesh.draw(shader, drawmode);
+  }
 }
 
 void Model::destroy()
 {
-  for(auto& mesh : _meshes)
+  for(uint32_t i = 0; i < _numMeshes; i++)
   {
-    mesh->destroy();
-    delete mesh;
+    auto& mesh = _meshPool[i];
+    mesh.destroy();
   }
+
+  _meshPool.reset();
 }
 
-void Model::setPosition(vec3f newPos)
-{
-  _translationMatrix = translate(mat4f(1.f), newPos);
-  updateModelMatrix();
-}
-
-void Model::setSize(vec3f newSz)
-{
-  _scalingMatrix = scale(mat4f(1.f), newSz);
-  updateModelMatrix();
-}
 
 /* -----------------------------------------------------
  *          PRIVATE METHODS
@@ -74,19 +59,22 @@ void Model::loadModel(const string& path)
     spdlog::error("ERROR::ASSIMP::{}", importer.GetErrorString());
     return;
   }
+  
+  // Allocates enough memory to hold `_numMeshes` mesh objects sequentially  
+  _numMeshes = scene->mNumMeshes;
+  _meshPool  = make_unique<Mesh[]>(_numMeshes);
 
-  _meshes.reserve(scene->mNumMeshes);
-
-  //spdlog::info("Loading meshes {}", scene->mNumMeshes);
-  for(uint32_t i = 0; i < scene->mNumMeshes; i++)
+  spdlog::info("Loading meshes {}", _numMeshes);
+  for(uint32_t i = 0; i < _numMeshes; i++)
   {
     aiMesh* aimesh = scene->mMeshes[i];
-    loadMesh(scene, aimesh);
+    loadMesh(i, scene, aimesh);
   }
-  //spdlog::info("Done!");
+  spdlog::info("Done!");
+
 }
 
-void Model::loadMesh(const aiScene* scene, const aiMesh* aimesh)
+void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
 {
   vector<Vertex>   vertices;
   vector<uint32_t> indices;
@@ -100,7 +88,8 @@ void Model::loadMesh(const aiScene* scene, const aiMesh* aimesh)
   // load indices
   loadIndices(indices, aimesh);
 
-  Mesh* mesh = new Mesh(vertices, indices);
+  // load meshe in array
+  Mesh* mesh = new(&_meshPool[index]) Mesh(vertices, indices);
 
   // load textures
   const aiMaterial* material = scene->mMaterials[aimesh->mMaterialIndex];
@@ -110,8 +99,6 @@ void Model::loadMesh(const aiScene* scene, const aiMesh* aimesh)
   mesh->diffuse  = diffuse;
   mesh->normal   = normal;
   mesh->specular = specular;
-
-  _meshes.push_back(mesh);
 }
 
 void Model::loadVertices(vector<Vertex>& out, const aiMesh* aimesh)
