@@ -63,7 +63,7 @@ void Texture::load(const string& path, bool immutable)
   }
   else
   {
-    spdlog::error("Failed to load texture {}", path);
+    spdlog::error("Failed to load texture `{}`", path);
   }
   stbi_image_free(data);
 }

@@ -167,6 +167,7 @@ Texture* Model::loadTexture(const aiMaterial* material, const TextureType texTyp
 
   string path = "assets/";
   path.append(filename.C_Str());
+  path.erase(remove_if(path.begin(), path.end(), isspace), path.end()); // remove whitespaces
 
   Texture* texture = pool::TexturePool::getTexture(path);
   if(!texture)  

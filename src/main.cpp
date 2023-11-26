@@ -36,14 +36,18 @@ int main()
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
 
+  // auto normalMap = pool::TexturePool::loadTexture("assets/Cube/normal.png");
+
+
+#if 0
   // simple grass
   // ------------------------------------------------------------------------
   auto texTransparentWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
   auto texGrass             = pool::TexturePool::loadTexture("res/grass.png");
 
   vector<Vertex> vertices = {
-    Vertex{vec3f(0.5f,  0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(1.0f, 1.0f)}, // top right
-    Vertex{vec3f(0.5f, -0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(1.0f, 0.0f)}, // bottom right
+    Vertex{vec3f(0.5f,  0.5f,  0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(1.0f, 1.0f)}, // top right
+    Vertex{vec3f(0.5f, -0.5f,  0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(1.0f, 0.0f)}, // bottom right
     Vertex{vec3f(-0.5f, -0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 0.0f)}, // bottom left
     Vertex{vec3f(-0.5f,  0.5f, 0.0f),  vec3f(0.0f, 0.0f, 0.0f),  vec2f(0.0f, 1.0f)}, // top left 
   };
@@ -52,7 +56,7 @@ int main()
   VertexBuffer  vertexBuffer(vertices.size(), vertices.data());
   ElementBuffer elementBuffer(indices.size(), indices.data());
   VertexArray   vertexArray(&vertexBuffer);
-
+#endif
 
   // load shaders
   // ------------------------------------------------------------------------
@@ -66,7 +70,7 @@ int main()
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera;
-
+  camera.sensitivity = 128.0f;
 
   // create model objects
   // ------------------------------------------------------------------------
@@ -76,13 +80,9 @@ int main()
 
   Model modelCrate("assets/Crate/Crate.obj");
   modelCrate.setPosition(vec3f(10.0f, 0.0125f, 0.0f));
-
-#if 0
-  Model modelCrate2("assets/Crate/Crate.obj");
-  modelCrate2.setPosition(vec3f(0.0f, 0.0125f, 0.0f));
-#endif
-
-
+  
+  Model modelCube("assets/Cube/Cube.obj");
+  modelCube.setPosition(vec3f(10.0f, 0.0125f, 5.0f));
 
   // light object
   // ------------------------------------------------------------------------
@@ -142,6 +142,7 @@ int main()
     // ------------------------------------------------------------------------
     modelFloor.draw(shaderScene);
     modelCrate.draw(shaderScene);
+    modelCube.draw(shaderScene);
 #if 0    
     stencil.drawOutline(&modelCrate2, shaderScene, vec3f(1.0f, 0.0f, 0.0f), 0.5f);
 #endif
@@ -214,7 +215,6 @@ int main()
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 
     window.swapBuffersAndProcessEvents();
 

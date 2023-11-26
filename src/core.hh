@@ -29,6 +29,7 @@ using std::stringstream;
 using std::ifstream;
 using std::make_pair;
 using std::make_unique;
+using std::remove_if;
 
 using vec2f = glm::vec2; 
 using vec2i = glm::ivec2;
