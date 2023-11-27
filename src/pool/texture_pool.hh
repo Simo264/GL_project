@@ -4,6 +4,11 @@
 #include "../core.hh"
 #include "../texture.hh"
 
+#define MAX_TEXTURE_BUFFER_SIZE 100
+
+#define STATIC_TEXTURE_BUFFER_ALLOCATION 
+// #define DYNAMIC_TEXTURE_BUFFER_ALLOCATION
+
 namespace pool
 {
   class TexturePool
@@ -20,7 +25,14 @@ namespace pool
     static void freeBuffer();
 
   private:
+  #ifdef DYNAMIC_TEXTURE_BUFFER_ALLOCATION
     static unique_ptr<Texture[]> _textureBuffer;
+  #endif
+
+  #ifdef STATIC_TEXTURE_BUFFER_ALLOCATION
+    static array<Texture, MAX_TEXTURE_BUFFER_SIZE> _textureBuffer;
+  #endif
+
     static uint32_t _bufferSz;
     static uint32_t _bufferCapacity;
   };

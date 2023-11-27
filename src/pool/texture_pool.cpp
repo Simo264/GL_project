@@ -2,21 +2,29 @@
 
 #include "spdlog/spdlog.h"
 
-#define MAX_TEXTURE_BUFFER_SIZE 200
-
 namespace pool
 {
-  unique_ptr<Texture[]> TexturePool::_textureBuffer;
+  #ifdef DYNAMIC_TEXTURE_BUFFER_ALLOCATION
+    unique_ptr<Texture[]> TexturePool::_textureBuffer;
+  #endif
+
+  #ifdef STATIC_TEXTURE_BUFFER_ALLOCATION
+    array<Texture, MAX_TEXTURE_BUFFER_SIZE> TexturePool::_textureBuffer;
+  #endif
+ 
   uint32_t              TexturePool::_bufferSz;
   uint32_t              TexturePool::_bufferCapacity;
 
   void TexturePool::initBuffer()
   {
-    // allocate a bunch of memory on the heap big enough to
-    // contain 200 contiguous texture objects
     _bufferSz = 0;
     _bufferCapacity = MAX_TEXTURE_BUFFER_SIZE;
-    _textureBuffer  = make_unique<Texture[]>(_bufferCapacity);
+
+    #ifdef DYNAMIC_TEXTURE_BUFFER_ALLOCATION
+      // allocate a bunch of memory on the heap big enough to
+      // contain 200 contiguous texture objects
+      _textureBuffer  = make_unique<Texture[]>(_bufferCapacity);
+    #endif
   }
 
   Texture* TexturePool::loadTexture(const string& path, TextureType type, bool immutable)
@@ -27,9 +35,9 @@ namespace pool
       return nullptr;
     }
 
-    Texture* texture = new(&_textureBuffer[_bufferSz]) Texture(path, type, immutable);
+    Texture* texture = &_textureBuffer[_bufferSz];
+    texture->init(path, type, immutable);
     _bufferSz++;
-
     return texture;
   }
 
@@ -52,7 +60,9 @@ namespace pool
       auto* texture = &_textureBuffer[i];
       texture->destroy();
     }
-    
+
+  #ifdef DYNAMIC_TEXTURE_BUFFER_ALLOCATION
     _textureBuffer.reset();
+  #endif
   }
 }

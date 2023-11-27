@@ -60,7 +60,7 @@ void Model::loadModel(const string& path)
     return;
   }
   
-  // Allocates enough memory to hold `_numMeshes` mesh objects sequentially on the heap
+  // Allocates memory on the heap to hold `_numMeshes` mesh objects
   _numMeshes = scene->mNumMeshes;
   _meshPool  = make_unique<Mesh[]>(_numMeshes);
 
@@ -89,7 +89,9 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   loadIndices(indices, aimesh);
 
   // load mesh objects sequentially on the heap
-  Mesh* mesh = new(&_meshPool[index]) Mesh(vertices, indices);
+  Mesh* mesh = &_meshPool[index];
+  mesh->init(vertices, indices);
+
 
   // load textures
   const aiMaterial* material = scene->mMaterials[aimesh->mMaterialIndex];
@@ -152,7 +154,6 @@ Texture* Model::loadTexture(const aiMaterial* material, const TextureType texTyp
 
   string path = "assets/";
   path.append(filename.C_Str());
-  path.erase(remove_if(path.begin(), path.end(), isspace), path.end()); // remove whitespaces
 
   Texture* texture = pool::TexturePool::getTexture(path);
   if(!texture)  

@@ -8,11 +8,11 @@ namespace pool
   uint32_t ShaderPool::_bufferCapacity;
 
 #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
-  unique_ptr<Shader[]> ShaderPool::_shaderPool;
+  unique_ptr<Shader[]> ShaderPool::_shaderBuffer;
 #endif
 
 #ifdef STATIC_SHADER_BUFFER_ALLOCATION
-  array<Shader, MAX_SHADER_BUFFER_SIZE> ShaderPool::_shaderPool;
+  array<Shader, MAX_SHADER_BUFFER_SIZE> ShaderPool::_shaderBuffer;
 #endif
 
   void ShaderPool::initBuffer()
@@ -23,45 +23,29 @@ namespace pool
   #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
     // allocate a bunch of memory on the heap big enough to
     // contain `MAX_SHADER_BUFFER_SIZE` contiguous shader objects
-    _shaderPool = make_unique<Shader[]>(_bufferCapacity);
+    _shaderBuffer = make_unique<Shader[]>(_bufferCapacity);
   #endif
   }
 
   Shader* ShaderPool::loadShader(const string& label, const string& vFilename, const string& fFilename)
   {
-  #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
     if(_bufferSz >= _bufferCapacity)
-    { 
-      spdlog::warn("Can't load more shaders. Buffer is full");
-      return nullptr;
-    }
-
-    Shader* shader = new(&_shaderPool[_bufferSz]) Shader(label, vFilename, fFilename);
-    _bufferSz++;
-
-    return shader;
-  #endif
-
-  #ifdef STATIC_SHADER_BUFFER_ALLOCATION
-    if(_bufferSz >= MAX_SHADER_BUFFER_SIZE)
     {
       spdlog::warn("Can't load more shaders. Buffer is full");
       return nullptr;
     }
-  
-    Shader* shader = &_shaderPool[_bufferSz];
+
+    Shader* shader = &_shaderBuffer[_bufferSz];
     shader->init(label, vFilename, fFilename);
     _bufferSz++;
-    
     return shader;
-  #endif
   }
 
   Shader* ShaderPool::getShader(const string& label)
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {
-      auto* s = &_shaderPool[i];
+      auto* s = &_shaderBuffer[i];
       if(s->label().compare(label) == 0)
         return s;
     }
@@ -72,12 +56,12 @@ namespace pool
   {
     for(uint32_t i = 0; i < _bufferSz; i++)
     {
-      auto* shader = &_shaderPool[i];
+      auto* shader = &_shaderBuffer[i];
       shader->destroy();
     }
     
   #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
-    _shaderPool.reset();
+    _shaderBuffer.reset();
   #endif
   
   }

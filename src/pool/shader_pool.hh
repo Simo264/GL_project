@@ -26,13 +26,13 @@ namespace pool
 
   private:
   #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
-    static unique_ptr<Shader[]> _shaderPool;
+    static unique_ptr<Shader[]> _shaderBuffer;
     static uint32_t _bufferSz;
     static uint32_t _bufferCapacity;
   #endif
 
   #ifdef STATIC_SHADER_BUFFER_ALLOCATION
-    static array<Shader, MAX_SHADER_BUFFER_SIZE> _shaderPool;
+    static array<Shader, MAX_SHADER_BUFFER_SIZE> _shaderBuffer;
     static uint32_t _bufferSz;
     static uint32_t _bufferCapacity;
   #endif
