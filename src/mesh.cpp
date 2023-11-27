@@ -7,7 +7,7 @@
  * -----------------------------------------------------
 */
 
-Mesh::Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices)
+Mesh::Mesh(vector<GL::Vertex>& vertices, vector<uint32_t>& indices)
 {
   diffuse   = nullptr;
   normal    = nullptr;

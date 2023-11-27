@@ -5,38 +5,42 @@
  * -----------------------------------------------------
 */
 
-VertexBuffer::VertexBuffer(uint64_t size, float* rawdata, int usage)
+namespace GL
 {
-  init(size, rawdata, usage);
-}
+  VertexBuffer::VertexBuffer(uint64_t size, float* rawdata, int usage)
+  {
+    init(size, rawdata, usage);
+  }
 
-VertexBuffer::VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage)
-{
-  init(nVertices, vertices, usage);
-}
+  VertexBuffer::VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage)
+  {
+    init(nVertices, vertices, usage);
+  }
 
-void VertexBuffer::init(uint64_t size, float* rawdata, int usage)
-{
-  glGenBuffers(1, &_buffer);
+  void VertexBuffer::init(uint64_t size, float* rawdata, int usage)
+  {
+    glGenBuffers(1, &_buffer);
 
-  bind();
+    bind();
 
-  glNamedBufferData(_buffer, size, rawdata, usage);
-}
+    glNamedBufferData(_buffer, size, rawdata, usage);
+  }
 
-void VertexBuffer::init(uint64_t nVertices, Vertex* vertices, int usage)
-{
-  glGenBuffers(1, &_buffer);
-  
-  bind();
+  void VertexBuffer::init(uint64_t nVertices, Vertex* vertices, int usage)
+  {
+    glGenBuffers(1, &_buffer);
+    
+    bind();
 
-  uint64_t size = nVertices * sizeof(Vertex);
-  glNamedBufferData(_buffer, size, (void*) vertices, usage);
-}
+    uint64_t size = nVertices * sizeof(Vertex);
+    glNamedBufferData(_buffer, size, (void*) vertices, usage);
+  }
 
 
-void VertexBuffer::destroy() 
-{ 
-  if(_buffer)
-    glDeleteBuffers(1, &_buffer);
+  void VertexBuffer::destroy() 
+  { 
+    if(_buffer)
+      glDeleteBuffers(1, &_buffer);
+  }
+
 }

@@ -76,7 +76,7 @@ void Model::loadModel(const string& path)
 
 void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
 {
-  vector<Vertex>   vertices;
+  vector<GL::Vertex>   vertices;
   vector<uint32_t> indices;
 
   vertices.reserve(aimesh->mNumVertices);
@@ -101,7 +101,7 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   mesh->specular = specular;
 }
 
-void Model::loadVertices(vector<Vertex>& outVertices, const aiMesh* aimesh)
+void Model::loadVertices(vector<GL::Vertex>& outVertices, const aiMesh* aimesh)
 {
   for (uint32_t i = 0 ; i < aimesh->mNumVertices; i++) 
   {

@@ -5,25 +5,29 @@
  * -----------------------------------------------------
 */
 
-ElementBuffer::ElementBuffer(uint64_t nIndices, uint32_t* data, int usage)
+namespace GL
 {
-  init(nIndices, data, usage);
-}
+  ElementBuffer::ElementBuffer(uint64_t nIndices, uint32_t* data, int usage)
+  {
+    init(nIndices, data, usage);
+  }
 
-void ElementBuffer::init(uint64_t nIndices, uint32_t* data, int usage)
-{
-  glGenBuffers(1, &_buffer);
+  void ElementBuffer::init(uint64_t nIndices, uint32_t* data, int usage)
+  {
+    glGenBuffers(1, &_buffer);
 
-  bind();
+    bind();
 
-  uint64_t size = nIndices * sizeof(uint32_t); 
-  glNamedBufferData(_buffer, size, data, usage);
+    uint64_t size = nIndices * sizeof(uint32_t); 
+    glNamedBufferData(_buffer, size, data, usage);
 
-  _nIndices = nIndices;
-}
+    _nIndices = nIndices;
+  }
 
-void ElementBuffer::destroy() 
-{ 
-  if(_buffer)
-    glDeleteBuffers(1, &_buffer);
+  void ElementBuffer::destroy() 
+  { 
+    if(_buffer)
+      glDeleteBuffers(1, &_buffer);
+  }
+
 }

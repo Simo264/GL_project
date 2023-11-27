@@ -19,7 +19,7 @@ class Mesh
 {
 public:
   Mesh() = default;
-  Mesh(vector<Vertex>& vertices, vector<uint32_t>& indices);
+  Mesh(vector<GL::Vertex>& vertices, vector<uint32_t>& indices);
   Mesh(const Mesh&) = delete;             // delete copy constructor
   Mesh& operator=(const Mesh&) = delete;  // delete assign op
 
@@ -34,9 +34,9 @@ public:
   Texture* specular;
 
 private:
-  VertexBuffer  _vertexBuffer;
-  ElementBuffer _elementBuffer;
-  VertexArray   _vertexArray;
+  GL::VertexBuffer  _vertexBuffer;
+  GL::ElementBuffer _elementBuffer;
+  GL::VertexArray   _vertexArray;
 };
 
 #endif
