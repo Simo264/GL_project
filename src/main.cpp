@@ -23,6 +23,8 @@
 int main()
 { 
   Window window(vec2u(720, 720), vec2u(400,200), "OpenGL");
+  
+  
 
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
@@ -90,6 +92,7 @@ int main()
 
   // render loop
   // ------------------------------------------------------------------------
+  const mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
   while(window.loop())
   {
     window.update(); // update delta time
@@ -106,8 +109,6 @@ int main()
     
     // View/Projection matrices
     // ------------------------------------------------------------------------
-    const mat4f projection = glm::perspective(
-      glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
     const mat4f view = camera.getViewMatrix();
   
     shaderScene->use();
@@ -127,19 +128,19 @@ int main()
 
     // Render models
     // ------------------------------------------------------------------------
-    modelFloor.draw(shaderScene);
+    // modelFloor.draw(shaderScene);
     modelCrate.draw(shaderScene);
     modelCube.draw(shaderScene);
 
-    glEnable(GL_BLEND); 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // render grass
+    // ------------------------------------------------------------------------
+    glDisable(GL_CULL_FACE);
     shaderBlending->use();
     shaderBlending->setMat4f("view",       view);
     shaderBlending->setMat4f("projection", projection);
     shaderBlending->setMat4f("model",      surface.model());
     surface.draw(shaderBlending, GL_TRIANGLES);
-    
-    
+    glEnable(GL_CULL_FACE);
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -190,6 +191,7 @@ int main()
   modelFloor.destroy();
   modelCrate.destroy();
   modelCube.destroy();
+  surface.destroy();
 
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();

@@ -29,7 +29,6 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  
 
   create(title, fullscreen);
 
@@ -46,6 +45,16 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   // depth buffer
   // -----------------------------
   glEnable(GL_DEPTH_TEST);
+
+  // blending
+  // -----------------------------
+  glEnable(GL_BLEND); 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // face culling
+  // -----------------------------
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);  
   
   // antialiasing
   // -----------------------------
