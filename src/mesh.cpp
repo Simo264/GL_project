@@ -9,13 +9,7 @@
 
 Mesh::Mesh(vector<GL::Vertex>& vertices, vector<uint32_t>& indices)
 {
-  diffuse   = nullptr;
-  normal    = nullptr;
-  specular  = nullptr;
-
-  _vertexBuffer.init(vertices.size(), vertices.data());
-  _elementBuffer.init(indices.size(), indices.data());
-  _vertexArray.init(_vertexBuffer);
+  init(vertices, indices);
 }
 
 void Mesh::draw(Shader* shader, uint32_t drawmode)
@@ -50,6 +44,17 @@ void Mesh::draw(Shader* shader, uint32_t drawmode)
 
   _vertexArray.unbind();
   _elementBuffer.unbind();
+}
+
+void Mesh::init(vector<GL::Vertex>& vertices, vector<uint32_t>& indices)
+{
+  diffuse   = nullptr;
+  normal    = nullptr;
+  specular  = nullptr;
+
+  _vertexBuffer.init(vertices.size(), vertices.data());
+  _elementBuffer.init(indices.size(), indices.data());
+  _vertexArray.init(_vertexBuffer);
 }
 
 void Mesh::destroy()

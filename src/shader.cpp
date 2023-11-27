@@ -8,8 +8,14 @@
 
 
 Shader::Shader(const string& label, const string& vFilename, const string& fFilename)
-  : _label{label}
 {
+  init(label, vFilename, fFilename);
+}
+
+void Shader::init(const string& label, const string& vFilename, const string& fFilename)
+{
+  _label = label;
+
   string vShaderSrc;
   string fShaderSrc;
   getSourceFromFile(vFilename, vShaderSrc);

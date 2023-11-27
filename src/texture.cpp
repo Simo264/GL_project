@@ -12,8 +12,15 @@
 
 
 Texture::Texture(const string& path, TextureType type, bool immutable)
-  : _path{path}, _type{type}
 {
+  init(path, type, immutable);
+}
+
+void Texture::init(const string& path, TextureType type, bool immutable)
+{
+  _path = path;
+  _type = type;
+
   glGenTextures(1, &_texture);
 
   bind();

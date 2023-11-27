@@ -4,6 +4,11 @@
 #include "../core.hh"
 #include "../shader.hh"
 
+#define MAX_SHADER_BUFFER_SIZE 10
+
+#define STATIC_SHADER_BUFFER_ALLOCATION 
+// #define DYNAMIC_SHADER_BUFFER_ALLOCATION
+
 namespace pool
 {
   class ShaderPool
@@ -20,9 +25,17 @@ namespace pool
     static void freeBuffer();
 
   private:
-    static unique_ptr<Shader[]> _shaderBuffer;
+  #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
+    static unique_ptr<Shader[]> _shaderPool;
     static uint32_t _bufferSz;
     static uint32_t _bufferCapacity;
+  #endif
+
+  #ifdef STATIC_SHADER_BUFFER_ALLOCATION
+    static array<Shader, MAX_SHADER_BUFFER_SIZE> _shaderPool;
+    static uint32_t _bufferSz;
+    static uint32_t _bufferCapacity;
+  #endif
 
   };
 }

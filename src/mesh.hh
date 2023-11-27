@@ -20,10 +20,13 @@ class Mesh
 public:
   Mesh() = default;
   Mesh(vector<GL::Vertex>& vertices, vector<uint32_t>& indices);
+
+  ~Mesh() = default;
+
   Mesh(const Mesh&) = delete;             // delete copy constructor
   Mesh& operator=(const Mesh&) = delete;  // delete assign op
 
-  ~Mesh() = default;
+  void init(vector<GL::Vertex>& vertices, vector<uint32_t>& indices);
 
   void draw(Shader* shader, uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
 

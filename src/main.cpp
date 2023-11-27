@@ -25,7 +25,6 @@ int main()
   Window window(vec2u(720, 720), vec2u(400,200), "OpenGL");
   
   
-
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -36,14 +35,15 @@ int main()
   ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
   ImGui_ImplOpenGL3_Init("#version 130");
 
+
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
+
 
   auto texTransparentWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
   auto texGrass             = pool::TexturePool::loadTexture("res/grass.png");
   (void) texTransparentWindow;
   (void) texGrass;
-
 
   // load shaders
   // ------------------------------------------------------------------------

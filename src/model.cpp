@@ -60,7 +60,7 @@ void Model::loadModel(const string& path)
     return;
   }
   
-  // Allocates enough memory to hold `_numMeshes` mesh objects sequentially  
+  // Allocates enough memory to hold `_numMeshes` mesh objects sequentially on the heap
   _numMeshes = scene->mNumMeshes;
   _meshPool  = make_unique<Mesh[]>(_numMeshes);
 
@@ -76,8 +76,8 @@ void Model::loadModel(const string& path)
 
 void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
 {
-  vector<GL::Vertex>   vertices;
-  vector<uint32_t> indices;
+  vector<GL::Vertex>  vertices;
+  vector<uint32_t>    indices;
 
   vertices.reserve(aimesh->mNumVertices);
   indices.reserve(aimesh->mNumFaces * 3);
@@ -88,7 +88,7 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   // load indices
   loadIndices(indices, aimesh);
 
-  // load mesh in array
+  // load mesh objects sequentially on the heap
   Mesh* mesh = new(&_meshPool[index]) Mesh(vertices, indices);
 
   // load textures

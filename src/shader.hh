@@ -10,6 +10,11 @@ public:
   Shader()  = default;
   ~Shader() = default;
 
+  Shader(const Shader&) = delete;            // delete copy constructor
+  Shader& operator=(const Shader&) = delete; // delete assign op
+
+  void init(const string& label, const string& vFilename, const string& fFilename);
+
   void use() const { glUseProgram(_shader); }
 
   void destroy() { glDeleteProgram(_shader); }
