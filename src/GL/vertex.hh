@@ -1,7 +1,7 @@
 #ifndef VERTEX_HH
 #define VERTEX_HH
 
-#include "core.hh"
+#include "../core.hh"
 
 struct Vertex
 {

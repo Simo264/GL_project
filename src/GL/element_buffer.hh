@@ -1,7 +1,7 @@
 #ifndef ELEMENT_BUFFER_HH
 #define ELEMENT_BUFFER_HH
 
-#include "core.hh"
+#include "../core.hh"
 
 class ElementBuffer
 {

@@ -3,10 +3,10 @@
 
 #include "core.hh"
 
-#include "vertex.hh"
-#include "vertex_buffer.hh"
-#include "element_buffer.hh"
-#include "vertex_array.hh"
+#include "GL/vertex.hh"
+#include "GL/vertex_buffer.hh"
+#include "GL/element_buffer.hh"
+#include "GL/vertex_array.hh"
 
 #include "texture.hh"
 #include "shader.hh"

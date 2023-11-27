@@ -12,10 +12,7 @@ STATIC_LIBS = ${STATIC_LIBS_DIR}libglad.a \
 							${STATIC_LIBS_DIR}libspdlog.a \
 							${STATIC_LIBS_DIR}libglm.a 
 
-SOURCES 	= 	$(wildcard src/*.cpp)
-SOURCES  += 	$(wildcard src/imgui/*.cpp)
-SOURCES  += 	$(wildcard src/pool/*.cpp)
-SOURCES  += 	$(wildcard src/lighting/*.cpp)
+SOURCES 	= $(shell find src/ -name "*.cpp")
 
 OBJDIR 		= debug/
 OBJECTS 	= $(patsubst %.cpp, $(OBJDIR)%.o, $(SOURCES))

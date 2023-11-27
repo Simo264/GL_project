@@ -1,7 +1,7 @@
 #ifndef VERTEX_ARRAY_HH
 #define VERTEX_ARRAY_HH
 
-#include "core.hh"
+#include "../core.hh"
 
 #include "vertex_buffer.hh"
 

@@ -46,7 +46,7 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   // -----------------------------
   glEnable(GL_DEPTH_TEST);
 
-  // blending
+  // blending/stencil buffer
   // -----------------------------
   glEnable(GL_BLEND); 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

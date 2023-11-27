@@ -1,7 +1,7 @@
 #ifndef VERTEX_BUFFER_HH
 #define VERTEX_BUFFER_HH
 
-#include "core.hh"
+#include "../core.hh"
 
 #include "vertex.hh"
 

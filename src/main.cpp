@@ -63,7 +63,7 @@ int main()
   // create model objects
   // ------------------------------------------------------------------------
   Model modelFloor("assets/Floor/Floor.obj");
-  modelFloor.scale(vec3f(0.25f, 0.25f, 0.25f));
+  modelFloor.scale(vec3f(0.125f, 1.0f, 0.125f));
   modelFloor.translate(vec3f(0.0,-1.0f,0.f));
 
   Model modelCrate("assets/Crate/Crate.obj");
@@ -128,10 +128,11 @@ int main()
 
     // Render models
     // ------------------------------------------------------------------------
-    // modelFloor.draw(shaderScene);
+    modelFloor.draw(shaderScene);
     modelCrate.draw(shaderScene);
     modelCube.draw(shaderScene);
 
+#if 0
     // render grass
     // ------------------------------------------------------------------------
     glDisable(GL_CULL_FACE);
@@ -141,6 +142,7 @@ int main()
     shaderBlending->setMat4f("model",      surface.model());
     surface.draw(shaderBlending, GL_TRIANGLES);
     glEnable(GL_CULL_FACE);
+#endif
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
