@@ -8,40 +8,9 @@
 */
 
 
-VertexArray::VertexArray(VertexBuffer* vBuffer)
+VertexArray::VertexArray(VertexBuffer& vBuffer)
 {
-  glGenVertexArrays(1, &_vertexArray);
-
-  bind();
-    
-  int offset;
-  int components;
-
-  // 0 -> position (x,y,z)
-  offset     = 0;
-  components = Vertex::posComponent::length();
-  vertexSpecification(0, components, GL_FLOAT, offset); 
-  bindBuffer(0, vBuffer->get(), 0, Vertex::VERTEX_LENGTH);
-  attribBinding(0, 0);
-  enableAttribute(0);
-
-  // 1 -> normal (x,y,z)
-  offset     = sizeof(Vertex::posComponent);
-  components = Vertex::normalComponent::length();
-  vertexSpecification(1, components, GL_FLOAT, offset); 
-  bindBuffer(1, vBuffer->get(), 0, Vertex::VERTEX_LENGTH);
-  attribBinding(1, 1);
-  enableAttribute(1);
-  
-  // 2 -> texture (u,v)
-  offset     = sizeof(Vertex::posComponent) + sizeof(Vertex::normalComponent);
-  components = Vertex::texcoordComponent::length();
-  vertexSpecification(2, components, GL_FLOAT, offset); 
-  bindBuffer(2, vBuffer->get(), 0, Vertex::VERTEX_LENGTH);
-  attribBinding(2, 2);
-  enableAttribute(2);
-
-  unbind();
+  init(vBuffer);
 }
 
 void VertexArray::vertexSpecification(uint32_t index, uint32_t size, uint32_t type, int offset)
@@ -73,4 +42,40 @@ void VertexArray::destroy()
 {
   if(_vertexArray)
     glDeleteVertexArrays(1, &_vertexArray);
+}
+
+void VertexArray::init(VertexBuffer& vBuffer)
+{
+  glGenVertexArrays(1, &_vertexArray);
+
+  bind();
+    
+  int offset;
+  int components;
+
+  // 0 -> position (x,y,z)
+  offset     = 0;
+  components = Vertex::posComponent::length();
+  vertexSpecification(0, components, GL_FLOAT, offset); 
+  bindBuffer(0, vBuffer.get(), 0, Vertex::VERTEX_LENGTH);
+  attribBinding(0, 0);
+  enableAttribute(0);
+
+  // 1 -> normal (x,y,z)
+  offset     = sizeof(Vertex::posComponent);
+  components = Vertex::normalComponent::length();
+  vertexSpecification(1, components, GL_FLOAT, offset); 
+  bindBuffer(1, vBuffer.get(), 0, Vertex::VERTEX_LENGTH);
+  attribBinding(1, 1);
+  enableAttribute(1);
+  
+  // 2 -> texture (u,v)
+  offset     = sizeof(Vertex::posComponent) + sizeof(Vertex::normalComponent);
+  components = Vertex::texcoordComponent::length();
+  vertexSpecification(2, components, GL_FLOAT, offset); 
+  bindBuffer(2, vBuffer.get(), 0, Vertex::VERTEX_LENGTH);
+  attribBinding(2, 2);
+  enableAttribute(2);
+
+  unbind();
 }

@@ -34,12 +34,9 @@ public:
   Texture* specular;
 
 private:
-  unique_ptr<char[]> _ptrData;
-  VertexBuffer*      _vertexBuffer;
-  ElementBuffer*     _elementBuffer;
-  VertexArray*       _vertexArray;
-  
-  vector<uint32_t>          _indices;
+  VertexBuffer  _vertexBuffer;
+  ElementBuffer _elementBuffer;
+  VertexArray   _vertexArray;
 };
 
 #endif

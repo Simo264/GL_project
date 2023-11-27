@@ -114,7 +114,10 @@ int main()
     shaderScene->setMat4f("view",       view);
     shaderScene->setMat4f("projection", projection);
     shaderScene->setVec3f("viewPos",    camera.position);
-
+    shaderScene->setInt("material.diffuse", 0);
+    shaderScene->setInt("material.normal", 1);
+    shaderScene->setInt("material.specular", 2);
+    shaderScene->setFloat("material.shininess", 32.0f);
 
     // Render lights
     // ------------------------------------------------------------------------
@@ -128,15 +131,15 @@ int main()
     modelCrate.draw(shaderScene);
     modelCube.draw(shaderScene);
 
-#if 0
+    glEnable(GL_BLEND); 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     shaderBlending->use();
     shaderBlending->setMat4f("view",       view);
     shaderBlending->setMat4f("projection", projection);
+    shaderBlending->setMat4f("model",      surface.model());
     surface.draw(shaderBlending, GL_TRIANGLES);
-    // glEnable(GL_BLEND); 
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // surface.draw(shaderBlending, GL_TRIANGLES);
-#endif
+    
+    
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

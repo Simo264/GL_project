@@ -16,7 +16,8 @@ void main()
   //  discard;
   // FragColor = texColor;
 
-  FragColor = texture(material.diffuse, TexCoords);
+  vec4 texColor = texture(material.diffuse, TexCoords);
+  FragColor = texColor;
   
-  // FragColor = vec4(0.25, 0.50, 0.75, 1);
+  //FragColor = vec4(0.25, 0.50, 0.75, 1);
 }

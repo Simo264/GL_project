@@ -88,7 +88,7 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   // load indices
   loadIndices(indices, aimesh);
 
-  // load meshe in array
+  // load mesh in array
   Mesh* mesh = new(&_meshPool[index]) Mesh(vertices, indices);
 
   // load textures
@@ -101,32 +101,30 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   mesh->specular = specular;
 }
 
-void Model::loadVertices(vector<Vertex>& out, const aiMesh* aimesh)
+void Model::loadVertices(vector<Vertex>& outVertices, const aiMesh* aimesh)
 {
   for (uint32_t i = 0 ; i < aimesh->mNumVertices; i++) 
   {
-    Vertex vertex;
-    vertex.position.x = aimesh->mVertices[i].x;
-    vertex.position.y = aimesh->mVertices[i].y;
-    vertex.position.z = aimesh->mVertices[i].z;
-    vertex.normal.x   = aimesh->mNormals[i].x;
-    vertex.normal.y   = aimesh->mNormals[i].y;
-    vertex.normal.z   = aimesh->mNormals[i].z;
-    vertex.texCoord.x = aimesh->mTextureCoords[0][i].x;
-    vertex.texCoord.y = aimesh->mTextureCoords[0][i].y;
-    out.push_back(vertex);
+    aiVector3D& vertPos = aimesh->mVertices[i];
+    aiVector3D& vertNor = aimesh->mNormals[i];
+    aiVector3D& vertTc  = aimesh->mTextureCoords[0][i];
+
+    outVertices.emplace_back(
+      vec3f(vertPos.x,  vertPos.y,  vertPos.z), 
+      vec3f(vertNor.x,  vertNor.y,  vertNor.z), 
+      vec2f(vertTc.x,   vertTc.y));
   }
 }
 
-void Model::loadIndices(vector<uint32_t>& out,  const aiMesh* aimesh)
+void Model::loadIndices(vector<uint32_t>& outIndices,  const aiMesh* aimesh)
 {
   // mNumFaces  : tells us how many polygons exist
   for (uint32_t i = 0 ; i < aimesh->mNumFaces; i++) 
   {
-    const aiFace& Face = aimesh->mFaces[i];
-    out.push_back(Face.mIndices[0]);
-    out.push_back(Face.mIndices[1]);
-    out.push_back(Face.mIndices[2]);
+    const aiFace& face = aimesh->mFaces[i];
+    outIndices.push_back(face.mIndices[0]);
+    outIndices.push_back(face.mIndices[1]);
+    outIndices.push_back(face.mIndices[2]);
   } 
 }
 

@@ -7,6 +7,16 @@
 
 VertexBuffer::VertexBuffer(uint64_t size, float* rawdata, int usage)
 {
+  init(size, rawdata, usage);
+}
+
+VertexBuffer::VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage)
+{
+  init(nVertices, vertices, usage);
+}
+
+void VertexBuffer::init(uint64_t size, float* rawdata, int usage)
+{
   glGenBuffers(1, &_buffer);
 
   bind();
@@ -14,7 +24,7 @@ VertexBuffer::VertexBuffer(uint64_t size, float* rawdata, int usage)
   glNamedBufferData(_buffer, size, rawdata, usage);
 }
 
-VertexBuffer::VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage)
+void VertexBuffer::init(uint64_t nVertices, Vertex* vertices, int usage)
 {
   glGenBuffers(1, &_buffer);
   
@@ -23,6 +33,7 @@ VertexBuffer::VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage)
   uint64_t size = nVertices * sizeof(Vertex);
   glNamedBufferData(_buffer, size, (void*) vertices, usage);
 }
+
 
 void VertexBuffer::destroy() 
 { 
