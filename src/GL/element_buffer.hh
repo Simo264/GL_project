@@ -19,7 +19,7 @@ namespace GL
     
     void bind() const   { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer); }
     void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
-    void destroy();
+    void destroy()      { glDeleteBuffers(1, &_buffer); }
 
     uint32_t get() const { return _buffer; }
 

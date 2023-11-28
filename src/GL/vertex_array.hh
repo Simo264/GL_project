@@ -11,7 +11,6 @@ namespace GL
   {
   public:
     VertexArray() = default;
-
     VertexArray(VertexBuffer& vBuffer);
     ~VertexArray() = default;
 
@@ -20,9 +19,9 @@ namespace GL
 
     void init(VertexBuffer& vBuffer);
 
-    void bind() const { glBindVertexArray(_vertexArray);}
+    void bind() const   { glBindVertexArray(_vertexArray);}
     void unbind() const { glBindVertexArray(0);}
-    void destroy();
+    void destroy()      { glDeleteVertexArrays(1, &_vertexArray); }
     
     void vertexSpecification(uint32_t index, uint32_t size, uint32_t type, int offset);
     void attribBinding(uint32_t attribindex, uint32_t bindingindex);

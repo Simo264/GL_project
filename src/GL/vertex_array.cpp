@@ -38,12 +38,6 @@ namespace GL
     glDisableVertexArrayAttrib(_vertexArray, index);
   }
 
-  void VertexArray::destroy()
-  {
-    if(_vertexArray)
-      glDeleteVertexArrays(1, &_vertexArray);
-  }
-
   void VertexArray::init(VertexBuffer& vBuffer)
   {
     glGenVertexArrays(1, &_vertexArray);

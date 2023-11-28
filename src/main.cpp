@@ -7,6 +7,8 @@
 #include "stencil.hh"
 #include "surface2d.hh"
 
+#include "GL/frame_buffer.hh"
+
 #include "pool/shader_pool.hh"
 #include "pool/texture_pool.hh"
 
@@ -39,25 +41,21 @@ int main()
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
 
+  pool::TexturePool::loadTexture("res/blending_transparent_window.png");
+  pool::TexturePool::loadTexture("res/grass.png");
 
-  auto texTransparentWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
-  auto texGrass             = pool::TexturePool::loadTexture("res/grass.png");
-  (void) texTransparentWindow;
-  (void) texGrass;
 
   // load shaders
   // ------------------------------------------------------------------------
-  auto shaderScene   = pool::ShaderPool::loadShader("shaderMesh", "shaders/scene.vert","shaders/scene.frag");
-  auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
-  auto shaderBlending= pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
-  (void) shaderScene;
-  (void) shaderOutline;
-  (void) shaderBlending;
+  auto shaderScene = pool::ShaderPool::loadShader("shaderScene", "shaders/scene.vert","shaders/scene.frag");
+  auto shaderFB    = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
+  pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
+  pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
+  (void) shaderFB;
 
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera;
-
 
 
   // create model objects
@@ -72,6 +70,14 @@ int main()
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
 
+
+  // grass
+  // ------------------------------------------------------------------------
+  Surface2D grass;
+  grass.diffuse = pool::TexturePool::getTexture("res/grass.png");
+  grass.translate(vec3f(0.0f, 1.0f, 0.0f));
+
+
   // light object
   // ------------------------------------------------------------------------
   lighting::DirectionalLight dirLight("dirLight");    (void)dirLight;
@@ -84,33 +90,35 @@ int main()
   Stencil stencil(shaderOutline); (void) stencil;
 #endif
 
-  // grass
+  // Framebuffer
   // ------------------------------------------------------------------------
-  Surface2D surface;
-  surface.diffuse = texGrass;
-  surface.translate(vec3f(0.0f, 1.0f, 0.0f));
+  GL::FrameBuffer frameBuffer; (void) frameBuffer;
+  Surface2D surfaceFB;         (void) surfaceFB;
 
   // render loop
   // ------------------------------------------------------------------------
-  const mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
+  
   while(window.loop())
   {
     window.update(); // update delta time
     window.msPerFrame();
-
-    window.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     // input
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
     camera.processInput(&window);
 
-    
     // View/Projection matrices
     // ------------------------------------------------------------------------
     const mat4f view = camera.getViewMatrix();
-  
+    const mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
+
+
+    window.clearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // draw scene
+    // -----------------------------------------------------
     shaderScene->use();
     shaderScene->setMat4f("view",       view);
     shaderScene->setMat4f("projection", projection);
@@ -119,7 +127,13 @@ int main()
     shaderScene->setInt("material.normal", 1);
     shaderScene->setInt("material.specular", 2);
     shaderScene->setFloat("material.shininess", 32.0f);
+    dirLight.render(shaderScene);
+    modelFloor.draw(shaderScene, GL_TRIANGLES);
+    modelCrate.draw(shaderScene, GL_TRIANGLES);
+    modelCube.draw(shaderScene, GL_TRIANGLES);
+  
 
+  #if 0
     // Render lights
     // ------------------------------------------------------------------------
     dirLight.render(shaderScene);
@@ -131,8 +145,9 @@ int main()
     modelFloor.draw(shaderScene);
     modelCrate.draw(shaderScene);
     modelCube.draw(shaderScene);
+  #endif
 
-#if 0
+  #if 0
     // render grass
     // ------------------------------------------------------------------------
     glDisable(GL_CULL_FACE);
@@ -142,13 +157,13 @@ int main()
     shaderBlending->setMat4f("model",      surface.model());
     surface.draw(shaderBlending, GL_TRIANGLES);
     glEnable(GL_CULL_FACE);
-#endif
+  #endif
 
+  #if 0
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-#if 0
     if(ImGui::Begin("Directional light"))
     {
       ImGui::SliderFloat3("Direction", (float*) &dirLight.direction, -10.f, 10.f);
@@ -158,8 +173,8 @@ int main()
       ImGui::SliderFloat("Specular",   (float*) &dirLight.specular,    0.f, 1.f);
     }
     ImGui::End();
-#endif
-#if 0
+  #endif
+  #if 0
     if(ImGui::Begin("Spot light"))
     {
       ImGui::SliderFloat3("Position", (float*) &spotLight.position,  -10.f, 10.f);
@@ -171,8 +186,8 @@ int main()
       ImGui::SliderFloat("Radius",    (float*) &spotLight.cutOff,     0.f, 90.f);
     }
     ImGui::End();
-#endif
-#if 0
+  #endif
+  #if 0
     if(ImGui::Begin("Point light"))
     {
       ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);
@@ -182,10 +197,10 @@ int main()
       ImGui::SliderFloat("Specular",  (float*) &pointLight.specular,   0.f, 1.f);
     }
     ImGui::End();
-#endif
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  #endif
 
     window.swapBuffersAndProcessEvents();
   }
@@ -193,7 +208,6 @@ int main()
   modelFloor.destroy();
   modelCrate.destroy();
   modelCube.destroy();
-  surface.destroy();
 
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();

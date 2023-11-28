@@ -10,7 +10,6 @@
  * -----------------------------------------------------
 */
 
-
 Texture::Texture(const string& path, TextureType type, bool immutable)
 {
   init(path, type, immutable);
@@ -30,9 +29,7 @@ void Texture::init(const string& path, TextureType type, bool immutable)
   setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   
-  load(path, immutable);
-
-  unbind();
+  loadImage(path, immutable);
 }
 
 
@@ -42,7 +39,7 @@ void Texture::init(const string& path, TextureType type, bool immutable)
 */
 
 
-void Texture::load(const string& path, bool immutable)
+void Texture::loadImage(const string& path, bool immutable)
 {
   stbi_set_flip_vertically_on_load(true);
   

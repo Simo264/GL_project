@@ -12,14 +12,14 @@ enum class TextureType {
 class Texture
 {
 public:
-  Texture(const string& path, TextureType type = TextureType::DIFFUSE, bool immutable = false);
-  Texture() = default;
+  Texture(const string& path, TextureType type, bool immutable = false);
+  Texture()  = default;
   ~Texture() = default;
 
   Texture(const Texture&) = delete;            // delete copy constructor
   Texture& operator=(const Texture&) = delete; // delete assign op
 
-  void init(const string& path, TextureType type = TextureType::DIFFUSE, bool immutable = false);
+  void init(const string& path, TextureType type, bool immutable = false);
 
   void bind() const { glBindTexture(GL_TEXTURE_2D, _texture); }
   void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
@@ -43,7 +43,7 @@ private:
 
   TextureType _type;
 
-  void load(const string& path, bool immutable);
+  void loadImage(const string& path, bool immutable);
   bool alpha(const string& path);
 };
 

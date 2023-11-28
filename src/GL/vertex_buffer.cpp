@@ -36,11 +36,4 @@ namespace GL
     glNamedBufferData(_buffer, size, (void*) vertices, usage);
   }
 
-
-  void VertexBuffer::destroy() 
-  { 
-    if(_buffer)
-      glDeleteBuffers(1, &_buffer);
-  }
-
 }
