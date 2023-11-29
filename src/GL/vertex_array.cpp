@@ -8,42 +8,17 @@
 */
 namespace GL
 {
-  VertexArray::VertexArray(VertexBuffer& vBuffer)
+  VertexArray::VertexArray(VAConfiguration& config, VertexBuffer& vBuffer)
   {
     init(vBuffer);
   }
 
-  void VertexArray::vertexSpecification(uint32_t index, uint32_t size, uint32_t type, int offset)
-  {
-    glVertexArrayAttribFormat(_vertexArray, index, size, type, GL_FALSE, offset);
-  }
-
-  void VertexArray::attribBinding(uint32_t attribindex, uint32_t bindingindex)
-  {
-    glVertexArrayAttribBinding(_vertexArray, attribindex, bindingindex);
-  }
-
-  void VertexArray::bindBuffer(uint32_t bindingindex, uint32_t buffer, int offset, int stride)
-  {
-    glVertexArrayVertexBuffer(_vertexArray, bindingindex, buffer, offset, stride);
-  }
-
-  void VertexArray::enableAttribute(uint32_t index)
-  {
-    glEnableVertexArrayAttrib(_vertexArray, index);
-  }
-
-  void VertexArray::disableAttribute(uint32_t index)
-  {
-    glDisableVertexArrayAttrib(_vertexArray, index);
-  }
-
-  void VertexArray::init(VertexBuffer& vBuffer)
+  void VertexArray::init(VAConfiguration& config, VertexBuffer& vBuffer)
   {
     glGenVertexArrays(1, &_vertexArray);
 
     bind();
-      
+  #if 0
     int offset;
     int components;
 
@@ -70,8 +45,36 @@ namespace GL
     bindBuffer(2, vBuffer.get(), 0, Vertex::VERTEX_LENGTH);
     attribBinding(2, 2);
     enableAttribute(2);
-
+  #endif
+  
+  
+  
     unbind();
+  }
+
+  void VertexArray::vertexSpecification(uint32_t index, uint32_t size, uint32_t type, int offset)
+  {
+    glVertexArrayAttribFormat(_vertexArray, index, size, type, GL_FALSE, offset);
+  }
+
+  void VertexArray::attribBinding(uint32_t attribindex, uint32_t bindingindex)
+  {
+    glVertexArrayAttribBinding(_vertexArray, attribindex, bindingindex);
+  }
+
+  void VertexArray::bindBuffer(uint32_t bindingindex, uint32_t buffer, int offset, int stride)
+  {
+    glVertexArrayVertexBuffer(_vertexArray, bindingindex, buffer, offset, stride);
+  }
+
+  void VertexArray::enableAttribute(uint32_t index)
+  {
+    glEnableVertexArrayAttrib(_vertexArray, index);
+  }
+
+  void VertexArray::disableAttribute(uint32_t index)
+  {
+    glDisableVertexArrayAttrib(_vertexArray, index);
   }
 
 }

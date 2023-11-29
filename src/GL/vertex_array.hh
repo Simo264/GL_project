@@ -7,17 +7,32 @@
 
 namespace GL
 {
+  enum class VALayout : uint32_t
+  {
+    POSITION  = 1,
+    NORMALS   = 2,
+    TEXTCOORDS= 3
+  };
+
+  struct VAConfiguration
+  {
+    // ex: mapAttributes = {<POSITION,3>,<NORMALS,3>,<TEXTCOORDS,2>}
+    map<VALayout, uint32_t> mapLayout;
+
+  };
+
+
   class VertexArray
   {
   public:
     VertexArray() = default;
-    VertexArray(VertexBuffer& vBuffer);
+    VertexArray(VAConfiguration& config, VertexBuffer& vBuffer);
     ~VertexArray() = default;
 
     VertexArray(const VertexArray&) = delete;            // delete copy constructor
     VertexArray& operator=(const VertexArray&) = delete; // delete assign op
 
-    void init(VertexBuffer& vBuffer);
+    void init(VAConfiguration& config, VertexBuffer& vBuffer);
 
     void bind() const   { glBindVertexArray(_vertexArray);}
     void unbind() const { glBindVertexArray(0);}

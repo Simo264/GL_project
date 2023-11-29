@@ -12,10 +12,8 @@ Mesh::Mesh(vector<GL::Vertex>& vertices, vector<uint32_t>& indices)
   init(vertices, indices);
 }
 
-void Mesh::draw(Shader* shader, uint32_t drawmode)
-{
-  (void) shader;
-  
+void Mesh::draw(uint32_t drawmode)
+{ 
   if(diffuse)
   {
     Texture::activeTextUnit(0);
@@ -39,6 +37,9 @@ void Mesh::draw(Shader* shader, uint32_t drawmode)
 
   _vertexArray.unbind();
   _elementBuffer.unbind();
+
+  // always good practice to set everything back to defaults once configured.
+  Texture::activeTextUnit(0);
 }
 
 void Mesh::init(vector<GL::Vertex>& vertices, vector<uint32_t>& indices)

@@ -22,13 +22,7 @@ public:
   GLFWwindow* get() const { return _window; }
 
   // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-  void swapBuffersAndProcessEvents();
-
-  // specify clear values for the color buffers
-  void clearColor(float r, float g, float b, float a) { glClearColor(r, g, b, a); }
-
-  // clear buffers to preset values
-  void clearBuffers(uint32_t mask) { glClear(mask); }
+  void swapBuffers() { glfwSwapBuffers(_window); }
 
   // window dimension
   uint32_t width() const  { return _width; }

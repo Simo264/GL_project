@@ -9,23 +9,21 @@ namespace lighting
 
   void DirectionalLight::render(Shader* shader)
   {
-    shader->use();
-    
     const int uniformNameSz = uniformName.size();
-    char shaderUName[50] = { };
+    char shaderUName[30]    = { };
 
-    strcpy(shaderUName, uniformName.c_str());          // shaderUName = "{uniformName}"
+    strcpy(shaderUName, uniformName.c_str());          // shaderUName = "dirLight"
 
-    strcpy(shaderUName+uniformNameSz, ".direction");   // shaderUName = "{uniformName}.direction"
+    strcpy(shaderUName+uniformNameSz, ".direction");   // shaderUName = "dirLight.direction"
     shader->setVec3f(shaderUName, direction);
     
-    strcpy(shaderUName+uniformNameSz, ".ambient");     // shaderUName = "{uniformName}.ambient"
+    strcpy(shaderUName+uniformNameSz, ".ambient");     // shaderUName = "dirLight.ambient"
     shader->setVec3f(shaderUName, color * ambient);
     
-    strcpy(shaderUName+uniformNameSz, ".diffuse");     // shaderUName = "{uniformName}.diffuse"
+    strcpy(shaderUName+uniformNameSz, ".diffuse");     // shaderUName = "dirLight.diffuse"
     shader->setVec3f(shaderUName, color * diffuse);
     
-    strcpy(shaderUName+uniformNameSz, ".specular");    // shaderUName = "{uniformName}.specular"
+    strcpy(shaderUName+uniformNameSz, ".specular");    // shaderUName = "dirLight.specular"
     shader->setVec3f(shaderUName, color * specular);
   }
 }

@@ -23,11 +23,4 @@ namespace GL
 
     _nIndices = nIndices;
   }
-
-  void ElementBuffer::destroy() 
-  { 
-    if(_buffer)
-      glDeleteBuffers(1, &_buffer);
-  }
-
 }

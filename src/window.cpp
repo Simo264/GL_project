@@ -35,7 +35,6 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   glfwMakeContextCurrent(_window);
   glfwSetWindowUserPointer(_window, this);
   
-
   gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
   // enable vsync
@@ -77,12 +76,6 @@ void Window::destroy()
     glfwDestroyWindow(_window);
 
   glfwTerminate();
-}
-
-void Window::swapBuffersAndProcessEvents()
-{
-  glfwSwapBuffers(_window);  
-  glfwPollEvents();
 }
 
 void Window::processKeyboardInput()

@@ -20,12 +20,11 @@ Model::Model(const string& path) : Actor()
 
 void Model::draw(Shader* shader, uint32_t drawmode)
 {
-  shader->use();
   shader->setMat4f("model", _model);
   for(uint32_t i = 0; i < _numMeshes; i++)
   {
-    auto& mesh = _meshPool.get()[i];
-    mesh.draw(shader, drawmode);
+    auto& mesh = _meshPool[i];
+    mesh.draw(drawmode);
   }
 }
 
@@ -49,10 +48,8 @@ void Model::destroy()
 void Model::loadModel(const string& path)
 {
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(path.c_str(),  aiProcess_Triangulate | 
-                                                          aiProcess_GenSmoothNormals | 
-                                                          aiProcess_FlipUVs | 
-                                                          aiProcess_JoinIdenticalVertices);
+  const aiScene* scene = importer.ReadFile(path.c_str(),  
+    aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
   if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
   {
@@ -64,13 +61,13 @@ void Model::loadModel(const string& path)
   _numMeshes = scene->mNumMeshes;
   _meshPool  = make_unique<Mesh[]>(_numMeshes);
 
-  spdlog::info("Loading meshes {}", _numMeshes);
+  //spdlog::info("Loading meshes {}", _numMeshes);
   for(uint32_t i = 0; i < _numMeshes; i++)
   {
     aiMesh* aimesh = scene->mMeshes[i];
     loadMesh(i, scene, aimesh);
   }
-  spdlog::info("Done!");
+  //spdlog::info("Done!");
 
 }
 

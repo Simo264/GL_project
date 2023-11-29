@@ -9,7 +9,6 @@
 #include "GL/vertex_array.hh"
 
 #include "texture.hh"
-#include "shader.hh"
 
 #include "lighting/material.hh"
 
@@ -28,7 +27,7 @@ public:
 
   void init(vector<GL::Vertex>& vertices, vector<uint32_t>& indices);
 
-  void draw(Shader* shader, uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
+  void draw(uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
 
   void destroy();
 

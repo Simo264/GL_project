@@ -2,6 +2,7 @@
 #define FRAME_BUFFER_HH
 
 #include "../core.hh"
+#include "vertex_array.hh"
 
 namespace GL
 {
@@ -24,11 +25,15 @@ namespace GL
   
     uint32_t texture() const { return _texture; }
 
+    void draw();
+
   private:
     uint32_t _buffer;
     uint32_t _texture;
     uint32_t _renderBuffer;
-  
+
+    VertexArray  _screenImageVAO;
+    VertexBuffer _screenImageVBO;
   };
 }
 #endif

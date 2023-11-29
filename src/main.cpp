@@ -51,7 +51,7 @@ int main()
   auto shaderFB    = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
   pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
   pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
-  (void) shaderFB;
+  
 
   // create camera object
   // ------------------------------------------------------------------------
@@ -71,67 +71,82 @@ int main()
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
 
 
+#if 0
   // grass
   // ------------------------------------------------------------------------
   Surface2D grass;
   grass.diffuse = pool::TexturePool::getTexture("res/grass.png");
   grass.translate(vec3f(0.0f, 1.0f, 0.0f));
-
+#endif
 
   // light object
   // ------------------------------------------------------------------------
-  lighting::DirectionalLight dirLight("dirLight");    (void)dirLight;
+  lighting::DirectionalLight dirLight("dirLight");
+#if 0
   lighting::PointLight pointLight("pointLight");      (void)pointLight;
   lighting::SpotLight spotLight("spotLight");         (void)spotLight;
-  
+#endif
+
 #if 0
   // stencil object
   // ------------------------------------------------------------------------
   Stencil stencil(shaderOutline); (void) stencil;
 #endif
 
-  // Framebuffer
+  // framebuffer configuration
   // ------------------------------------------------------------------------
-  GL::FrameBuffer frameBuffer; (void) frameBuffer;
-  Surface2D surfaceFB;         (void) surfaceFB;
+  GL::FrameBuffer frameBuffer;
+
+  shaderScene->use();
+  shaderScene->setInt("material.diffuse", 0);
+  shaderScene->setInt("material.normal", 1);
+  shaderScene->setInt("material.specular", 2);
+  shaderScene->setFloat("material.shininess", 32.0f);
+
+  shaderFB->use();
+  shaderFB->setInt("screenTexture", 0);
 
   // render loop
   // ------------------------------------------------------------------------
-  
   while(window.loop())
   {
-    window.update(); // update delta time
-    window.msPerFrame();
+    // per-frame time logic
+    // --------------------
+    window.update();
+    //window.msPerFrame();
 
     // input
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
     camera.processInput(&window);
-
-    // View/Projection matrices
-    // ------------------------------------------------------------------------
     const mat4f view = camera.getViewMatrix();
     const mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
-
-
-    window.clearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    window.clearBuffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // draw scene
-    // -----------------------------------------------------
     shaderScene->use();
     shaderScene->setMat4f("view",       view);
     shaderScene->setMat4f("projection", projection);
     shaderScene->setVec3f("viewPos",    camera.position);
-    shaderScene->setInt("material.diffuse", 0);
-    shaderScene->setInt("material.normal", 1);
-    shaderScene->setInt("material.specular", 2);
-    shaderScene->setFloat("material.shininess", 32.0f);
+
+    // render
+    // ------------------------------------------------------------------------
+    frameBuffer.bind();
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
+    
+    // draw scene
     dirLight.render(shaderScene);
     modelFloor.draw(shaderScene, GL_TRIANGLES);
     modelCrate.draw(shaderScene, GL_TRIANGLES);
     modelCube.draw(shaderScene, GL_TRIANGLES);
-  
+
+    frameBuffer.unbind();
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    shaderFB->use();
+    frameBuffer.draw();
+
 
   #if 0
     // Render lights
@@ -202,7 +217,8 @@ int main()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   #endif
 
-    window.swapBuffersAndProcessEvents();
+    window.swapBuffers();
+    glfwPollEvents();
   }
 
   modelFloor.destroy();
