@@ -12,14 +12,12 @@ namespace GL
   public:
     VertexBuffer() = default;
     VertexBuffer(uint64_t size, float* rawdata, int usage = GL_STATIC_DRAW);
-    VertexBuffer(uint64_t nVertices, Vertex* vertices, int usage = GL_STATIC_DRAW);
     ~VertexBuffer() = default;
 
     VertexBuffer(const VertexBuffer&) = delete;            // delete copy constructor
     VertexBuffer& operator=(const VertexBuffer&) = delete; // delete assign op
 
     void init(uint64_t size, float* rawdata, int usage = GL_STATIC_DRAW);
-    void init(uint64_t nVertices, Vertex* vertices, int usage = GL_STATIC_DRAW);
 
     void bind() const   { glBindBuffer(GL_ARRAY_BUFFER, _buffer); }
     void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }

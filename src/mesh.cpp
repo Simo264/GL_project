@@ -7,10 +7,27 @@
  * -----------------------------------------------------
 */
 
-Mesh::Mesh(vector<GL::Vertex>& vertices, vector<uint32_t>& indices)
+Mesh::Mesh(vector<float>& vertices, vector<uint32_t>& indices)
 {
   init(vertices, indices);
 }
+
+void Mesh::init(vector<float>& vertices, vector<uint32_t>& indices)
+{
+  diffuse   = nullptr;
+  normal    = nullptr;
+  specular  = nullptr;
+
+  GL::VAConfiguration config;
+  config.layout.push_back(3); //layout=0 vec3
+  config.layout.push_back(3); //layout=1 vec3
+  config.layout.push_back(2); //layout=2 vec2
+
+  _vertexBuffer.init(vertices.size(), vertices.data());
+  _elementBuffer.init(indices.size(), indices.data());
+  _vertexArray.init(config, _vertexBuffer);
+}
+
 
 void Mesh::draw(uint32_t drawmode)
 { 
@@ -42,16 +59,6 @@ void Mesh::draw(uint32_t drawmode)
   Texture::activeTextUnit(0);
 }
 
-void Mesh::init(vector<GL::Vertex>& vertices, vector<uint32_t>& indices)
-{
-  diffuse   = nullptr;
-  normal    = nullptr;
-  specular  = nullptr;
-
-  _vertexBuffer.init(vertices.size(), vertices.data());
-  _elementBuffer.init(indices.size(), indices.data());
-  _vertexArray.init(_vertexBuffer);
-}
 
 void Mesh::destroy()
 {

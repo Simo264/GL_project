@@ -13,7 +13,7 @@ public:
 
   mat4f getViewMatrix() const;
 
-  void processInput(Window* window);
+  void processInput(Window& window);
 
   // void processKeyboardInput(Window* window, double deltaTime);
   // void processMouseScrollInput(Window* window, double deltaTime);
@@ -44,7 +44,7 @@ private:
 
   void rotateAroundTarget(const vec2d& mousePos, float velocity);
 
-  void freeCameraWalk(const Window* window, float delta);
+  void freeCameraWalk(const Window& window, float delta);
   void freeCameraRotation(vec2d& mousePos, float delta);
 };
 

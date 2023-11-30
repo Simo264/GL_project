@@ -37,29 +37,7 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   
   gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-  // enable vsync
-  // -----------------------------
-  glfwSwapInterval(1); 
-
-  // depth buffer
-  // -----------------------------
-  glEnable(GL_DEPTH_TEST);
-
-  // blending/stencil buffer
-  // -----------------------------
-  glEnable(GL_BLEND); 
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  // face culling
-  // -----------------------------
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);  
-  
-  // antialiasing
-  // -----------------------------
-  // glEnable(GL_MULTISAMPLE); 
-  // glfwWindowHint(GLFW_SAMPLES, 4);
- 
+  glfwSwapInterval(1); // enable vsync
 
   setPosition(pos);
   

@@ -35,17 +35,17 @@ mat4f Camera::getViewMatrix() const
     return glm::lookAt(position, position + _front, _up); // walk around
 }
 
-void Camera::processInput(Window* window)
+void Camera::processInput(Window& window)
 {
-  const double delta = window->delta();     
+  const double delta = window.delta();     
   _right = glm::cross(_front, _up); // update right vector
 
   vec2d mousePos;
-  window->getCursorPosition(mousePos);
+  window.getCursorPosition(mousePos);
   
   if(target)
   {
-    if(window->getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    if(window.getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
       rotateAroundTarget(mousePos, delta);
     }
@@ -54,7 +54,7 @@ void Camera::processInput(Window* window)
   {
     freeCameraWalk(window, delta);
 
-    if(window->getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    if(window.getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
       freeCameraRotation(mousePos, delta);
     }
@@ -112,33 +112,33 @@ void Camera::rotateAroundTarget(const vec2d& mousePos, float delta)
 
 }
 
-void Camera::freeCameraWalk(const Window* window, float delta)
+void Camera::freeCameraWalk(const Window& window, float delta)
 {
   const float cameraSpeed = delta * speed;
 
-  if(window->getKey(GLFW_KEY_W) == GLFW_PRESS)
+  if(window.getKey(GLFW_KEY_W) == GLFW_PRESS)
   {
     position += _front * cameraSpeed;
   }
-  else if(window->getKey(GLFW_KEY_S) == GLFW_PRESS)
+  else if(window.getKey(GLFW_KEY_S) == GLFW_PRESS)
   {
     position -= _front * cameraSpeed;
   }
   
-  if(window->getKey(GLFW_KEY_A) == GLFW_PRESS)
+  if(window.getKey(GLFW_KEY_A) == GLFW_PRESS)
   {
     position -= _right * cameraSpeed;
   }
-  else if(window->getKey(GLFW_KEY_D) == GLFW_PRESS)
+  else if(window.getKey(GLFW_KEY_D) == GLFW_PRESS)
   {
     position += _right * cameraSpeed;
   }
 
-  if(window->getKey(GLFW_KEY_SPACE) == GLFW_PRESS)
+  if(window.getKey(GLFW_KEY_SPACE) == GLFW_PRESS)
   {
     position += _up * cameraSpeed;
   }
-  else if(window->getKey(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+  else if(window.getKey(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
   {
     position -= _up * cameraSpeed;
   }

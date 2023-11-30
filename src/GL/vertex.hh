@@ -7,9 +7,9 @@ namespace GL
 {
   struct Vertex
   {
-    using posComponent      = vec3f;  
-    using normalComponent   = vec3f;  
-    using texcoordComponent = vec2f;  
+    using posComponent      = vec3f;
+    using normalComponent   = vec3f;
+    using texcoordComponent = vec2f;
     
     static constexpr int VERTEX_COMPONENTS =  posComponent::length()    +   // 3
                                               normalComponent::length() +   // 3

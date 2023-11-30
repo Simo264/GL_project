@@ -18,14 +18,14 @@ class Mesh
 {
 public:
   Mesh() = default;
-  Mesh(vector<GL::Vertex>& vertices, vector<uint32_t>& indices);
+  Mesh(vector<float>& vertices, vector<uint32_t>& indices);
 
   ~Mesh() = default;
 
   Mesh(const Mesh&) = delete;             // delete copy constructor
   Mesh& operator=(const Mesh&) = delete;  // delete assign op
 
-  void init(vector<GL::Vertex>& vertices, vector<uint32_t>& indices);
+  void init(vector<float>& vertices, vector<uint32_t>& indices);
 
   void draw(uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
 

@@ -2,6 +2,8 @@
 
 #include "vertex.hh"
 
+#include "spdlog/spdlog.h"
+
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
@@ -10,7 +12,7 @@ namespace GL
 {
   VertexArray::VertexArray(VAConfiguration& config, VertexBuffer& vBuffer)
   {
-    init(vBuffer);
+    init(config, vBuffer);
   }
 
   void VertexArray::init(VAConfiguration& config, VertexBuffer& vBuffer)
@@ -18,37 +20,20 @@ namespace GL
     glGenVertexArrays(1, &_vertexArray);
 
     bind();
-  #if 0
-    int offset;
-    int components;
 
-    // 0 -> position (x,y,z)
-    offset     = 0;
-    components = Vertex::posComponent::length();
-    vertexSpecification(0, components, GL_FLOAT, offset); 
-    bindBuffer(0, vBuffer.get(), 0, Vertex::VERTEX_LENGTH);
-    attribBinding(0, 0);
-    enableAttribute(0);
+    int stride = std::accumulate(config.layout.begin(), config.layout.end(), 0);
+    stride *= 4;
 
-    // 1 -> normal (x,y,z)
-    offset     = sizeof(Vertex::posComponent);
-    components = Vertex::normalComponent::length();
-    vertexSpecification(1, components, GL_FLOAT, offset); 
-    bindBuffer(1, vBuffer.get(), 0, Vertex::VERTEX_LENGTH);
-    attribBinding(1, 1);
-    enableAttribute(1);
-    
-    // 2 -> texture (u,v)
-    offset     = sizeof(Vertex::posComponent) + sizeof(Vertex::normalComponent);
-    components = Vertex::texcoordComponent::length();
-    vertexSpecification(2, components, GL_FLOAT, offset); 
-    bindBuffer(2, vBuffer.get(), 0, Vertex::VERTEX_LENGTH);
-    attribBinding(2, 2);
-    enableAttribute(2);
-  #endif
-  
-  
-  
+    int offset = 0;
+    for(uint32_t i = 0; config.layout[i] != 0 && i < config.layout.size(); i++)
+    {
+      vertexSpecification(i, config.layout[i], GL_FLOAT, offset);
+      bindBuffer(i, vBuffer.get(), 0, stride);
+      attribBinding(i, i);
+      enableAttribute(i);
+      offset += config.layout[i] * sizeof(float);
+    }
+
     unbind();
   }
 

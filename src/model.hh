@@ -27,8 +27,6 @@ private:
 
   void loadModel(const string& path);
   void loadMesh(uint32_t index, const struct aiScene* scene, const struct aiMesh* aimesh);
-  void loadVertices(vector<GL::Vertex>& outVertices, const struct aiMesh* aimesh);
-  void loadIndices(vector<uint32_t>& outIndices,  const struct aiMesh* aimesh);
   Texture* loadTexture(const struct aiMaterial* material, const TextureType texType);
 };  
 

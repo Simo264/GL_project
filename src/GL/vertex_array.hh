@@ -7,18 +7,18 @@
 
 namespace GL
 {
-  enum class VALayout : uint32_t
-  {
-    POSITION  = 1,
-    NORMALS   = 2,
-    TEXTCOORDS= 3
-  };
-
   struct VAConfiguration
   {
-    // ex: mapAttributes = {<POSITION,3>,<NORMALS,3>,<TEXTCOORDS,2>}
-    map<VALayout, uint32_t> mapLayout;
+    // ex: layout = [3, 3, 2]
+    // i=0: position   3 components (x,y,z)
+    // i=1: normals    3 components (x,y,z)
+    // i=2: textcoords 2 components (x,y)
+    vector<uint32_t> layout; 
 
+    VAConfiguration()
+    {
+      layout.reserve(5); // default size 5
+    }
   };
 
 

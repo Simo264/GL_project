@@ -59,7 +59,7 @@ void Model::loadModel(const string& path)
   
   // Allocates memory on the heap to hold `_numMeshes` mesh objects
   _numMeshes = scene->mNumMeshes;
-  _meshPool  = make_unique<Mesh[]>(_numMeshes);
+  _meshPool  = std::make_unique<Mesh[]>(_numMeshes);
 
   //spdlog::info("Loading meshes {}", _numMeshes);
   for(uint32_t i = 0; i < _numMeshes; i++)
@@ -73,17 +73,39 @@ void Model::loadModel(const string& path)
 
 void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
 {
-  vector<GL::Vertex>  vertices;
-  vector<uint32_t>    indices;
+  vector<float>     vertices;
+  vector<uint32_t>  indices;
 
-  vertices.reserve(aimesh->mNumVertices);
-  indices.reserve(aimesh->mNumFaces * 3);
+  vertices.reserve(aimesh->mNumVertices * 32); // 32 -> position(4*3)+normals(4*3)+textcoord(4*2)
+  indices.reserve(aimesh->mNumFaces * 3);      // 3  -> 3 vertices per triangle 
+
+  int iVert = 0;
+  int iInd  = 0;
 
   // load vertices
-  loadVertices(vertices, aimesh);
+  for (uint32_t i = 0 ; i < aimesh->mNumVertices; i++) 
+  {
+    aiVector3D& vertPos = aimesh->mVertices[i];
+    aiVector3D& vertNor = aimesh->mNormals[i];
+    aiVector3D& vertTc  = aimesh->mTextureCoords[0][i];
+    vertices[iVert++] = vertPos.x;
+    vertices[iVert++] = vertPos.y;
+    vertices[iVert++] = vertPos.z;
+    vertices[iVert++] = vertNor.x;
+    vertices[iVert++] = vertNor.y;
+    vertices[iVert++] = vertNor.z;
+    vertices[iVert++] = vertTc.x;
+    vertices[iVert++] = vertTc.y;
+  }
 
   // load indices
-  loadIndices(indices, aimesh);
+  for (uint32_t i = 0 ; i < aimesh->mNumFaces; i++) 
+  {
+    const aiFace& face = aimesh->mFaces[i];
+    indices[iInd++] = face.mIndices[0];
+    indices[iInd++] = face.mIndices[1];
+    indices[iInd++] = face.mIndices[2];
+  }
 
   // load mesh objects sequentially on the heap
   Mesh* mesh = &_meshPool[index];
@@ -98,33 +120,6 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   mesh->diffuse  = diffuse;
   mesh->normal   = normal;
   mesh->specular = specular;
-}
-
-void Model::loadVertices(vector<GL::Vertex>& outVertices, const aiMesh* aimesh)
-{
-  for (uint32_t i = 0 ; i < aimesh->mNumVertices; i++) 
-  {
-    aiVector3D& vertPos = aimesh->mVertices[i];
-    aiVector3D& vertNor = aimesh->mNormals[i];
-    aiVector3D& vertTc  = aimesh->mTextureCoords[0][i];
-
-    outVertices.emplace_back(
-      vec3f(vertPos.x,  vertPos.y,  vertPos.z), 
-      vec3f(vertNor.x,  vertNor.y,  vertNor.z), 
-      vec2f(vertTc.x,   vertTc.y));
-  }
-}
-
-void Model::loadIndices(vector<uint32_t>& outIndices,  const aiMesh* aimesh)
-{
-  // mNumFaces  : tells us how many polygons exist
-  for (uint32_t i = 0 ; i < aimesh->mNumFaces; i++) 
-  {
-    const aiFace& face = aimesh->mFaces[i];
-    outIndices.push_back(face.mIndices[0]);
-    outIndices.push_back(face.mIndices[1]);
-    outIndices.push_back(face.mIndices[2]);
-  } 
 }
 
 Texture* Model::loadTexture(const aiMaterial* material, const TextureType texType)

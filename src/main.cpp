@@ -5,7 +5,6 @@
 #include "camera.hh"
 #include "model.hh"
 #include "stencil.hh"
-#include "surface2d.hh"
 
 #include "GL/frame_buffer.hh"
 
@@ -26,6 +25,23 @@ int main()
 { 
   Window window(vec2u(720, 720), vec2u(400,200), "OpenGL");
   
+  // glEnable(GL_DEPTH_TEST); // depth buffer
+
+  // blending/stencil buffer
+  // -----------------------------
+  // glEnable(GL_BLEND); 
+  // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // face culling
+  // -----------------------------
+  // glEnable(GL_CULL_FACE);
+  // glCullFace(GL_BACK);  
+  
+  // antialiasing
+  // -----------------------------
+  // glEnable(GL_MULTISAMPLE); 
+  // glfwWindowHint(GLFW_SAMPLES, 4);
+  
   
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
@@ -41,22 +57,34 @@ int main()
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
 
-  pool::TexturePool::loadTexture("res/blending_transparent_window.png");
-  pool::TexturePool::loadTexture("res/grass.png");
+  // load default textures
+  // ------------------------------------------------------------------------
+  auto textWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
+  auto textGrass  = pool::TexturePool::loadTexture("res/grass.png");
+  (void) textWindow; (void) textGrass;
 
 
   // load shaders
   // ------------------------------------------------------------------------
   auto shaderScene = pool::ShaderPool::loadShader("shaderScene", "shaders/scene.vert","shaders/scene.frag");
   auto shaderFB    = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
-  pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
-  pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
-  
+  auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
+  auto shaderBlend = pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
+  shaderScene->use();
+  shaderScene->setInt("material.diffuse", 0);
+  shaderScene->setInt("material.normal", 1);
+  shaderScene->setInt("material.specular", 2);
+  shaderScene->setFloat("material.shininess", 32.0f);
+  shaderFB->use();
+  shaderFB->setInt("screenTexture", 0);
+  shaderOutline->use();
+  shaderOutline->setVec3f("outlineColor", vec3f(0.25f, 0.50f, 0.75f));
+  shaderBlend->use();
+  shaderBlend->setInt("material.diffuse", 0);
 
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera;
-
 
   // create model objects
   // ------------------------------------------------------------------------
@@ -71,13 +99,6 @@ int main()
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
 
 
-#if 0
-  // grass
-  // ------------------------------------------------------------------------
-  Surface2D grass;
-  grass.diffuse = pool::TexturePool::getTexture("res/grass.png");
-  grass.translate(vec3f(0.0f, 1.0f, 0.0f));
-#endif
 
   // light object
   // ------------------------------------------------------------------------
@@ -88,23 +109,10 @@ int main()
 #endif
 
 #if 0
-  // stencil object
-  // ------------------------------------------------------------------------
-  Stencil stencil(shaderOutline); (void) stencil;
-#endif
-
   // framebuffer configuration
   // ------------------------------------------------------------------------
-  GL::FrameBuffer frameBuffer;
-
-  shaderScene->use();
-  shaderScene->setInt("material.diffuse", 0);
-  shaderScene->setInt("material.normal", 1);
-  shaderScene->setInt("material.specular", 2);
-  shaderScene->setFloat("material.shininess", 32.0f);
-
-  shaderFB->use();
-  shaderFB->setInt("screenTexture", 0);
+  //GL::FrameBuffer frameBuffer;
+#endif
 
   // render loop
   // ------------------------------------------------------------------------
@@ -113,12 +121,12 @@ int main()
     // per-frame time logic
     // --------------------
     window.update();
-    //window.msPerFrame();
+    window.msPerFrame();
 
     // input
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
-    camera.processInput(&window);
+    camera.processInput(window);
     const mat4f view = camera.getViewMatrix();
     const mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
     shaderScene->use();
@@ -128,14 +136,24 @@ int main()
 
     // render
     // ------------------------------------------------------------------------
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
+    glEnable(GL_DEPTH_TEST);
+    
+    dirLight.render(shaderScene);
+    modelFloor.draw(shaderScene);
+
+  #if 0
+    
     frameBuffer.bind();
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
-    
+   
     // draw scene
     dirLight.render(shaderScene);
     modelFloor.draw(shaderScene, GL_TRIANGLES);
+
     modelCrate.draw(shaderScene, GL_TRIANGLES);
     modelCube.draw(shaderScene, GL_TRIANGLES);
 
@@ -146,7 +164,7 @@ int main()
 
     shaderFB->use();
     frameBuffer.draw();
-
+  #endif
 
   #if 0
     // Render lights
@@ -221,9 +239,9 @@ int main()
     glfwPollEvents();
   }
 
-  modelFloor.destroy();
-  modelCrate.destroy();
-  modelCube.destroy();
+  // modelFloor.destroy();
+  // modelCrate.destroy();
+  // modelCube.destroy();
 
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();

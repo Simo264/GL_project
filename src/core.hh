@@ -10,6 +10,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -27,9 +28,6 @@ using std::map;
 using std::unique_ptr;
 using std::stringstream;
 using std::ifstream;
-using std::make_pair;
-using std::make_unique;
-using std::remove_if;
 
 using vec2f = glm::vec2; 
 using vec2i = glm::ivec2;
