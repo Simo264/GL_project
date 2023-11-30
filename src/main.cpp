@@ -92,12 +92,13 @@ int main()
   modelFloor.scale(vec3f(0.125f, 1.0f, 0.125f));
   modelFloor.translate(vec3f(0.0,-1.0f,0.f));
 
+#if 0
   Model modelCrate("assets/Crate/Crate.obj");
   modelCrate.translate(vec3f(10.0f, 0.0125f, 0.0f));
   
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
-
+#endif
 
 
   // light object

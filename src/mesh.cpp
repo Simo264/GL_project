@@ -19,12 +19,15 @@ void Mesh::init(vector<float>& vertices, vector<uint32_t>& indices)
   specular  = nullptr;
 
   GL::VAConfiguration config;
-  config.layout.push_back(3); //layout=0 vec3
-  config.layout.push_back(3); //layout=1 vec3
-  config.layout.push_back(2); //layout=2 vec2
+  config.pushAttribute(3); //layout=0 vec3
+  config.pushAttribute(3); //layout=1 vec3
+  config.pushAttribute(2); //layout=2 vec2
 
-  _vertexBuffer.init(vertices.size(), vertices.data());
-  _elementBuffer.init(indices.size(), indices.data());
+  spdlog::info("(Mesh) vertices.size={}", vertices.size());
+  spdlog::info("(Mesh) indices.size={}", indices.size());
+
+  _vertexBuffer.init(vertices.size() * 4, vertices.data()); // vertices.size() * sizeof(float)
+  _elementBuffer.init(indices.size() * 4, indices.data());  // indices.size() * sizeof(uint32_t)
   _vertexArray.init(config, _vertexBuffer);
 }
 

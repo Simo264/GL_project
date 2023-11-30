@@ -10,6 +10,27 @@
 */
 namespace GL
 {
+  // VAConfiguration
+  // ------------------------------------------------
+  VAConfiguration::VAConfiguration()
+  {
+    layout.fill(0);
+    numAttrs = 0;
+  }
+
+  void VAConfiguration::pushAttribute(uint32_t attribute)
+  {
+    if(numAttrs >= layout.size())
+    {
+      spdlog::error("VAConfiguration::pushAttribute can't push more attributes");
+      return;
+    }
+
+    layout[numAttrs++] = attribute;
+  }
+
+  // VertexArray
+  // ------------------------------------------------
   VertexArray::VertexArray(VAConfiguration& config, VertexBuffer& vBuffer)
   {
     init(config, vBuffer);
@@ -25,13 +46,13 @@ namespace GL
     stride *= 4;
 
     int offset = 0;
-    for(uint32_t i = 0; config.layout[i] != 0 && i < config.layout.size(); i++)
+    for(uint32_t i = 0; i < config.numAttrs; i++)
     {
       vertexSpecification(i, config.layout[i], GL_FLOAT, offset);
       bindBuffer(i, vBuffer.get(), 0, stride);
       attribBinding(i, i);
       enableAttribute(i);
-      offset += config.layout[i] * sizeof(float);
+      offset += config.layout[i] * 4; // config.layout[i] * sizeof(float)
     }
 
     unbind();

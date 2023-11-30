@@ -75,9 +75,12 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
 {
   vector<float>     vertices;
   vector<uint32_t>  indices;
+  
+  spdlog::info("mNumVertices={}", aimesh->mNumVertices);
+  spdlog::info("mNumFaces={}", aimesh->mNumFaces);
 
-  vertices.reserve(aimesh->mNumVertices * 32); // 32 -> position(4*3)+normals(4*3)+textcoord(4*2)
-  indices.reserve(aimesh->mNumFaces * 3);      // 3  -> 3 vertices per triangle 
+  vertices.reserve(aimesh->mNumVertices * 8); // 8 -> position(3)+normals(3)+textcoord(2)
+  indices.reserve(aimesh->mNumFaces * 3);     // 3 -> 3 vertices per triangle 
 
   int iVert = 0;
   int iInd  = 0;
@@ -107,9 +110,14 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
     indices[iInd++] = face.mIndices[2];
   }
 
+  spdlog::info("(Model) vertices.size={}", vertices.size());
+  spdlog::info("(Model) indices.size={}", indices.size());
+
   // load mesh objects sequentially on the heap
-  Mesh* mesh = &_meshPool[index];
-  mesh->init(vertices, indices);
+  Mesh& mesh = _meshPool[index];
+  mesh.init(vertices, indices);
+  
+
 
 
   // load textures
@@ -117,9 +125,9 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   Texture* diffuse  = loadTexture(material, TextureType::DIFFUSE);
   Texture* normal   = loadTexture(material, TextureType::NORMAL);
   Texture* specular = loadTexture(material, TextureType::SPECULAR);
-  mesh->diffuse  = diffuse;
-  mesh->normal   = normal;
-  mesh->specular = specular;
+  mesh.diffuse  = diffuse;
+  mesh.normal   = normal;
+  mesh.specular = specular;
 }
 
 Texture* Model::loadTexture(const aiMaterial* material, const TextureType texType)

@@ -40,8 +40,8 @@ namespace GL
        1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  1.0f, 1.0f
     };
     VAConfiguration config;
-    config.layout.push_back(2);
-    config.layout.push_back(2);
+    config.pushAttribute(2);
+    config.pushAttribute(2);
 
     _screenImageVBO.init(sizeof(quadVertices), quadVertices);
     _screenImageVAO.init(config, _screenImageVBO);

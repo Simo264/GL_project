@@ -7,18 +7,19 @@
 
 namespace GL
 {
-  struct VAConfiguration
+  class VAConfiguration
   {
-    // ex: layout = [3, 3, 2]
-    // i=0: position   3 components (x,y,z)
-    // i=1: normals    3 components (x,y,z)
-    // i=2: textcoords 2 components (x,y)
-    vector<uint32_t> layout; 
+    public:
+      VAConfiguration();
 
-    VAConfiguration()
-    {
-      layout.reserve(5); // default size 5
-    }
+      void pushAttribute(uint32_t attribute);
+
+      // ex: layout = [3, 3, 2]
+      // i=0: position   3 components (x,y,z)
+      // i=1: normals    3 components (x,y,z)
+      // i=2: textcoords 2 components (x,y)
+      array<uint32_t, 5> layout;
+      uint32_t numAttrs;
   };
 
 

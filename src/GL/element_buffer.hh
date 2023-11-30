@@ -9,13 +9,13 @@ namespace GL
   {
   public:
     ElementBuffer() = default;
-    ElementBuffer(uint64_t nIndices, uint32_t* data, int usage = GL_STATIC_DRAW);
+    ElementBuffer(uint64_t size, uint32_t* data, int usage = GL_STATIC_DRAW);
     ~ElementBuffer() = default;
     
     ElementBuffer(const ElementBuffer&) = delete;            // delete copy constructor
     ElementBuffer& operator=(const ElementBuffer&) = delete; // delete assign op
 
-    void init(uint64_t nIndices, uint32_t* data, int usage = GL_STATIC_DRAW);
+    void init(uint64_t size, uint32_t* data, int usage = GL_STATIC_DRAW);
     
     void bind() const   { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer); }
     void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
