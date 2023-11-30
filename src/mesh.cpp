@@ -14,23 +14,19 @@ Mesh::Mesh(vector<float>& vertices, vector<uint32_t>& indices)
 
 void Mesh::init(vector<float>& vertices, vector<uint32_t>& indices)
 {
-  diffuse   = nullptr;
-  normal    = nullptr;
-  specular  = nullptr;
-
   GL::VAConfiguration config;
   config.pushAttribute(3); //layout=0 vec3
   config.pushAttribute(3); //layout=1 vec3
   config.pushAttribute(2); //layout=2 vec2
 
-  spdlog::info("(Mesh) vertices.size={}", vertices.size());
-  spdlog::info("(Mesh) indices.size={}", indices.size());
-
   _vertexBuffer.init(vertices.size() * 4, vertices.data()); // vertices.size() * sizeof(float)
   _elementBuffer.init(indices.size() * 4, indices.data());  // indices.size() * sizeof(uint32_t)
   _vertexArray.init(config, _vertexBuffer);
-}
 
+  diffuse   = nullptr;
+  normal    = nullptr;
+  specular  = nullptr;
+}
 
 void Mesh::draw(uint32_t drawmode)
 { 
@@ -61,8 +57,7 @@ void Mesh::draw(uint32_t drawmode)
   // always good practice to set everything back to defaults once configured.
   Texture::activeTextUnit(0);
 }
-
-
+  
 void Mesh::destroy()
 {
   _vertexArray.destroy();

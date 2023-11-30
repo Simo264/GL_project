@@ -26,9 +26,7 @@ public:
   Mesh& operator=(const Mesh&) = delete;  // delete assign op
 
   void init(vector<float>& vertices, vector<uint32_t>& indices);
-
   void draw(uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
-
   void destroy();
 
   Texture* diffuse;

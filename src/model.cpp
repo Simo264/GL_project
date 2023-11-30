@@ -75,15 +75,8 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
 {
   vector<float>     vertices;
   vector<uint32_t>  indices;
-  
-  spdlog::info("mNumVertices={}", aimesh->mNumVertices);
-  spdlog::info("mNumFaces={}", aimesh->mNumFaces);
-
   vertices.reserve(aimesh->mNumVertices * 8); // 8 -> position(3)+normals(3)+textcoord(2)
   indices.reserve(aimesh->mNumFaces * 3);     // 3 -> 3 vertices per triangle 
-
-  int iVert = 0;
-  int iInd  = 0;
 
   // load vertices
   for (uint32_t i = 0 ; i < aimesh->mNumVertices; i++) 
@@ -91,34 +84,22 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
     aiVector3D& vertPos = aimesh->mVertices[i];
     aiVector3D& vertNor = aimesh->mNormals[i];
     aiVector3D& vertTc  = aimesh->mTextureCoords[0][i];
-    vertices[iVert++] = vertPos.x;
-    vertices[iVert++] = vertPos.y;
-    vertices[iVert++] = vertPos.z;
-    vertices[iVert++] = vertNor.x;
-    vertices[iVert++] = vertNor.y;
-    vertices[iVert++] = vertNor.z;
-    vertices[iVert++] = vertTc.x;
-    vertices[iVert++] = vertTc.y;
+    
+    vertices.insert(vertices.end(), { vertPos.x,vertPos.y,vertPos.z });
+    vertices.insert(vertices.end(), { vertNor.x,vertNor.y,vertNor.z });
+    vertices.insert(vertices.end(), { vertTc.x,vertTc.y });
   }
 
   // load indices
   for (uint32_t i = 0 ; i < aimesh->mNumFaces; i++) 
   {
     const aiFace& face = aimesh->mFaces[i];
-    indices[iInd++] = face.mIndices[0];
-    indices[iInd++] = face.mIndices[1];
-    indices[iInd++] = face.mIndices[2];
+    indices.insert(indices.end(), { face.mIndices[0],face.mIndices[1],face.mIndices[2] });
   }
-
-  spdlog::info("(Model) vertices.size={}", vertices.size());
-  spdlog::info("(Model) indices.size={}", indices.size());
 
   // load mesh objects sequentially on the heap
   Mesh& mesh = _meshPool[index];
   mesh.init(vertices, indices);
-  
-
-
 
   // load textures
   const aiMaterial* material = scene->mMaterials[aimesh->mMaterialIndex];
