@@ -1,4 +1,4 @@
-#include "mesh.hh"
+#include "mesh3d.hh"
 
 #include "spdlog/spdlog.h"
 
@@ -7,17 +7,17 @@
  * -----------------------------------------------------
 */
 
-Mesh::Mesh(vector<float>& vertices, vector<uint32_t>& indices)
+Mesh3D::Mesh3D(vector<float>& vertices, vector<uint32_t>& indices)
 {
   init(vertices, indices);
 }
 
-void Mesh::init(vector<float>& vertices, vector<uint32_t>& indices)
+void Mesh3D::init(vector<float>& vertices, vector<uint32_t>& indices)
 {
   GL::VAConfiguration config;
-  config.pushAttribute(3); //layout=0 vec3
-  config.pushAttribute(3); //layout=1 vec3
-  config.pushAttribute(2); //layout=2 vec2
+  config.pushAttribute(3); //layout=0 vec3 position
+  config.pushAttribute(3); //layout=1 vec3 normals
+  config.pushAttribute(2); //layout=2 vec2 textcoords
 
   _vertexBuffer.init(vertices.size() * 4, vertices.data()); // vertices.size() * sizeof(float)
   _elementBuffer.init(indices.size() * 4, indices.data());  // indices.size() * sizeof(uint32_t)
@@ -28,7 +28,7 @@ void Mesh::init(vector<float>& vertices, vector<uint32_t>& indices)
   specular  = nullptr;
 }
 
-void Mesh::draw(uint32_t drawmode)
+void Mesh3D::draw(uint32_t drawmode)
 { 
   if(diffuse)
   {
@@ -58,7 +58,7 @@ void Mesh::draw(uint32_t drawmode)
   Texture::activeTextUnit(0);
 }
   
-void Mesh::destroy()
+void Mesh3D::destroy()
 {
   _vertexArray.destroy();
   _vertexBuffer.destroy();

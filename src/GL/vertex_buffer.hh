@@ -3,8 +3,6 @@
 
 #include "../core.hh"
 
-#include "vertex.hh"
-
 namespace GL
 {
   class VertexBuffer

@@ -3,7 +3,7 @@
 
 #include "core.hh"
 
-#include "mesh.hh"
+#include "mesh3d.hh"
 #include "shader.hh"
 #include "texture.hh"
 #include "actor.hh"
@@ -22,7 +22,7 @@ public:
   void destroy();
   
 private:
-  unique_ptr<Mesh[]> _meshPool;
+  unique_ptr<Mesh3D[]> _meshPool;
   uint32_t           _numMeshes;
 
   void loadModel(const string& path);

@@ -1,29 +1,26 @@
-#ifndef MESH_HH
-#define MESH_HH
+#ifndef MESH3D_HH
+#define MESH3D_HH
 
 #include "core.hh"
 
-#include "GL/vertex.hh"
 #include "GL/vertex_buffer.hh"
 #include "GL/element_buffer.hh"
 #include "GL/vertex_array.hh"
 
 #include "texture.hh"
 
-#include "lighting/material.hh"
 
-// A mesh represents a single drawable entity
+// A mesh represents a single drawable 3d entity
 // ------------------------------------------------
-class Mesh
+class Mesh3D
 {
 public:
-  Mesh() = default;
-  Mesh(vector<float>& vertices, vector<uint32_t>& indices);
+  Mesh3D() = default;
+  Mesh3D(vector<float>& vertices, vector<uint32_t>& indices);
+  ~Mesh3D() = default;
 
-  ~Mesh() = default;
-
-  Mesh(const Mesh&) = delete;             // delete copy constructor
-  Mesh& operator=(const Mesh&) = delete;  // delete assign op
+  Mesh3D(const Mesh3D&) = delete;             // delete copy constructor
+  Mesh3D& operator=(const Mesh3D&) = delete;  // delete assign op
 
   void init(vector<float>& vertices, vector<uint32_t>& indices);
   void draw(uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP

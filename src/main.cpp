@@ -5,6 +5,7 @@
 #include "camera.hh"
 #include "model.hh"
 #include "stencil.hh"
+#include "mesh2d.hh"
 
 #include "GL/frame_buffer.hh"
 
@@ -98,6 +99,9 @@ int main()
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
 
+  Mesh2D plane;
+  plane.texture = textGrass;
+
 
   // light object
   // ------------------------------------------------------------------------
@@ -138,11 +142,17 @@ int main()
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
     glEnable(GL_DEPTH_TEST);
-    
     dirLight.render(shaderScene);
     modelFloor.draw(shaderScene);
     modelCrate.draw(shaderScene);
     modelCube.draw(shaderScene);
+
+    shaderBlend->use();
+    shaderBlend->setMat4f("model",      mat4f(1.0f));
+    shaderBlend->setMat4f("view",       view);
+    shaderBlend->setMat4f("projection", projection);
+    shaderBlend->setVec3f("viewPos",    camera.position);
+    plane.draw();
 
   #if 0
     frameBuffer.bind();

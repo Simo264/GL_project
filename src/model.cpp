@@ -59,7 +59,7 @@ void Model::loadModel(const string& path)
   
   // Allocates memory on the heap to hold `_numMeshes` mesh objects
   _numMeshes = scene->mNumMeshes;
-  _meshPool  = std::make_unique<Mesh[]>(_numMeshes);
+  _meshPool  = std::make_unique<Mesh3D[]>(_numMeshes);
 
   //spdlog::info("Loading meshes {}", _numMeshes);
   for(uint32_t i = 0; i < _numMeshes; i++)
@@ -98,7 +98,7 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   }
 
   // load mesh objects sequentially on the heap
-  Mesh& mesh = _meshPool[index];
+  Mesh3D& mesh = _meshPool[index];
   mesh.init(vertices, indices);
 
   // load textures
