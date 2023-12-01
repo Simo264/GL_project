@@ -6,12 +6,6 @@
  * -----------------------------------------------------
 */
 
-
-Shader::Shader(const string& label, const string& vFilename, const string& fFilename)
-{
-  init(label, vFilename, fFilename);
-}
-
 void Shader::init(const string& label, const string& vFilename, const string& fFilename)
 {
   _label = label;
@@ -44,7 +38,7 @@ void Shader::init(const string& label, const string& vFilename, const string& fF
   // build and compile our shader program
   if(!createAndLink(vertexShader, fragmentShader))
   {
-    glGetProgramInfoLog(_shader, 512, NULL, infoLog);
+    glGetProgramInfoLog(_shaderID, 512, NULL, infoLog);
     spdlog::error("ERROR::SHADER::PROGRAM::LINKING_FAILED [{}]",infoLog);
     return;
   }
@@ -52,47 +46,47 @@ void Shader::init(const string& label, const string& vFilename, const string& fF
 
 void Shader::setBool(const char* name, bool value) const
 {         
-  glUniform1i(glGetUniformLocation(_shader, name), (int) value); 
+  glUniform1i(glGetUniformLocation(_shaderID, name), (int) value); 
 }
 
 void Shader::setInt(const char* name, int value) const
 { 
-  glUniform1i(glGetUniformLocation(_shader, name), value); 
+  glUniform1i(glGetUniformLocation(_shaderID, name), value); 
 }
 
 void Shader::setFloat(const char* name, float value) const
 { 
-  glUniform1f(glGetUniformLocation(_shader, name), value); 
+  glUniform1f(glGetUniformLocation(_shaderID, name), value); 
 }
 
 void Shader::setVec2f(const char* name, const vec2f& value) const
 { 
-  glUniform2fv(glGetUniformLocation(_shader, name), 1, &value[0]); 
+  glUniform2fv(glGetUniformLocation(_shaderID, name), 1, &value[0]); 
 }
 
 void Shader::setVec3f(const char* name, const vec3f& value) const
 { 
-  glUniform3fv(glGetUniformLocation(_shader, name), 1, &value[0]); 
+  glUniform3fv(glGetUniformLocation(_shaderID, name), 1, &value[0]); 
 }
 
 void Shader::setVec4f(const char* name, const vec4f& value) const
 { 
-  glUniform4fv(glGetUniformLocation(_shader, name), 1, &value[0]); 
+  glUniform4fv(glGetUniformLocation(_shaderID, name), 1, &value[0]); 
 }
 
 void Shader::setMat2f(const char* name, const mat2f& mat) const
 {
-  glUniformMatrix2fv(glGetUniformLocation(_shader, name), 1, GL_FALSE, &mat[0][0]);
+  glUniformMatrix2fv(glGetUniformLocation(_shaderID, name), 1, GL_FALSE, &mat[0][0]);
 }
 
 void Shader::setMat3f(const char* name, const mat3f& mat) const
 {
-  glUniformMatrix3fv(glGetUniformLocation(_shader, name), 1, GL_FALSE, &mat[0][0]);
+  glUniformMatrix3fv(glGetUniformLocation(_shaderID, name), 1, GL_FALSE, &mat[0][0]);
 }
 
 void Shader::setMat4f(const char* name, const mat4f& mat) const
 {
-  glUniformMatrix4fv(glGetUniformLocation(_shader, name), 1, GL_FALSE, &mat[0][0]);
+  glUniformMatrix4fv(glGetUniformLocation(_shaderID, name), 1, GL_FALSE, &mat[0][0]);
 }
 
 
@@ -132,12 +126,12 @@ bool Shader::createAndLink(uint32_t vShader, uint32_t fShader)
 {
   int success;
 
-  _shader = glCreateProgram();
-  glAttachShader(_shader, vShader);
-  glAttachShader(_shader, fShader);
-  glLinkProgram(_shader);
+  _shaderID = glCreateProgram();
+  glAttachShader(_shaderID, vShader);
+  glAttachShader(_shaderID, fShader);
+  glLinkProgram(_shaderID);
 
-  glGetProgramiv(_shader, GL_LINK_STATUS, &success);
+  glGetProgramiv(_shaderID, GL_LINK_STATUS, &success);
 
   glDeleteShader(vShader);
   glDeleteShader(fShader);

@@ -4,66 +4,45 @@
 
 namespace pool
 {
-  uint32_t ShaderPool::_bufferSz;
-  uint32_t ShaderPool::_bufferCapacity;
-
-#ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
-  unique_ptr<Shader[]> ShaderPool::_shaderBuffer;
-#endif
-
-#ifdef STATIC_SHADER_BUFFER_ALLOCATION
-  array<Shader, MAX_SHADER_BUFFER_SIZE> ShaderPool::_shaderBuffer;
-#endif
+  array<Shader, 10> ShaderPool::_shaderBuffer;
+  uint32_t          ShaderPool::_nShaders;
 
   void ShaderPool::initBuffer()
   {
-    _bufferSz       = 0;
-    _bufferCapacity = MAX_SHADER_BUFFER_SIZE;
-  
-  #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
-    // allocate a bunch of memory on the heap big enough to
-    // contain `MAX_SHADER_BUFFER_SIZE` contiguous shader objects
-    _shaderBuffer = make_unique<Shader[]>(_bufferCapacity);
-  #endif
+    _nShaders = 0;
   }
 
   Shader* ShaderPool::loadShader(const string& label, const string& vFilename, const string& fFilename)
   {
-    if(_bufferSz >= _bufferCapacity)
+    if(_nShaders >= _shaderBuffer.size())
     {
       spdlog::warn("Can't load more shaders. Buffer is full");
       return nullptr;
     }
 
-    Shader* shader = &_shaderBuffer[_bufferSz];
-    shader->init(label, vFilename, fFilename);
-    _bufferSz++;
-    return shader;
+    Shader& shader = _shaderBuffer[_nShaders++];
+    shader.init(label, vFilename, fFilename);
+    return &shader;
   }
 
   Shader* ShaderPool::getShader(const string& label)
   {
-    for(uint32_t i = 0; i < _bufferSz; i++)
+    for(uint32_t i = 0; i < _nShaders; i++)
     {
-      auto* s = &_shaderBuffer[i];
-      if(s->label().compare(label) == 0)
-        return s;
+      auto& s = _shaderBuffer[i];
+      if(s.label().compare(label) == 0)
+        return &s;
     }
     return nullptr;
   }
 
   void ShaderPool::freeBuffer()
   {
-    for(uint32_t i = 0; i < _bufferSz; i++)
+    for(uint32_t i = 0; i < _nShaders; i++)
     {
-      auto* shader = &_shaderBuffer[i];
-      shader->destroy();
+      auto& shader = _shaderBuffer[i];
+      shader.destroy();
     }
-    
-  #ifdef DYNAMIC_SHADER_BUFFER_ALLOCATION
-    _shaderBuffer.reset();
-  #endif
-  
   }
 
 }

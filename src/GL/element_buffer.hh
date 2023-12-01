@@ -9,7 +9,6 @@ namespace GL
   {
   public:
     ElementBuffer() = default;
-    ElementBuffer(uint64_t size, uint32_t* data, int usage = GL_STATIC_DRAW);
     ~ElementBuffer() = default;
     
     ElementBuffer(const ElementBuffer&) = delete;            // delete copy constructor
@@ -17,17 +16,12 @@ namespace GL
 
     void init(uint64_t size, uint32_t* data, int usage = GL_STATIC_DRAW);
     
-    void bind() const   { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer); }
+    void bind() const   { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID); }
     void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
-    void destroy()      { glDeleteBuffers(1, &_buffer); }
+    void destroy()      { glDeleteBuffers(1, &bufferID); }
 
-    uint32_t get() const { return _buffer; }
-
-    uint32_t numIndices() const { return _nIndices; }
-
-  private:
-    uint32_t _buffer;
-    uint32_t _nIndices; 
+    uint32_t bufferID;
+    uint32_t nIndices; 
   };
 }
 #endif

@@ -7,17 +7,12 @@
 
 namespace GL
 {
-  VertexBuffer::VertexBuffer(uint64_t size, float* rawdata, int usage)
-  {
-    init(size, rawdata, usage);
-  }
-
   void VertexBuffer::init(uint64_t size, float* rawdata, int usage)
   {
-    glGenBuffers(1, &_buffer);
+    glGenBuffers(1, &bufferID);
 
     bind();
 
-    glNamedBufferData(_buffer, size, rawdata, usage);
+    glNamedBufferData(bufferID, size, rawdata, usage);
   }
 }

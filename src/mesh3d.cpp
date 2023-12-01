@@ -7,11 +7,6 @@
  * -----------------------------------------------------
 */
 
-Mesh3D::Mesh3D(vector<float>& vertices, vector<uint32_t>& indices)
-{
-  init(vertices, indices);
-}
-
 void Mesh3D::init(vector<float>& vertices, vector<uint32_t>& indices)
 {
   GL::VAConfiguration config;
@@ -32,30 +27,30 @@ void Mesh3D::draw(uint32_t drawmode)
 { 
   if(diffuse)
   {
-    Texture::activeTextUnit(0);
+    glActiveTexture(GL_TEXTURE0);
     diffuse->bind();
   }
   if(normal)
   {
-    Texture::activeTextUnit(1);
+    glActiveTexture(GL_TEXTURE1);
     normal->bind();
   }
   if(specular)
   {
-    Texture::activeTextUnit(2);
+    glActiveTexture(GL_TEXTURE2);
     specular->bind();
   }
 
   _vertexArray.bind();
   _elementBuffer.bind();
   
-  glDrawElements(drawmode, _elementBuffer.numIndices(), GL_UNSIGNED_INT, 0);
+  glDrawElements(drawmode, _elementBuffer.nIndices, GL_UNSIGNED_INT, 0);
 
   _vertexArray.unbind();
   _elementBuffer.unbind();
 
   // always good practice to set everything back to defaults once configured.
-  Texture::activeTextUnit(0);
+  glActiveTexture(GL_TEXTURE0);
 }
   
 void Mesh3D::destroy()

@@ -4,50 +4,35 @@
 
 namespace pool
 {
-  #ifdef DYNAMIC_TEXTURE_BUFFER_ALLOCATION
-    unique_ptr<Texture[]> TexturePool::_textureBuffer;
-  #endif
-
-  #ifdef STATIC_TEXTURE_BUFFER_ALLOCATION
-    array<Texture, MAX_TEXTURE_BUFFER_SIZE> TexturePool::_textureBuffer;
-  #endif
- 
-  uint32_t              TexturePool::_bufferSz;
-  uint32_t              TexturePool::_bufferCapacity;
+  array<Texture2D, 100> TexturePool::_textureBuffer;
+  uint32_t              TexturePool::_nTextures;
 
   void TexturePool::initBuffer()
   {
-    _bufferSz = 0;
-    _bufferCapacity = MAX_TEXTURE_BUFFER_SIZE;
-
-    #ifdef DYNAMIC_TEXTURE_BUFFER_ALLOCATION
-      // allocate a bunch of memory on the heap big enough to
-      // contain 200 contiguous texture objects
-      _textureBuffer  = make_unique<Texture[]>(_bufferCapacity);
-    #endif
+    _nTextures = 0;
   }
 
-  Texture* TexturePool::loadTexture(const string& path, TextureType type, bool immutable)
+  Texture2D* TexturePool::loadTexture(const string& path)
   {
-    if(_bufferSz >= _bufferCapacity)
+    if(_nTextures >= _textureBuffer.size())
     { 
       spdlog::warn("Can't load more textures. Buffer is full");
       return nullptr;
     }
 
-    Texture* texture = &_textureBuffer[_bufferSz];
-    texture->init(path, type, immutable);
-    _bufferSz++;
-    return texture;
+    Texture2D& texture = _textureBuffer[_nTextures++];
+    texture.init(path);
+    
+    return &texture;
   }
 
-  Texture* TexturePool::getTexture(const string& path)
+  Texture2D* TexturePool::getTexture(const string& path)
   {
-    for(uint32_t i = 0; i < _bufferSz; i++)
+    for(uint32_t i = 0; i < _nTextures; i++)
     {
-      auto* t = &_textureBuffer[i];
-      if(t->path().compare(path) == 0)
-        return t;
+      auto& t = _textureBuffer[i];
+      if(t.path().compare(path) == 0)
+        return &t;
     }
 
     return nullptr;
@@ -55,14 +40,10 @@ namespace pool
 
   void TexturePool::freeBuffer()
   {
-    for(uint32_t i = 0; i < _bufferSz; i++)
+    for(uint32_t i = 0; i < _nTextures; i++)
     {
-      auto* texture = &_textureBuffer[i];
-      texture->destroy();
+      auto& texture = _textureBuffer[i];
+      texture.destroy();
     }
-
-  #ifdef DYNAMIC_TEXTURE_BUFFER_ALLOCATION
-    _textureBuffer.reset();
-  #endif
   }
 }

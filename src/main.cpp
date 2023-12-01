@@ -59,7 +59,7 @@ int main()
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
 
-  // load default textures
+  // blending textures
   // ------------------------------------------------------------------------
   auto textWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
   auto textGrass  = pool::TexturePool::loadTexture("res/grass.png");
@@ -74,15 +74,19 @@ int main()
   shaderScene->setInt("material.normal", 1);
   shaderScene->setInt("material.specular", 2);
   shaderScene->setFloat("material.shininess", 32.0f);
+  
   auto shaderFB = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
   shaderFB->use();
   shaderFB->setInt("screenTexture", 0);
+  
   auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
   shaderOutline->use();
   shaderOutline->setVec3f("outlineColor", vec3f(0.25f, 0.50f, 0.75f));
+  
   auto shaderBlend = pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
   shaderBlend->use();
   shaderBlend->setInt("material.diffuse", 0);
+  
   auto shaderSky = pool::ShaderPool::loadShader("shaderSkybox", "shaders/skybox.vert","shaders/skybox.frag");
   shaderSky->use();
   shaderSky->setInt("skybox", 0);
@@ -104,7 +108,16 @@ int main()
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
 
-  SkyBox skybox;
+
+  array<string, 6> skyboxImages = {
+    "res/Skybox/back.jpg",
+    "res/Skybox/bottom.jpg",
+    "res/Skybox/front.jpg",
+    "res/Skybox/left.jpg",
+    "res/Skybox/right.jpg",
+    "res/Skybox/top.jpg"
+  };
+  SkyBox skybox(skyboxImages);
 
 
   // light object
@@ -144,14 +157,6 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
    
     // draw scene
-    glDepthFunc(GL_LEQUAL);
-    shaderSky->use();
-    shaderSky->setMat4f("view",       mat4f(mat3f(view)));
-    shaderSky->setMat4f("projection", projection);
-    skybox.draw();
-    glDepthFunc(GL_LESS); 
-
-
     shaderScene->use();
     shaderScene->setMat4f("view",       view);
     shaderScene->setMat4f("projection", projection);
@@ -160,17 +165,22 @@ int main()
     modelFloor.draw(shaderScene, GL_TRIANGLES);
     modelCrate.draw(shaderScene, GL_TRIANGLES);
     modelCube.draw(shaderScene, GL_TRIANGLES);
-
-
-
-
+  
+    glDepthFunc(GL_LEQUAL);
+    shaderSky->use();
+    shaderSky->setMat4f("view",       mat4f(mat3f(view)));
+    shaderSky->setMat4f("projection", projection);
+    skybox.draw();
+    glDepthFunc(GL_LESS); 
+    
     frameBuffer.unbind();
     glDisable(GL_DEPTH_TEST);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
     glClear(GL_COLOR_BUFFER_BIT);
-
     shaderFB->use();
     frameBuffer.draw();
+
+
 
 
 

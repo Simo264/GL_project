@@ -103,28 +103,24 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
 
   // load textures
   const aiMaterial* material = scene->mMaterials[aimesh->mMaterialIndex];
-  Texture* diffuse  = loadTexture(material, TextureType::DIFFUSE);
-  Texture* normal   = loadTexture(material, TextureType::NORMAL);
-  Texture* specular = loadTexture(material, TextureType::SPECULAR);
+  Texture2D* diffuse  = loadTexture(material, "diffuse");
+  Texture2D* normal   = loadTexture(material, "normal");
+  Texture2D* specular = loadTexture(material, "specular");
   mesh.diffuse  = diffuse;
   mesh.normal   = normal;
   mesh.specular = specular;
 }
 
-Texture* Model::loadTexture(const aiMaterial* material, const TextureType texType)
+Texture2D* Model::loadTexture(const aiMaterial* material, const char* textureType)
 {
-  aiTextureType aiType;
-  switch (texType)
-  {
-  case TextureType::DIFFUSE:  aiType = aiTextureType_DIFFUSE; 
-    break;
-  case TextureType::NORMAL:   aiType = aiTextureType_NORMALS; 
-    break;
-  case TextureType::SPECULAR: aiType = aiTextureType_SPECULAR; 
-    break;
-  default:
-    break;
-  }
+  aiTextureType aiType = aiTextureType_NONE;
+  if(strcmp(textureType, "diffuse") == 0)
+    aiType = aiTextureType_DIFFUSE; 
+  else if(strcmp(textureType, "normal") == 0)
+    aiType = aiTextureType_NORMALS; 
+  else if(strcmp(textureType, "specular") == 0)
+    aiType = aiTextureType_SPECULAR; 
+
 
   if (material->GetTextureCount(aiType) <= 0)
     return nullptr; 
@@ -136,29 +132,10 @@ Texture* Model::loadTexture(const aiMaterial* material, const TextureType texTyp
   string path = "assets/";
   path.append(filename.C_Str());
 
-  Texture* texture = pool::TexturePool::getTexture(path);
+  Texture2D* texture = pool::TexturePool::getTexture(path);
   if(!texture)  
-    texture = pool::TexturePool::loadTexture(path, texType, false);
+    texture = pool::TexturePool::loadTexture(path);
   
   return texture;
-
-#if 0
-  for(uint32_t i = 0; i < material->GetTextureCount(aiType); i++)
-  {
-    aiString filename;
-    material->GetTexture(aiType, i, &filename);
-
-    string path = "assets/";
-    path.append(filename.C_Str());
-
-    Texture* texture = pool::TexturePool::getTexture(path);
-    if(!texture)
-    {
-      texture = pool::TexturePool::loadTexture(path, texType, false);
-      return texture;
-    }
-  }
-  return nullptr;
-#endif
 }
 

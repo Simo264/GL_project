@@ -27,7 +27,6 @@ namespace GL
   {
   public:
     VertexArray() = default;
-    VertexArray(VAConfiguration& config, VertexBuffer& vBuffer);
     ~VertexArray() = default;
 
     VertexArray(const VertexArray&) = delete;            // delete copy constructor
@@ -35,9 +34,9 @@ namespace GL
 
     void init(VAConfiguration& config, VertexBuffer& vBuffer);
 
-    void bind() const   { glBindVertexArray(_vertexArray);}
+    void bind() const   { glBindVertexArray(vertexArrayID);}
     void unbind() const { glBindVertexArray(0);}
-    void destroy()      { glDeleteVertexArrays(1, &_vertexArray); }
+    void destroy()      { glDeleteVertexArrays(1, &vertexArrayID); }
     
     void vertexSpecification(uint32_t index, uint32_t size, uint32_t type, int offset);
     void attribBinding(uint32_t attribindex, uint32_t bindingindex);
@@ -45,10 +44,7 @@ namespace GL
     void enableAttribute(uint32_t index);
     void disableAttribute(uint32_t index);
 
-    uint32_t get() const { return _vertexArray; }
-
-  private:
-    uint32_t _vertexArray;
+    uint32_t vertexArrayID;
   };
 }
 #endif

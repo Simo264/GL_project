@@ -6,7 +6,6 @@
 class Shader
 {
 public:
-  Shader(const string& label, const string& vFilename, const string& fFilename);
   Shader()  = default;
   ~Shader() = default;
 
@@ -15,11 +14,9 @@ public:
 
   void init(const string& label, const string& vFilename, const string& fFilename);
 
-  void use() const { glUseProgram(_shader); }
+  void use() const { glUseProgram(_shaderID); }
 
-  void destroy() { glDeleteProgram(_shader); }
-
-  uint32_t get() const { return _shader; }
+  void destroy() { glDeleteProgram(_shaderID); }
 
   const string& label() const { return _label; }
 
@@ -35,7 +32,7 @@ public:
   void setMat4f(const char* name, const mat4f& mat) const;
 
 private:
-  uint32_t _shader;
+  uint32_t _shaderID;
   string   _label;
   
   void getSourceFromFile(const string& filename, string& dest);

@@ -15,7 +15,7 @@ namespace GL
     FrameBuffer(const FrameBuffer&) = delete;            // delete copy constructor
     FrameBuffer& operator=(const FrameBuffer&) = delete; // delete assign op
 
-    void bind(uint32_t target = GL_FRAMEBUFFER)   { glBindFramebuffer(target, _buffer); }
+    void bind(uint32_t target = GL_FRAMEBUFFER)   { glBindFramebuffer(target, _frameBufferID); }
     void unbind(uint32_t target = GL_FRAMEBUFFER) { glBindFramebuffer(target, 0); }
     void destroy();
 
@@ -23,14 +23,14 @@ namespace GL
     // which must be GL_DRAW_FRAMEBUFFER | GL_READ_FRAMEBUFFER | GL_FRAMEBUFFER
     bool checkStatus(uint32_t target = GL_FRAMEBUFFER) const;
   
-    uint32_t texture() const { return _texture; }
+    uint32_t texture() const { return _textureID; }
 
     void draw();
 
   private:
-    uint32_t _buffer;
-    uint32_t _texture;
-    uint32_t _renderBuffer;
+    uint32_t _frameBufferID;
+    uint32_t _textureID;
+    uint32_t _renderBufferID;
 
     Mesh2D _screenImage;
   };

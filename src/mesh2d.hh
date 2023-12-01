@@ -7,7 +7,7 @@
 #include "GL/element_buffer.hh"
 #include "GL/vertex_array.hh"
 
-#include "texture.hh"
+#include "texture2d.hh"
 
 class Mesh2D
 {
@@ -21,7 +21,7 @@ public:
   void draw(uint32_t drawmode = GL_TRIANGLES);
   void destroy();
 
-  Texture* texture;
+  Texture2D* texture;
 
 private:
   GL::VertexBuffer  _vertexBuffer;

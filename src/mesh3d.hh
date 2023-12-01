@@ -7,7 +7,7 @@
 #include "GL/element_buffer.hh"
 #include "GL/vertex_array.hh"
 
-#include "texture.hh"
+#include "texture2d.hh"
 
 
 // A mesh represents a single drawable 3d entity
@@ -16,7 +16,6 @@ class Mesh3D
 {
 public:
   Mesh3D() = default;
-  Mesh3D(vector<float>& vertices, vector<uint32_t>& indices);
   ~Mesh3D() = default;
 
   Mesh3D(const Mesh3D&) = delete;             // delete copy constructor
@@ -26,9 +25,9 @@ public:
   void draw(uint32_t drawmode); // GL_TRIANGLES | GL_LINE_STRIP
   void destroy();
 
-  Texture* diffuse;
-  Texture* normal;
-  Texture* specular;
+  Texture2D* diffuse;
+  Texture2D* normal;
+  Texture2D* specular;
 
 private:
   GL::VertexBuffer  _vertexBuffer;

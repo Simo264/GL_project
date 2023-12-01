@@ -7,19 +7,14 @@
 
 namespace GL
 {
-  ElementBuffer::ElementBuffer(uint64_t size, uint32_t* data, int usage)
-  {
-    init(size, data, usage);
-  }
-
   void ElementBuffer::init(uint64_t size, uint32_t* data, int usage)
   {
-    glGenBuffers(1, &_buffer);
+    glGenBuffers(1, &bufferID);
 
     bind();
 
-    glNamedBufferData(_buffer, size, data, usage);
+    glNamedBufferData(bufferID, size, data, usage);
 
-    _nIndices = size / 4; // size / sizeof(uint32_t)
+    nIndices = size / 4; // size / sizeof(uint32_t)
   }
 }

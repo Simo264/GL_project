@@ -9,7 +9,6 @@ namespace GL
   {
   public:
     VertexBuffer() = default;
-    VertexBuffer(uint64_t size, float* rawdata, int usage = GL_STATIC_DRAW);
     ~VertexBuffer() = default;
 
     VertexBuffer(const VertexBuffer&) = delete;            // delete copy constructor
@@ -17,14 +16,11 @@ namespace GL
 
     void init(uint64_t size, float* rawdata, int usage = GL_STATIC_DRAW);
 
-    void bind() const   { glBindBuffer(GL_ARRAY_BUFFER, _buffer); }
+    void bind() const   { glBindBuffer(GL_ARRAY_BUFFER, bufferID); }
     void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
-    void destroy()      { glDeleteBuffers(1, &_buffer); }
+    void destroy()      { glDeleteBuffers(1, &bufferID); }
 
-    uint32_t get() const { return _buffer; }
-    
-  private:
-    uint32_t _buffer;
+    uint32_t bufferID;
   };
 
 }

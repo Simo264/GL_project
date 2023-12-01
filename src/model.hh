@@ -5,7 +5,7 @@
 
 #include "mesh3d.hh"
 #include "shader.hh"
-#include "texture.hh"
+#include "texture2d.hh"
 #include "actor.hh"
 
 class Model : public Actor
@@ -23,11 +23,11 @@ public:
   
 private:
   unique_ptr<Mesh3D[]> _meshPool;
-  uint32_t           _numMeshes;
+  uint32_t             _numMeshes;
 
   void loadModel(const string& path);
   void loadMesh(uint32_t index, const struct aiScene* scene, const struct aiMesh* aimesh);
-  Texture* loadTexture(const struct aiMaterial* material, const TextureType texType);
+  Texture2D* loadTexture(const struct aiMaterial* material, const char* textureType);
 };  
 
 #endif
