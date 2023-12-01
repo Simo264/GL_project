@@ -16,8 +16,9 @@ public:
 private:
   TextureCubeMap _texture;
 
-  GL::VertexBuffer _vertexBuffer;
-  GL::VertexArray  _vertexArray;
+  GL::VertexBuffer  _vertexBuffer;
+  GL::ElementBuffer _elementBuffer;
+  GL::VertexArray   _vertexArray;
 };
 
 #endif

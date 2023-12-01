@@ -27,6 +27,7 @@ void TextureCubeMap::init(const array<string, 6>& images)
     if(strcmp(suffix, ".png") == 0)
       format = GL_RGBA;
 
+    stbi_set_flip_vertically_on_load(false);
     u_char* data = stbi_load(images[i].c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {

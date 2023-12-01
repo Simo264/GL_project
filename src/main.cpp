@@ -110,14 +110,14 @@ int main()
 
 
   array<string, 6> skyboxImages = {
-    "res/Skybox/back.jpg",
+    "res/Skybox/right.jpg",
+    "res/Skybox/left.jpg",
+    "res/Skybox/top.jpg",
     "res/Skybox/bottom.jpg",
     "res/Skybox/front.jpg",
-    "res/Skybox/left.jpg",
-    "res/Skybox/right.jpg",
-    "res/Skybox/top.jpg"
+    "res/Skybox/back.jpg",
   };
-  SkyBox skybox(skyboxImages);
+  SkyBox skybox(skyboxImages); (void) skybox;
 
 
   // light object

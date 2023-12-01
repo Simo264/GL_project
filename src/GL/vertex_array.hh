@@ -4,6 +4,7 @@
 #include "../core.hh"
 
 #include "vertex_buffer.hh"
+#include "element_buffer.hh"
 
 namespace GL
 {
