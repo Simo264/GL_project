@@ -29,9 +29,6 @@ public:
   
   uint32_t get() const  { return _texture; }
 
-  int width() const  { return _width; }
-  int height() const { return _height; }
-
   TextureType type() const { return _type; }
 
   string path() const { return _path; }
@@ -39,7 +36,6 @@ public:
 private:
   uint32_t _texture;
   string   _path;
-  int      _width, _height;
 
   TextureType _type;
 

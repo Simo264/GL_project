@@ -43,8 +43,8 @@ void Texture::loadImage(const string& path, bool immutable)
 {
   stbi_set_flip_vertically_on_load(true);
   
-  int nrChannels;
-  auto data = stbi_load(path.c_str(), &_width, &_height, &nrChannels, 0);
+  int width, height, nrChannels;
+  auto data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
   if (data)
   {
     int format = GL_RGB;
@@ -54,13 +54,13 @@ void Texture::loadImage(const string& path, bool immutable)
     if(immutable)
     {
       // immutable object
-      glTextureStorage2D(_texture, 1, format, _width, _height);
-      glTextureSubImage2D(_texture, 0, 0, 0, _width, _height, format, GL_UNSIGNED_BYTE, data);
+      glTextureStorage2D(_texture, 1, format, width, height);
+      glTextureSubImage2D(_texture, 0, 0, 0, width, height, format, GL_UNSIGNED_BYTE, data);
     }
     else
     {
       // mutable object
-      glTexImage2D(GL_TEXTURE_2D, 0, format, _width, _height, 0, format, GL_UNSIGNED_BYTE, data);
+      glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     }
     
     glGenerateMipmap(GL_TEXTURE_2D);

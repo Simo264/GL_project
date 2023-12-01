@@ -28,23 +28,6 @@ namespace GL
       spdlog::error("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 
     unbind();
-
-
-    float quadVertices[] = { 
-      // positions         // normals         // texCoords
-      -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
-      -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
-       1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
-      -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
-       1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
-       1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  1.0f, 1.0f
-    };
-    VAConfiguration config;
-    config.pushAttribute(2);
-    config.pushAttribute(2);
-
-    _screenImageVBO.init(sizeof(quadVertices), quadVertices);
-    _screenImageVAO.init(config, _screenImageVBO);
   }
 
   bool FrameBuffer::checkStatus(uint32_t target) const
@@ -55,8 +38,7 @@ namespace GL
   void FrameBuffer::draw()
   {
     glBindTexture(GL_TEXTURE_2D, _texture);
-    _screenImageVAO.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    _screenImage.draw();
   }
 
   void FrameBuffer::destroy()

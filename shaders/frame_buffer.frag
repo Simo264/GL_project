@@ -5,7 +5,7 @@ out vec4 FragColor;
 
 uniform sampler2D screenTexture;
 
-#define EFFECT_INVERSION
+#define EFFECT_NONE
 
 vec4 inversionEffect();
 vec4 grayscaleEffect();

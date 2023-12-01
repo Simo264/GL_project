@@ -2,7 +2,7 @@
 #define FRAME_BUFFER_HH
 
 #include "../core.hh"
-#include "vertex_array.hh"
+#include "../mesh2d.hh"
 
 namespace GL
 {
@@ -32,8 +32,7 @@ namespace GL
     uint32_t _texture;
     uint32_t _renderBuffer;
 
-    VertexArray  _screenImageVAO;
-    VertexBuffer _screenImageVBO;
+    Mesh2D _screenImage;
   };
 }
 #endif

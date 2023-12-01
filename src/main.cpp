@@ -6,6 +6,7 @@
 #include "model.hh"
 #include "stencil.hh"
 #include "mesh2d.hh"
+#include "skybox.hh"
 
 #include "GL/frame_buffer.hh"
 
@@ -68,24 +69,28 @@ int main()
   // load shaders
   // ------------------------------------------------------------------------
   auto shaderScene = pool::ShaderPool::loadShader("shaderScene", "shaders/scene.vert","shaders/scene.frag");
-  auto shaderFB    = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
-  auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
-  auto shaderBlend = pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
   shaderScene->use();
   shaderScene->setInt("material.diffuse", 0);
   shaderScene->setInt("material.normal", 1);
   shaderScene->setInt("material.specular", 2);
   shaderScene->setFloat("material.shininess", 32.0f);
+  auto shaderFB = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
   shaderFB->use();
   shaderFB->setInt("screenTexture", 0);
+  auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
   shaderOutline->use();
   shaderOutline->setVec3f("outlineColor", vec3f(0.25f, 0.50f, 0.75f));
+  auto shaderBlend = pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
   shaderBlend->use();
   shaderBlend->setInt("material.diffuse", 0);
+  auto shaderSky = pool::ShaderPool::loadShader("shaderSkybox", "shaders/skybox.vert","shaders/skybox.frag");
+  shaderSky->use();
+  shaderSky->setInt("skybox", 0);
 
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera;
+
 
   // create model objects
   // ------------------------------------------------------------------------
@@ -99,23 +104,20 @@ int main()
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
 
-  Mesh2D plane;
-  plane.texture = textGrass;
+  SkyBox skybox;
 
 
   // light object
   // ------------------------------------------------------------------------
   lighting::DirectionalLight dirLight("dirLight");
-#if 0
   lighting::PointLight pointLight("pointLight");      (void)pointLight;
   lighting::SpotLight spotLight("spotLight");         (void)spotLight;
-#endif
 
-#if 0
+
   // framebuffer configuration
   // ------------------------------------------------------------------------
-  //GL::FrameBuffer frameBuffer;
-#endif
+  GL::FrameBuffer frameBuffer;
+
 
   // render loop
   // ------------------------------------------------------------------------
@@ -130,42 +132,37 @@ int main()
     // ------------------------------------------------------------------------
     window.processKeyboardInput();
     camera.processInput(window);
-    const mat4f view = camera.getViewMatrix();
-    const mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
-    shaderScene->use();
-    shaderScene->setMat4f("view",       view);
-    shaderScene->setMat4f("projection", projection);
-    shaderScene->setVec3f("viewPos",    camera.position);
+    mat4f view = camera.getViewMatrix();
+    mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
+
 
     // render
     // ------------------------------------------------------------------------
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
-    glEnable(GL_DEPTH_TEST);
-    dirLight.render(shaderScene);
-    modelFloor.draw(shaderScene);
-    modelCrate.draw(shaderScene);
-    modelCube.draw(shaderScene);
-
-    shaderBlend->use();
-    shaderBlend->setMat4f("model",      mat4f(1.0f));
-    shaderBlend->setMat4f("view",       view);
-    shaderBlend->setMat4f("projection", projection);
-    shaderBlend->setVec3f("viewPos",    camera.position);
-    plane.draw();
-
-  #if 0
     frameBuffer.bind();
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
    
     // draw scene
+    glDepthFunc(GL_LEQUAL);
+    shaderSky->use();
+    shaderSky->setMat4f("view",       mat4f(mat3f(view)));
+    shaderSky->setMat4f("projection", projection);
+    skybox.draw();
+    glDepthFunc(GL_LESS); 
+
+
+    shaderScene->use();
+    shaderScene->setMat4f("view",       view);
+    shaderScene->setMat4f("projection", projection);
+    shaderScene->setVec3f("viewPos",    camera.position);
     dirLight.render(shaderScene);
     modelFloor.draw(shaderScene, GL_TRIANGLES);
-
     modelCrate.draw(shaderScene, GL_TRIANGLES);
     modelCube.draw(shaderScene, GL_TRIANGLES);
+
+
+
 
     frameBuffer.unbind();
     glDisable(GL_DEPTH_TEST);
@@ -174,21 +171,8 @@ int main()
 
     shaderFB->use();
     frameBuffer.draw();
-  #endif
 
-  #if 0
-    // Render lights
-    // ------------------------------------------------------------------------
-    dirLight.render(shaderScene);
-    //pointLight.render(shaderScene);
-    //spotLight.render(shaderScene);
 
-    // Render models
-    // ------------------------------------------------------------------------
-    modelFloor.draw(shaderScene);
-    modelCrate.draw(shaderScene);
-    modelCube.draw(shaderScene);
-  #endif
 
   #if 0
     // render grass

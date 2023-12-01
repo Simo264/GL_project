@@ -15,7 +15,7 @@ Camera::Camera(vec3f position) : position{position}
   _pitch = 0.0f;
   _yaw = 0.0f;
 
-  sensitivity    = 64.0f;
+  sensitivity    = 128.0f;
   distance       = 10.0f;
   speed          = 8.0f;
   fov            = 45.0f;
