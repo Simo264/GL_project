@@ -2,7 +2,7 @@
 
 SkyBox::SkyBox(const array<string, 6>& images)
 {
-   _texture.init(images);
+  _texture.init(images);
 
   float skyboxVertices[] ={
 	//   Coordinates

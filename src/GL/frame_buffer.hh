@@ -15,24 +15,21 @@ namespace GL
     FrameBuffer(const FrameBuffer&) = delete;            // delete copy constructor
     FrameBuffer& operator=(const FrameBuffer&) = delete; // delete assign op
 
-    void bind(uint32_t target = GL_FRAMEBUFFER)   { glBindFramebuffer(target, _frameBufferID); }
-    void unbind(uint32_t target = GL_FRAMEBUFFER) { glBindFramebuffer(target, 0); }
+    void bind();   
+    void unbind(); 
     void destroy();
-
-    // the framebuffer checked is that bound to target, 
-    // which must be GL_DRAW_FRAMEBUFFER | GL_READ_FRAMEBUFFER | GL_FRAMEBUFFER
-    bool checkStatus(uint32_t target = GL_FRAMEBUFFER) const;
-  
-    uint32_t texture() const { return _textureID; }
-
     void draw();
 
   private:
     uint32_t _frameBufferID;
-    uint32_t _textureID;
+    uint32_t _textureColorBufferMultiSampledID;
     uint32_t _renderBufferID;
+    uint32_t _intermediateFrameBufferID;
+    uint32_t _textureScreenID;
 
-    Mesh2D _screenImage;
+    Mesh2D   _screenImage;
+
+    bool checkStatus();
   };
 }
 #endif

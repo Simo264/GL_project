@@ -15,7 +15,7 @@ Camera::Camera(vec3f position) : position{position}
   _pitch = 0.0f;
   _yaw = 0.0f;
 
-  sensitivity    = 128.0f;
+  sensitivity    = 50.0f;
   distance       = 10.0f;
   speed          = 8.0f;
   fov            = 45.0f;
@@ -53,10 +53,10 @@ void Camera::processInput(Window& window)
   else
   {
     freeCameraWalk(window, delta);
-
+    
     if(window.getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
-      freeCameraRotation(mousePos, delta);
+     freeCameraRotation(mousePos, delta);
     }
   }
 }

@@ -6,8 +6,11 @@
 class Window
 {
 public:
-  Window(vec2u dim, vec2u pos, string title, bool fullscreen = false);
+  Window();
   ~Window() = default;
+
+  // creating a window and context
+  void create(vec2u dim, vec2u pos, const char* title, bool fullscreen = false);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   void destroy();
@@ -41,7 +44,7 @@ public:
   void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
 
   // window position
-  void setPosition(vec2i pos) { glfwSetWindowPos(_window, pos.x, pos.y); }
+  void setPosition(vec2i pos)  { glfwSetWindowPos(_window, pos.x, pos.y); }
   void getPosition(vec2i& pos) { glfwGetWindowPos(_window, &pos.x, &pos.y); }
 
   void processKeyboardInput();
@@ -66,10 +69,5 @@ private:
   // measure speed per frame
   double _lastTime;
   int    _nbFrames;
-
-  // creating a window and context
-  void create(string title="", bool fullscreen = false);
 };
-
-
 #endif

@@ -23,29 +23,36 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+const uint32_t samples = 8;
+
 int main()
 { 
-  Window window(vec2u(720, 720), vec2u(400,200), "OpenGL");
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_SAMPLES, samples);
+
+  Window window;
+  window.create(vec2u(720, 720), vec2u(400,200), "OpenGL");
+
+  // antialising
+  glEnable(GL_MULTISAMPLE);
   
-  // glEnable(GL_DEPTH_TEST); // depth buffer
+  // depth buffer
+  glEnable(GL_DEPTH_TEST);
 
   // blending/stencil buffer
-  // -----------------------------
   // glEnable(GL_BLEND); 
   // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // face culling
-  // -----------------------------
   // glEnable(GL_CULL_FACE);
   // glCullFace(GL_BACK);  
   
-  // antialiasing
-  // -----------------------------
-  // glEnable(GL_MULTISAMPLE); 
-  // glfwWindowHint(GLFW_SAMPLES, 4);
+
   
-  
-  // Setup Dear ImGui context
+#if 0
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -54,7 +61,7 @@ int main()
   ImGui::StyleColorsDark();
   ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
   ImGui_ImplOpenGL3_Init("#version 130");
-
+#endif
 
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
@@ -108,7 +115,7 @@ int main()
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
 
-
+#if 0
   array<string, 6> skyboxImages = {
     "res/Skybox/right.jpg",
     "res/Skybox/left.jpg",
@@ -117,8 +124,8 @@ int main()
     "res/Skybox/front.jpg",
     "res/Skybox/back.jpg",
   };
-  SkyBox skybox(skyboxImages); (void) skybox;
-
+  SkyBox skybox(skyboxImages);
+#endif
 
   // light object
   // ------------------------------------------------------------------------
@@ -129,7 +136,7 @@ int main()
 
   // framebuffer configuration
   // ------------------------------------------------------------------------
-  GL::FrameBuffer frameBuffer;
+  // GL::FrameBuffer frameBuffer; (void) frameBuffer;
 
 
   // render loop
@@ -139,7 +146,6 @@ int main()
     // per-frame time logic
     // --------------------
     window.update();
-    window.msPerFrame();
 
     // input
     // ------------------------------------------------------------------------
@@ -151,11 +157,24 @@ int main()
 
     // render
     // ------------------------------------------------------------------------
-    frameBuffer.bind();
-    glEnable(GL_DEPTH_TEST);
+    // frameBuffer.bind();
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
-   
+
+    glEnable(GL_DEPTH_TEST);
+    shaderBlend->use();
+    shaderBlend->setMat4f("view",       view);
+    shaderBlend->setMat4f("projection", projection);
+    modelCube.draw(shaderBlend);
+
+    // frameBuffer.unbind();
+    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
+    // glClear(GL_COLOR_BUFFER_BIT);
+    // glDisable(GL_DEPTH_TEST);
+    // shaderFB->use();
+    // frameBuffer.draw();
+
+  #if 0
     // draw scene
     shaderScene->use();
     shaderScene->setMat4f("view",       view);
@@ -172,17 +191,14 @@ int main()
     shaderSky->setMat4f("projection", projection);
     skybox.draw();
     glDepthFunc(GL_LESS); 
-    
+
     frameBuffer.unbind();
     glDisable(GL_DEPTH_TEST);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
     glClear(GL_COLOR_BUFFER_BIT);
     shaderFB->use();
     frameBuffer.draw();
-
-
-
-
+  #endif
 
   #if 0
     // render grass
@@ -243,19 +259,23 @@ int main()
     glfwPollEvents();
   }
 
-  // modelFloor.destroy();
-  // modelCrate.destroy();
-  // modelCube.destroy();
+#if 0
+  modelFloor.destroy();
+  modelCrate.destroy();
+  modelCube.destroy();
+#endif
 
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();
 
+#if 0
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+#endif
 
   window.destroy();
-
+  glfwTerminate();
   return 0;
 }
 

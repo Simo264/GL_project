@@ -2,45 +2,13 @@
 
 #include "spdlog/spdlog.h"
 
-static void errorCallback(int error, const char* description)
-{
-  (void)error; // suppress werror 
-
-  spdlog::error(description);
-}
-
-
 /* -----------------------------------------------------
  *          PUBLIC METHODS
  * -----------------------------------------------------
 */
 
-Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
-  : _width {dim.x}, _height{dim.y}
+Window::Window()
 {
-  glfwSetErrorCallback(errorCallback);
-
-  if(!glfwInit())
-  {
-    spdlog::error("GLFW failed to initialize.");
-    exit(EXIT_FAILURE);
-  }
-
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  create(title, fullscreen);
-
-  glfwMakeContextCurrent(_window);
-  glfwSetWindowUserPointer(_window, this);
-  
-  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-  glfwSwapInterval(1); // enable vsync
-
-  setPosition(pos);
-  
   _prevFrame = 0; 
   _currFrame = 0;
 
@@ -48,12 +16,26 @@ Window::Window(vec2u dim, vec2u pos, string title, bool fullscreen)
   _nbFrames  = 0;
 }
 
+void Window::create(vec2u dim, vec2u pos, const char* title, bool fullscreen)
+{
+  _width = dim.x;
+  _height= dim.y;
+
+  GLFWmonitor* monitor = nullptr;
+  if(fullscreen)
+    monitor = glfwGetPrimaryMonitor();
+
+  _window = glfwCreateWindow(_width, _height, title, monitor, NULL);
+  glfwMakeContextCurrent(_window);
+  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+  setPosition(pos);
+}
+
 void Window::destroy()
 {
   if (_window)
     glfwDestroyWindow(_window);
-
-  glfwTerminate();
 }
 
 void Window::processKeyboardInput()
@@ -86,22 +68,3 @@ void Window::msPerFrame()
   }
 }
 
-/* -----------------------------------------------------
- *          PRIVATE METHODS
- * -----------------------------------------------------
-*/
-
-void Window::create(string title, bool fullscreen)
-{
-  GLFWmonitor* monitor = nullptr;
-  if(fullscreen)
-    monitor = glfwGetPrimaryMonitor();
-
-  _window = glfwCreateWindow(_width, _height, title.c_str(), monitor, NULL);
-  if (!_window)
-  {
-    spdlog::error("Failed to create GLFW window");
-    glfwTerminate();
-    exit(EXIT_FAILURE);
-  }
-}
