@@ -9,7 +9,7 @@ namespace GL
   * -----------------------------------------------------
   */
 
-  FrameBuffer::FrameBuffer(vec2u windowDim) : _windowDim{windowDim}
+  FrameBuffer::FrameBuffer(vec2i framebufferSize) : _fbSize{framebufferSize}
   {
     // configure MSAA framebuffer
     // --------------------------
@@ -21,14 +21,14 @@ namespace GL
     // create a multisampled color attachment texture
     glGenTextures(1, &_textureColorBufferMultiSampledID);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _textureColorBufferMultiSampledID);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, _windowDim.x, _windowDim.y, GL_TRUE);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, _fbSize.x, _fbSize.y, GL_TRUE);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, _textureColorBufferMultiSampledID, 0);
     
     // create a (also multisampled) renderbuffer object for depth and stencil attachments
     glGenRenderbuffers(1, &_renderBufferID);
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBufferID);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, _windowDim.x, _windowDim.y);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, _fbSize.x, _fbSize.y);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _renderBufferID);
 
@@ -44,7 +44,7 @@ namespace GL
     // create a color attachment texture
     glGenTextures(1, &_textureScreenID);
     glBindTexture(GL_TEXTURE_2D, _textureScreenID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _windowDim.x, _windowDim.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _fbSize.x, _fbSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _textureScreenID, 0);	

@@ -9,26 +9,20 @@
 
 Window::Window()
 {
+  // delta time
   _prevFrame = 0; 
   _currFrame = 0;
-
-  _lastTime  = glfwGetTime();
-  _nbFrames  = 0;
+  
+  //_lastTime  = 0;
+  //_nbFrames  = 0;
 }
 
-void Window::create(vec2u dim, vec2u pos, const char* title, bool fullscreen)
+void Window::create(vec2u dim, vec2u pos, const char* title)
 {
   _width = dim.x;
   _height= dim.y;
-
-  GLFWmonitor* monitor = nullptr;
-  if(fullscreen)
-    monitor = glfwGetPrimaryMonitor();
-
-  _window = glfwCreateWindow(_width, _height, title, monitor, NULL);
+  _window = glfwCreateWindow(_width, _height, title, NULL, NULL);
   glfwMakeContextCurrent(_window);
-  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
   setPosition(pos);
 }
 
@@ -55,6 +49,7 @@ void Window::update()
   _currFrame = glfwGetTime();
 }
 
+#if 0
 void Window::msPerFrame()
 {
   double currentTime = glfwGetTime();
@@ -67,4 +62,4 @@ void Window::msPerFrame()
     _lastTime += 1.0f;
   }
 }
-
+#endif

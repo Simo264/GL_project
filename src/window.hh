@@ -10,15 +10,15 @@ public:
   ~Window() = default;
 
   // creating a window and context
-  void create(vec2u dim, vec2u pos, const char* title, bool fullscreen = false);
+  void create(vec2u dim, vec2u pos, const char* title);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   void destroy();
   
-  // set close flag TRUE
+  // glfw: set close flag TRUE
   void close() { glfwSetWindowShouldClose(_window, GLFW_TRUE); }
 
-  // render loop
+  // glfw: render loop
   bool loop() const { return !glfwWindowShouldClose(_window); }
 
   // return GLFWwindow* object
@@ -27,23 +27,26 @@ public:
   // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
   void swapBuffers() { glfwSwapBuffers(_window); }
 
-  // window dimension
-  uint32_t width() const  { return _width; }
-  uint32_t height() const { return _height; }
+  // glfw: retrieves the size, in pixels, of the framebuffer of the specified window
+  void getFramebufferSize(vec2i& sz) { glfwGetFramebufferSize(_window, &sz.x, &sz.y); }
 
-  // keyboard key
+  // window dimension
+  const uint32_t& width() const  { return _width; }
+  const uint32_t& height() const { return _height; }
+
+  // glfw: keyboard key
   int getKey(uint32_t key) const { return glfwGetKey(_window, key); }
 
-  // mouse Key
+  // glfw: mouse Key
   int getMouseKey(uint32_t key) const { return glfwGetMouseButton(_window, key); }
 
-  // mouse position 
+  // glfw: mouse position 
   void getCursorPosition(vec2d& pos) { glfwGetCursorPos(_window, &pos.x, &pos.y); }
   
-  // value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
+  // glfw: value = GLFW_CURSOR_NORMAL | GLFW_CURSOR_HIDDEN | GLFW_CURSOR_DISABLED
   void setCursorMode(int value) { glfwSetInputMode(_window, GLFW_CURSOR, value); }
 
-  // window position
+  // glfw: window position
   void setPosition(vec2i pos)  { glfwSetWindowPos(_window, pos.x, pos.y); }
   void getPosition(vec2i& pos) { glfwGetWindowPos(_window, &pos.x, &pos.y); }
 
@@ -53,8 +56,10 @@ public:
   void update();
   double delta() const;
 
+#if 0
   // display milliseconds-per-frames
   void msPerFrame();
+#endif
 
 private:
   GLFWwindow* _window;
@@ -67,7 +72,7 @@ private:
   double _currFrame;
 
   // measure speed per frame
-  double _lastTime;
-  int    _nbFrames;
+  // double _lastTime;
+  // int    _nbFrames;
 };
 #endif

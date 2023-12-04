@@ -44,8 +44,6 @@ SkyBox::SkyBox(const array<string, 6>& images)
   _vertexBuffer.init(sizeof(skyboxVertices), skyboxVertices);
   _elementBuffer.init(sizeof(skyboxIndices), skyboxIndices);
   _vertexArray.init(config, _vertexBuffer);
-
- 
 }
 
 
@@ -60,4 +58,12 @@ void SkyBox::draw(uint32_t drawmode)
 
   _elementBuffer.unbind();
   _vertexArray.unbind();
+}
+
+void SkyBox::destroy()
+{
+  _vertexArray.destroy();
+  _vertexBuffer.destroy();
+  _elementBuffer.destroy();
+  _texture.destroy();
 }

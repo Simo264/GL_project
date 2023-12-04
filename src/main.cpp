@@ -23,32 +23,33 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-const vec2u WINDOW_DIM { 720,720 };
-
 int main()
 { 
+  // init libraries and create GLFW window
+  // ---------------------------------------
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+  
   Window window;
-  window.create(WINDOW_DIM, vec2u(400,200), "OpenGL");
+  window.create(vec2u(720,720), vec2u(400,400), "Opengl");
+  
+  gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+  glfwSwapInterval(1); // v-sync on
 
   // antialising
   glEnable(GL_MULTISAMPLE);
   // depth buffer
   glEnable(GL_DEPTH_TEST);
-  
   // blending/stencil buffer
-  // glEnable(GL_BLEND); 
-  // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
+  glDisable(GL_BLEND); 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   // face culling
-  // glEnable(GL_CULL_FACE);
-  // glCullFace(GL_BACK);  
+  glDisable(GL_CULL_FACE);
+  glCullFace(GL_BACK);  
+  // ---------------------------------------
   
-
   
 #if 0
   IMGUI_CHECKVERSION();
@@ -103,9 +104,6 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  Model modelCube("assets/Cube/Cube.obj");
-
-#if 0
   Model modelFloor("assets/Floor/Floor.obj");
   modelFloor.scale(vec3f(0.125f, 1.0f, 0.125f));
   modelFloor.translate(vec3f(0.0,-1.0f,0.f));
@@ -115,9 +113,7 @@ int main()
   
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
-#endif
 
-#if 0
   array<string, 6> skyboxImages = {
     "res/Skybox/right.jpg",
     "res/Skybox/left.jpg",
@@ -127,7 +123,6 @@ int main()
     "res/Skybox/back.jpg",
   };
   SkyBox skybox(skyboxImages);
-#endif
 
   // light object
   // ------------------------------------------------------------------------
@@ -136,18 +131,23 @@ int main()
   lighting::SpotLight spotLight("spotLight");         (void)spotLight;
 
 
-
   // configure MSAA framebuffer
   // --------------------------
-  GL::FrameBuffer frameBuffer(WINDOW_DIM);
+  vec2i fbSize;
+  window.getFramebufferSize(fbSize);
+  GL::FrameBuffer frameBuffer(fbSize);
+
 
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
   {
+    auto start = std::chrono::high_resolution_clock::now();
+
     // per-frame time logic
     // --------------------
     window.update();
+    
 
     // input
     // ------------------------------------------------------------------------
@@ -165,14 +165,27 @@ int main()
     frameBuffer.bindFB(GL_FRAMEBUFFER);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-
+    
     // draw scene here
     // ----------------------------------
-    shaderBlend->use();
-    shaderBlend->setMat4f("view",       view);
-    shaderBlend->setMat4f("projection", projection);
-    modelCube.draw(shaderBlend);
+    glEnable(GL_DEPTH_TEST);
+    shaderScene->use();
+    shaderScene->setMat4f("view",       view);
+    shaderScene->setMat4f("projection", projection);
+    shaderScene->setVec3f("viewPos",    camera.position);
+    dirLight.render(shaderScene);
+    modelFloor.draw(shaderScene, GL_TRIANGLES);
+    glEnable(GL_CULL_FACE);
+    modelCrate.draw(shaderScene, GL_TRIANGLES);
+    modelCube.draw(shaderScene, GL_TRIANGLES);
+    glDisable(GL_CULL_FACE);
+    
+    glDepthFunc(GL_LEQUAL);
+    shaderSky->use();
+    shaderSky->setMat4f("view",       mat4f(mat3f(view)));
+    shaderSky->setMat4f("projection", projection);
+    skybox.draw();
+    glDepthFunc(GL_LESS);
     // ----------------------------------
     
     frameBuffer.bindFB(GL_READ_FRAMEBUFFER);
@@ -187,31 +200,11 @@ int main()
     shaderFB->use();
     frameBuffer.draw();
 
-  #if 0
-    // draw scene
-    shaderScene->use();
-    shaderScene->setMat4f("view",       view);
-    shaderScene->setMat4f("projection", projection);
-    shaderScene->setVec3f("viewPos",    camera.position);
-    dirLight.render(shaderScene);
-    modelFloor.draw(shaderScene, GL_TRIANGLES);
-    modelCrate.draw(shaderScene, GL_TRIANGLES);
-    modelCube.draw(shaderScene, GL_TRIANGLES);
-  
-    glDepthFunc(GL_LEQUAL);
-    shaderSky->use();
-    shaderSky->setMat4f("view",       mat4f(mat3f(view)));
-    shaderSky->setMat4f("projection", projection);
-    skybox.draw();
-    glDepthFunc(GL_LESS); 
 
-    frameBuffer.unbind();
-    glDisable(GL_DEPTH_TEST);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
-    glClear(GL_COLOR_BUFFER_BIT);
-    shaderFB->use();
-    frameBuffer.draw();
-  #endif
+    auto end = std::chrono::high_resolution_clock::now();
+    uint64_t rendertime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    spdlog::info("{} ms per frame", rendertime);
+
 
   #if 0
     // render grass
@@ -272,12 +265,11 @@ int main()
     glfwPollEvents();
   }
 
-#if 0
   modelFloor.destroy();
   modelCrate.destroy();
   modelCube.destroy();
-#endif
-
+  skybox.destroy();
+  
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();
 
@@ -286,7 +278,8 @@ int main()
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
 #endif
-
+  
+  frameBuffer.destroy();
   window.destroy();
   glfwTerminate();
   return 0;
