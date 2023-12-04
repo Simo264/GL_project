@@ -9,18 +9,24 @@ namespace GL
   class FrameBuffer
   {
   public:
-    FrameBuffer();
+    FrameBuffer(vec2u windowDim);
     ~FrameBuffer() = default;
 
     FrameBuffer(const FrameBuffer&) = delete;            // delete copy constructor
     FrameBuffer& operator=(const FrameBuffer&) = delete; // delete assign op
 
-    void bind();   
-    void unbind(); 
+    void bindFB(uint32_t target) { glBindFramebuffer(target, _frameBufferID); }
+    void bindIFB(uint32_t target){ glBindFramebuffer(target, _intermediateFrameBufferID); }
+    void blit() { glBlitFramebuffer(0, 0, _windowDim.x, _windowDim.y, 0, 0, _windowDim.x, _windowDim.y, GL_COLOR_BUFFER_BIT, GL_NEAREST); }
+
+    void unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+    
     void destroy();
     void draw();
 
   private:
+    vec2u _windowDim;
+
     uint32_t _frameBufferID;
     uint32_t _textureColorBufferMultiSampledID;
     uint32_t _renderBufferID;

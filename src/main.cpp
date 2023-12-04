@@ -23,7 +23,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-const uint32_t samples = 8;
+const vec2u WINDOW_DIM { 720,720 };
 
 int main()
 { 
@@ -31,21 +31,19 @@ int main()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_SAMPLES, samples);
 
   Window window;
-  window.create(vec2u(720, 720), vec2u(400,200), "OpenGL");
+  window.create(WINDOW_DIM, vec2u(400,200), "OpenGL");
 
   // antialising
   glEnable(GL_MULTISAMPLE);
-  
   // depth buffer
   glEnable(GL_DEPTH_TEST);
-
+  
   // blending/stencil buffer
   // glEnable(GL_BLEND); 
   // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+  
   // face culling
   // glEnable(GL_CULL_FACE);
   // glCullFace(GL_BACK);  
@@ -105,6 +103,9 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
+  Model modelCube("assets/Cube/Cube.obj");
+
+#if 0
   Model modelFloor("assets/Floor/Floor.obj");
   modelFloor.scale(vec3f(0.125f, 1.0f, 0.125f));
   modelFloor.translate(vec3f(0.0,-1.0f,0.f));
@@ -114,6 +115,7 @@ int main()
   
   Model modelCube("assets/Cube/Cube.obj");
   modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
+#endif
 
 #if 0
   array<string, 6> skyboxImages = {
@@ -134,10 +136,10 @@ int main()
   lighting::SpotLight spotLight("spotLight");         (void)spotLight;
 
 
-  // framebuffer configuration
-  // ------------------------------------------------------------------------
-  // GL::FrameBuffer frameBuffer; (void) frameBuffer;
 
+  // configure MSAA framebuffer
+  // --------------------------
+  GL::FrameBuffer frameBuffer(WINDOW_DIM);
 
   // render loop
   // ------------------------------------------------------------------------
@@ -157,22 +159,33 @@ int main()
 
     // render
     // ------------------------------------------------------------------------
-    // frameBuffer.bind();
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
 
+    frameBuffer.bindFB(GL_FRAMEBUFFER);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+
+    // draw scene here
+    // ----------------------------------
     shaderBlend->use();
     shaderBlend->setMat4f("view",       view);
     shaderBlend->setMat4f("projection", projection);
     modelCube.draw(shaderBlend);
+    // ----------------------------------
+    
+    frameBuffer.bindFB(GL_READ_FRAMEBUFFER);
+    frameBuffer.bindIFB(GL_DRAW_FRAMEBUFFER);
+    frameBuffer.blit();
 
-    // frameBuffer.unbind();
-    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
-    // glClear(GL_COLOR_BUFFER_BIT);
-    // glDisable(GL_DEPTH_TEST);
-    // shaderFB->use();
-    // frameBuffer.draw();
+    frameBuffer.unbind();
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+
+    shaderFB->use();
+    frameBuffer.draw();
 
   #if 0
     // draw scene
