@@ -35,9 +35,8 @@ mat4f Camera::getViewMatrix() const
     return glm::lookAt(position, position + _front, _up); // walk around
 }
 
-void Camera::processInput(Window& window)
+void Camera::processInput(Window& window, double deltaTime)
 {
-  const double delta = window.delta();     
   _right = glm::cross(_front, _up); // update right vector
 
   vec2d mousePos;
@@ -47,16 +46,16 @@ void Camera::processInput(Window& window)
   {
     if(window.getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
-      rotateAroundTarget(mousePos, delta);
+      rotateAroundTarget(mousePos, deltaTime);
     }
   }
   else
   {
-    freeCameraWalk(window, delta);
+    freeCameraWalk(window, deltaTime);
     
     if(window.getMouseKey(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
-     freeCameraRotation(mousePos, delta);
+     freeCameraRotation(mousePos, deltaTime);
     }
   }
 }
@@ -67,9 +66,9 @@ void Camera::processInput(Window& window)
  * -----------------------------------------------------
 */
 
-void Camera::rotateAroundTarget(const vec2d& mousePos, float delta)
+void Camera::rotateAroundTarget(const vec2d& mousePos, double deltaTime)
 {
-  const float velocity = delta;
+  const float velocity = deltaTime * speed;
 
   // rotate X axis
   auto diffX = _prevXPos - mousePos.x;
@@ -112,9 +111,9 @@ void Camera::rotateAroundTarget(const vec2d& mousePos, float delta)
 
 }
 
-void Camera::freeCameraWalk(const Window& window, float delta)
+void Camera::freeCameraWalk(const Window& window, double deltaTime)
 {
-  const float cameraSpeed = delta * speed;
+  const float cameraSpeed = deltaTime * speed;
 
   if(window.getKey(GLFW_KEY_W) == GLFW_PRESS)
   {
@@ -144,9 +143,9 @@ void Camera::freeCameraWalk(const Window& window, float delta)
   }
 }
 
-void Camera::freeCameraRotation(vec2d& mousePos, float delta)
+void Camera::freeCameraRotation(vec2d& mousePos, double deltaTime)
 {
-  const float cameraSens = delta * sensitivity;
+  const float cameraSens = deltaTime * sensitivity;
 
   // rotate X axis
   float diffX = _prevXPos - mousePos.x;

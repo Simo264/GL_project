@@ -31,6 +31,8 @@ int main()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_SAMPLES, 4); // enable 4x MSAA on GLFW framebuffer
+
   
   Window window;
   window.create(vec2u(720,720), vec2u(400,400), "Opengl");
@@ -51,7 +53,6 @@ int main()
   // ---------------------------------------
   
   
-#if 0
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -60,7 +61,7 @@ int main()
   ImGui::StyleColorsDark();
   ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
   ImGui_ImplOpenGL3_Init("#version 130");
-#endif
+
 
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
@@ -130,64 +131,78 @@ int main()
   lighting::PointLight pointLight("pointLight");      (void)pointLight;
   lighting::SpotLight spotLight("spotLight");         (void)spotLight;
 
-
-  // configure MSAA framebuffer
-  // --------------------------
+#if 0 // create custom MSAA framebuffer
   vec2i fbSize;
   window.getFramebufferSize(fbSize);
-  GL::FrameBuffer frameBuffer(fbSize);
+  GL::FrameBuffer frameBuffer(fbSize); (void) frameBuffer;
+#endif
 
+  const double fpsLimit = 1.0 / 60.0;
+  double lastUpdateTime = 0;  // number of seconds since the last loop
+  double lastFrameTime  = 0;   // number of seconds since the last frame
 
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
   {
-    auto start = std::chrono::high_resolution_clock::now();
-
     // per-frame time logic
     // --------------------
-    window.update();
+    double now = glfwGetTime();
+    double deltaTime = now - lastUpdateTime;
     
-
     // input
     // ------------------------------------------------------------------------
+    glfwPollEvents();
     window.processKeyboardInput();
-    camera.processInput(window);
+    camera.processInput(window, deltaTime);
     mat4f view = camera.getViewMatrix();
     mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
 
-
     // render
     // ------------------------------------------------------------------------
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
+    if ((now - lastFrameTime) >= fpsLimit)
+    {
+      glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
 
-    frameBuffer.bindFB(GL_FRAMEBUFFER);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      // draw scene here
+      // ----------------------------------
+      glEnable(GL_DEPTH_TEST);
+      shaderScene->use();
+      shaderScene->setMat4f("view",       view);
+      shaderScene->setMat4f("projection", projection);
+      shaderScene->setVec3f("viewPos",    camera.position);
+      dirLight.render(shaderScene);
+      modelFloor.draw(shaderScene, GL_TRIANGLES);
+      glEnable(GL_CULL_FACE);
+      modelCrate.draw(shaderScene, GL_TRIANGLES);
+      modelCube.draw(shaderScene, GL_TRIANGLES);
+      glDisable(GL_CULL_FACE);
+      
+      glDepthFunc(GL_LEQUAL);
+      shaderSky->use();
+      shaderSky->setMat4f("view",       mat4f(mat3f(view)));
+      shaderSky->setMat4f("projection", projection);
+      skybox.draw();
+      glDepthFunc(GL_LESS);
+      // ----------------------------------
+
+      // only set lastFrameTime when you actually draw something
+      lastFrameTime = now;
+
+      window.swapBuffers();
+    }
     
-    // draw scene here
-    // ----------------------------------
-    glEnable(GL_DEPTH_TEST);
-    shaderScene->use();
-    shaderScene->setMat4f("view",       view);
-    shaderScene->setMat4f("projection", projection);
-    shaderScene->setVec3f("viewPos",    camera.position);
-    dirLight.render(shaderScene);
-    modelFloor.draw(shaderScene, GL_TRIANGLES);
-    glEnable(GL_CULL_FACE);
-    modelCrate.draw(shaderScene, GL_TRIANGLES);
-    modelCube.draw(shaderScene, GL_TRIANGLES);
-    glDisable(GL_CULL_FACE);
+    // set lastUpdateTime every iteration
+    lastUpdateTime = now;
     
-    glDepthFunc(GL_LEQUAL);
-    shaderSky->use();
-    shaderSky->setMat4f("view",       mat4f(mat3f(view)));
-    shaderSky->setMat4f("projection", projection);
-    skybox.draw();
-    glDepthFunc(GL_LESS);
-    // ----------------------------------
     
+  #if 0 // use custom framebuffer
+    frameBuffer.bindFB(GL_FRAMEBUFFER); 
+  #endif
+
+  #if 0 // render on custom framebuffer
+    // antialiasing frame buffer slows down performance
     frameBuffer.bindFB(GL_READ_FRAMEBUFFER);
     frameBuffer.bindIFB(GL_DRAW_FRAMEBUFFER);
     frameBuffer.blit();
@@ -196,15 +211,9 @@ int main()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
-
     shaderFB->use();
     frameBuffer.draw();
-
-
-    auto end = std::chrono::high_resolution_clock::now();
-    uint64_t rendertime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    spdlog::info("{} ms per frame", rendertime);
-
+  #endif
 
   #if 0
     // render grass
@@ -261,8 +270,7 @@ int main()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   #endif
 
-    window.swapBuffers();
-    glfwPollEvents();
+    
   }
 
   modelFloor.destroy();
@@ -273,13 +281,14 @@ int main()
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();
 
-#if 0
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
-#endif
   
+#if 0 // destroy custom framebuffer
   frameBuffer.destroy();
+#endif
+
   window.destroy();
   glfwTerminate();
   return 0;

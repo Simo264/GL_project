@@ -13,11 +13,8 @@ public:
 
   mat4f getViewMatrix() const;
 
-  void processInput(Window& window);
+  void processInput(Window& window, double deltaTime);
 
-  // void processKeyboardInput(Window* window, double deltaTime);
-  // void processMouseScrollInput(Window* window, double deltaTime);
-  
   vec3f   position;
   vec3f*  target;
 
@@ -42,10 +39,10 @@ private:
   float _prevXPos;
   float _prevYPos;
 
-  void rotateAroundTarget(const vec2d& mousePos, float velocity);
+  void rotateAroundTarget(const vec2d& mousePos, double deltaTime);
 
-  void freeCameraWalk(const Window& window, float delta);
-  void freeCameraRotation(vec2d& mousePos, float delta);
+  void freeCameraWalk(const Window& window, double deltaTime);
+  void freeCameraRotation(vec2d& mousePos, double deltaTime);
 };
 
 #endif

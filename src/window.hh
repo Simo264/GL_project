@@ -6,7 +6,7 @@
 class Window
 {
 public:
-  Window();
+  Window()  = default;
   ~Window() = default;
 
   // creating a window and context
@@ -52,27 +52,10 @@ public:
 
   void processKeyboardInput();
 
-  // update delta time
-  void update();
-  double delta() const;
-
-#if 0
-  // display milliseconds-per-frames
-  void msPerFrame();
-#endif
-
 private:
   GLFWwindow* _window;
   
   uint32_t _width;
   uint32_t _height;
-
-  // delta time
-  double _prevFrame;
-  double _currFrame;
-
-  // measure speed per frame
-  // double _lastTime;
-  // int    _nbFrames;
 };
 #endif
