@@ -17,9 +17,12 @@ public:
   Model(const Model&) = delete;            // delete copy constructor
   Model& operator=(const Model&) = delete; // delete assign op
 
-  void draw(Shader* shader, uint32_t drawmode = GL_TRIANGLES); // GL_TRIANGLES | GL_LINE_STRIP
+  void draw(Shader* shader); // GL_TRIANGLES | GL_LINE_STRIP
   
   void destroy();
+
+  const uint32_t& numMeshes() const { return _numMeshes; }
+  Mesh3D& getMesh(uint32_t i) { return _meshPool[i]; }
   
 private:
   unique_ptr<Mesh3D[]> _meshPool;

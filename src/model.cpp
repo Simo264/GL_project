@@ -18,13 +18,15 @@ Model::Model(const string& path) : Actor()
   loadModel(path);
 }
 
-void Model::draw(Shader* shader, uint32_t drawmode)
+void Model::draw(Shader* shader)
 {
   shader->setMat4f("model", _model);
   for(uint32_t i = 0; i < _numMeshes; i++)
   {
     auto& mesh = _meshPool[i];
-    mesh.draw(drawmode);
+    mesh.preDraw();
+    mesh.draw();
+    mesh.postDraw();
   }
 }
 
@@ -98,8 +100,13 @@ void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
   }
 
   // load mesh objects sequentially on the heap
+  GL::VAConfiguration config;
+  config.pushAttribute(3); //layout=0 vec3 position
+  config.pushAttribute(3); //layout=1 vec3 normals
+  config.pushAttribute(2); //layout=2 vec2 textcoords
+  
   Mesh3D& mesh = _meshPool[index];
-  mesh.init(vertices, indices);
+  mesh.init(config, vertices, indices);
 
   // load textures
   const aiMaterial* material = scene->mMaterials[aimesh->mMaterialIndex];

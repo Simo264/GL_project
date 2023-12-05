@@ -11,10 +11,18 @@ out vec3 Normal;
 out vec3 FragPos;  
 out vec2 TexCoords;
 
+uniform vec3 translations[100];
+
 void main()
 {
+  // Normal      = aNormal;
+  // FragPos     = vec3(model * vec4(aPos, 1.0));
+  // TexCoords   = aTexCoord;
+  // gl_Position = projection * view * model * vec4(aPos, 1.0);
+
+  vec3 trans  = translations[gl_InstanceID];
   Normal      = aNormal;
   FragPos     = vec3(model * vec4(aPos, 1.0));
   TexCoords   = aTexCoord;
-  gl_Position = projection * view * model * vec4(aPos, 1.0);
+  gl_Position = projection * view * model * vec4(aPos + trans, 1.0);
 } 

@@ -35,7 +35,7 @@ int main()
 
   
   Window window;
-  window.create(vec2u(720,720), vec2u(400,400), "Opengl");
+  window.create(vec2u(720,720), vec2u(400,200), "OpenGL");
   
   gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
   glfwSwapInterval(1); // v-sync on
@@ -81,6 +81,13 @@ int main()
   shaderScene->setInt("material.normal", 1);
   shaderScene->setInt("material.specular", 2);
   shaderScene->setFloat("material.shininess", 32.0f);
+  vec3f translations[100];
+  int i = 0;
+  for(int x = 0; x < 10; x++)
+    for(int z = 0; z < 10; z++)
+      translations[i++] = vec3f(x*3.5, 0, z*3.5);
+  for(i = 0; i < 100; i++)
+    shaderScene->setVec3f(("translations[" + std::to_string(i) + "]").c_str(), translations[i]);
   
   auto shaderFB = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
   shaderFB->use();
@@ -98,6 +105,9 @@ int main()
   shaderSky->use();
   shaderSky->setInt("skybox", 0);
 
+
+
+
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera;
@@ -113,7 +123,8 @@ int main()
   modelCrate.translate(vec3f(10.0f, 0.0125f, 0.0f));
   
   Model modelCube("assets/Cube/Cube.obj");
-  modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
+  // modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
+  Mesh3D& meshCube = modelCube.getMesh(0);
 
   array<string, 6> skyboxImages = {
     "res/Skybox/right.jpg",
@@ -162,9 +173,27 @@ int main()
     // ------------------------------------------------------------------------
     if ((now - lastFrameTime) >= fpsLimit)
     {
+      auto start = std::chrono::high_resolution_clock::now();
+
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
 
+      // draw scene here with instance
+      // ----------------------------------
+      glEnable(GL_DEPTH_TEST);
+      shaderScene->use();
+      shaderScene->setMat4f("model",      mat4f(1.0f));
+      shaderScene->setMat4f("view",       view);
+      shaderScene->setMat4f("projection", projection);
+      shaderScene->setVec3f("viewPos",    camera.position);
+      dirLight.render(shaderScene);
+
+      auto& ebo = meshCube.EBO();
+      meshCube.preDraw();
+      glDrawElementsInstanced(GL_TRIANGLES, ebo.nIndices, GL_UNSIGNED_INT, 0, 100);
+      meshCube.postDraw();
+
+#if 0
       // draw scene here
       // ----------------------------------
       glEnable(GL_DEPTH_TEST);
@@ -186,6 +215,12 @@ int main()
       skybox.draw();
       glDepthFunc(GL_LESS);
       // ----------------------------------
+#endif
+
+
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::milli> msRenderTime = end - start;
+      spdlog::info("{} ms per frame", msRenderTime.count());
 
       // only set lastFrameTime when you actually draw something
       lastFrameTime = now;

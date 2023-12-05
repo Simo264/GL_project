@@ -22,7 +22,7 @@ Mesh2D::Mesh2D()
   texture = nullptr;
 }
 
-void Mesh2D::draw(uint32_t drawmode)
+void Mesh2D::preDraw()
 {
   if(texture)
   {
@@ -32,9 +32,10 @@ void Mesh2D::draw(uint32_t drawmode)
 
   _vertexArray.bind();
   _elementBuffer.bind();
-  
-  glDrawElements(drawmode, _elementBuffer.nIndices, GL_UNSIGNED_INT, 0);
+}
 
+void Mesh2D::postDraw()
+{
   _vertexArray.unbind();
   _elementBuffer.unbind();
 
@@ -42,9 +43,9 @@ void Mesh2D::draw(uint32_t drawmode)
   glActiveTexture(GL_TEXTURE0);
 }
 
-void Mesh2D::destroy()
+
+void Mesh2D::draw()
 {
-  _vertexArray.destroy();
-  _vertexBuffer.destroy();
-  _elementBuffer.destroy();
+  glDrawElements(GL_TRIANGLES, _elementBuffer.nIndices, GL_UNSIGNED_INT, 0);
 }
+
