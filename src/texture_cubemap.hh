@@ -15,7 +15,6 @@ public:
   void init(const array<string, 6>& images);
   
   void bind()   const { glBindTexture(GL_TEXTURE_CUBE_MAP, textureID); }
-  void unbind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, 0); }
 
   void destroy() { glDeleteTextures(1, &textureID); }
 

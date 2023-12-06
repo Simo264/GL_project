@@ -14,7 +14,6 @@ public:
 
   void init(const string& path);
   void bind()   const { glBindTexture(GL_TEXTURE_2D, textureID); }
-  void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
   const string& path() const { return _path; }
 

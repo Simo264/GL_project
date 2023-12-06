@@ -64,12 +64,10 @@ int main()
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
 
-#if 0
   // load textures in res/
   // ------------------------------------------------------------------------
   pool::TexturePool::loadTexture("res/blending_transparent_window.png");
   pool::TexturePool::loadTexture("res/grass.png");
-#endif
 
   // load and configure shaders
   // ------------------------------------------------------------------------
@@ -79,23 +77,20 @@ int main()
   shaderScene->setInt("material.normal", 1);
   shaderScene->setInt("material.specular", 2);
   shaderScene->setFloat("material.shininess", 32.0f);
+  auto shaderBlend = pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
+  shaderBlend->use();
+  shaderBlend->setInt("material.diffuse", 0);
+  auto shaderSky = pool::ShaderPool::loadShader("shaderSkybox", "shaders/skybox.vert","shaders/skybox.frag");
+  shaderSky->use();
+  shaderSky->setInt("skybox", 0);
 
 #if 0
   auto shaderFB = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
   shaderFB->use();
   shaderFB->setInt("screenTexture", 0);
-  
   auto shaderOutline = pool::ShaderPool::loadShader("shaderOutline", "shaders/outline.vert","shaders/outline.frag");
   shaderOutline->use();
   shaderOutline->setVec3f("outlineColor", vec3f(0.25f, 0.50f, 0.75f));
-  
-  auto shaderBlend = pool::ShaderPool::loadShader("shaderBlending", "shaders/blending.vert","shaders/blending.frag");
-  shaderBlend->use();
-  shaderBlend->setInt("material.diffuse", 0);
-  
-  auto shaderSky = pool::ShaderPool::loadShader("shaderSkybox", "shaders/skybox.vert","shaders/skybox.frag");
-  shaderSky->use();
-  shaderSky->setInt("skybox", 0);
 #endif
 
   // create camera object
@@ -105,19 +100,19 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  Model modelCube("assets/Cube/Cube.obj");
-  
-
-#if 0
-  Model modelFloor("assets/Cube/Cube.obj");
+  Model modelFloor("assets/DefaultCube/Cube.obj");
   modelFloor.scale(vec3f(20.0f, 0.01f, 20.0f));
   modelFloor.translate(vec3f(0.0,-1.0f,0.f));
 
+  Model modelCube("assets/DefaultCube/Cube.obj");
+  modelCube.translate(vec3f(5.0f, 0.0125f, 0.0f));
+
   Model modelCrate("assets/Crate/Crate.obj");
   modelCrate.translate(vec3f(10.0f, 0.0125f, 0.0f));
-#endif
 
-#if 0
+  Mesh2D grass;
+  grass.texture = pool::TexturePool::getTexture("res/grass.png");
+
   array<string, 6> skyboxImages = {
     "res/Skybox/right.jpg",
     "res/Skybox/left.jpg",
@@ -126,8 +121,7 @@ int main()
     "res/Skybox/front.jpg",
     "res/Skybox/back.jpg",
   };
-  SkyBox skybox(skyboxImages);   
-#endif
+  SkyBox skybox(skyboxImages); (void) skybox;
 
   // light object
   // ------------------------------------------------------------------------
@@ -135,7 +129,7 @@ int main()
 
   const double fpsLimit = 1.0 / 60.0;
   double lastUpdateTime = 0;  // number of seconds since the last loop
-  double lastFrameTime  = 0;   // number of seconds since the last frame
+  double lastFrameTime  = 0;  // number of seconds since the last frame
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
@@ -150,9 +144,9 @@ int main()
     glfwPollEvents();
     window.processKeyboardInput();
     camera.processInput(window, deltaTime);
-    mat4f view = camera.getViewMatrix();
     mat4f projection = glm::perspective(glm::radians(camera.fov), (float)(window.width()/window.height()), 0.1f, 100.0f);
-
+    mat4f view = camera.getViewMatrix();
+    
     // render
     // ------------------------------------------------------------------------
     if ((now - lastFrameTime) >= fpsLimit)
@@ -163,35 +157,44 @@ int main()
       // ----------------------------------
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
+      
       glEnable(GL_DEPTH_TEST);
       shaderScene->use();
       shaderScene->setMat4f("view",       view);
       shaderScene->setMat4f("projection", projection);
       shaderScene->setVec3f("viewPos",    camera.position);
       dirLight.render(shaderScene);
-      modelCube.draw(shaderScene);
 
-    #if 0
       modelFloor.draw(shaderScene);
       glEnable(GL_CULL_FACE);
       modelCrate.draw(shaderScene);
       modelCube.draw(shaderScene);
       glDisable(GL_CULL_FACE);
-    #endif
 
-    #if 0
+      glEnable(GL_BLEND); 
+      shaderSky->use();
+      shaderSky->setMat4f("model",      mat4f(1.f));
+      shaderSky->setMat4f("view",       view);
+      shaderSky->setMat4f("projection", projection);
+      grass.preDraw();
+      grass.draw();
+      grass.postDraw();
+      glDisable(GL_BLEND);
+
       glDepthFunc(GL_LEQUAL);
       shaderSky->use();
       shaderSky->setMat4f("view",       mat4f(mat3f(view)));
       shaderSky->setMat4f("projection", projection);
+      skybox.preDraw();
       skybox.draw();
+      skybox.postDraw();
       glDepthFunc(GL_LESS);
-    #endif
       // ----------------------------------
       auto end = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> msRenderTime = end - start;
       spdlog::info("{} ms per frame", msRenderTime.count());
-    #if 0
+    
+  
       ImGui_ImplOpenGL3_NewFrame();
       ImGui_ImplGlfw_NewFrame();
       ImGui::NewFrame();
@@ -204,14 +207,9 @@ int main()
         ImGui::SliderFloat("Specular",   (float*) &dirLight.specular,    0.f, 1.f);
       }
       ImGui::End();
-      if(ImGui::Begin("Point light"))
-      {
-        ImGui::SliderFloat3("Position", (float*) &pointLight.position, -10.f, 10.f);
-      }
-      ImGui::End();
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    #endif
+   
       // only set lastFrameTime when you actually draw something
       lastFrameTime = now;
       

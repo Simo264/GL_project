@@ -20,6 +20,9 @@ void Mesh3D::init(GL::VAConfiguration& configuration, vector<float>& vertices, v
 
 void Mesh3D::preDraw()
 {
+  if(!diffuse && !normal && !specular)
+    glBindTexture(GL_TEXTURE_2D, 0);
+
   if(diffuse)
   {
     glActiveTexture(GL_TEXTURE0);

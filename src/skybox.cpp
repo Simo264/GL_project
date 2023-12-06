@@ -1,9 +1,7 @@
 #include "skybox.hh"
 
-SkyBox::SkyBox(const array<string, 6>& images)
+SkyBox::SkyBox(const array<string, 6>& images) : IMesh()
 {
-  _texture.init(images);
-
   float skyboxVertices[] ={
 	//   Coordinates
 	-1.0f, -1.0f,  1.0f,//        7--------6
@@ -37,33 +35,39 @@ SkyBox::SkyBox(const array<string, 6>& images)
     6, 2, 3
   };
 
-
   GL::VAConfiguration config;
-  config.pushAttribute(3);
+  config.pushAttribute(3); // layout = 0 in vec3 position
 
   _vertexBuffer.init(sizeof(skyboxVertices), skyboxVertices);
   _elementBuffer.init(sizeof(skyboxIndices), skyboxIndices);
   _vertexArray.init(config, _vertexBuffer);
+
+  _textureCubeMap.init(images);
 }
 
-
-void SkyBox::draw(uint32_t drawmode)
+void SkyBox::preDraw()
 {
+  glActiveTexture(GL_TEXTURE0);
+  _textureCubeMap.bind();
+
   _vertexArray.bind();
   _elementBuffer.bind();
+}
 
-  glActiveTexture(GL_TEXTURE0);
-  _texture.bind();
-  glDrawElements(drawmode, _elementBuffer.nIndices, GL_UNSIGNED_INT, 0);
-
+void SkyBox::postDraw()
+{
   _elementBuffer.unbind();
   _vertexArray.unbind();
+  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+void SkyBox::draw()
+{
+  glDrawElements(GL_TRIANGLES, _elementBuffer.nIndices, GL_UNSIGNED_INT, 0);
 }
 
 void SkyBox::destroy()
 {
-  _vertexArray.destroy();
-  _vertexBuffer.destroy();
-  _elementBuffer.destroy();
-  _texture.destroy();
+  IMesh::destroy();
+  _textureCubeMap.destroy();
 }

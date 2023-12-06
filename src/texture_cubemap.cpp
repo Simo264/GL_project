@@ -40,5 +40,5 @@ void TextureCubeMap::init(const array<string, 6>& images)
     stbi_image_free(data);
   }
 
-  unbind();
+  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
