@@ -105,14 +105,17 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
+  Model modelCube("assets/Cube/Cube.obj");
+  
+
+#if 0
   Model modelFloor("assets/Cube/Cube.obj");
   modelFloor.scale(vec3f(20.0f, 0.01f, 20.0f));
   modelFloor.translate(vec3f(0.0,-1.0f,0.f));
 
   Model modelCrate("assets/Crate/Crate.obj");
   modelCrate.translate(vec3f(10.0f, 0.0125f, 0.0f));
-  
-  Model modelCube("assets/Cube/Cube.obj");
+#endif
 
 #if 0
   array<string, 6> skyboxImages = {
@@ -166,13 +169,16 @@ int main()
       shaderScene->setMat4f("projection", projection);
       shaderScene->setVec3f("viewPos",    camera.position);
       dirLight.render(shaderScene);
-      
+      modelCube.draw(shaderScene);
+
+    #if 0
       modelFloor.draw(shaderScene);
       glEnable(GL_CULL_FACE);
       modelCrate.draw(shaderScene);
       modelCube.draw(shaderScene);
       glDisable(GL_CULL_FACE);
-      
+    #endif
+
     #if 0
       glDepthFunc(GL_LEQUAL);
       shaderSky->use();
@@ -215,7 +221,7 @@ int main()
     // set lastUpdateTime every iteration
     lastUpdateTime = now;
   }
-  
+
   // modelFloor.destroy();
   // modelCrate.destroy();
   // modelCube.destroy();
