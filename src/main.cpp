@@ -62,18 +62,16 @@ int main()
   ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
   ImGui_ImplOpenGL3_Init("#version 130");
 
-
   pool::ShaderPool::initBuffer();
   pool::TexturePool::initBuffer();
 
-  // blending textures
+  // load textures in res/
   // ------------------------------------------------------------------------
-  auto textWindow = pool::TexturePool::loadTexture("res/blending_transparent_window.png");
-  auto textGrass  = pool::TexturePool::loadTexture("res/grass.png");
-  (void) textWindow; (void) textGrass;
+  pool::TexturePool::loadTexture("res/blending_transparent_window.png");
+  pool::TexturePool::loadTexture("res/grass.png");
 
 
-  // load shaders
+  // load and configure shaders
   // ------------------------------------------------------------------------
   auto shaderScene = pool::ShaderPool::loadShader("shaderScene", "shaders/scene.vert","shaders/scene.frag");
   shaderScene->use();
@@ -81,13 +79,6 @@ int main()
   shaderScene->setInt("material.normal", 1);
   shaderScene->setInt("material.specular", 2);
   shaderScene->setFloat("material.shininess", 32.0f);
-  vec3f translations[100];
-  int i = 0;
-  for(int x = 0; x < 10; x++)
-    for(int z = 0; z < 10; z++)
-      translations[i++] = vec3f(x*3.5, 0, z*3.5);
-  for(i = 0; i < 100; i++)
-    shaderScene->setVec3f(("translations[" + std::to_string(i) + "]").c_str(), translations[i]);
   
   auto shaderFB = pool::ShaderPool::loadShader("shaderFB", "shaders/frame_buffer.vert","shaders/frame_buffer.frag");
   shaderFB->use();
@@ -106,8 +97,6 @@ int main()
   shaderSky->setInt("skybox", 0);
 
 
-
-
   // create camera object
   // ------------------------------------------------------------------------
   Camera camera;
@@ -115,16 +104,14 @@ int main()
 
   // create model objects
   // ------------------------------------------------------------------------
-  Model modelFloor("assets/Floor/Floor.obj");
-  modelFloor.scale(vec3f(0.125f, 1.0f, 0.125f));
+  Model modelFloor("assets/Cube/Cube.obj");
+  modelFloor.scale(vec3f(20.0f, 0.01f, 20.0f));
   modelFloor.translate(vec3f(0.0,-1.0f,0.f));
 
   Model modelCrate("assets/Crate/Crate.obj");
   modelCrate.translate(vec3f(10.0f, 0.0125f, 0.0f));
   
   Model modelCube("assets/Cube/Cube.obj");
-  // modelCube.translate(vec3f(10.0f, 0.0125f, 5.0f));
-  Mesh3D& meshCube = modelCube.getMesh(0);
 
   array<string, 6> skyboxImages = {
     "res/Skybox/right.jpg",
@@ -134,13 +121,13 @@ int main()
     "res/Skybox/front.jpg",
     "res/Skybox/back.jpg",
   };
-  SkyBox skybox(skyboxImages);
+  SkyBox skybox(skyboxImages); (void) skybox;  
+
 
   // light object
   // ------------------------------------------------------------------------
   lighting::DirectionalLight dirLight("dirLight");
-  lighting::PointLight pointLight("pointLight");      (void)pointLight;
-  lighting::SpotLight spotLight("spotLight");         (void)spotLight;
+
 
 #if 0 // create custom MSAA framebuffer
   vec2i fbSize;
@@ -151,7 +138,6 @@ int main()
   const double fpsLimit = 1.0 / 60.0;
   double lastUpdateTime = 0;  // number of seconds since the last loop
   double lastFrameTime  = 0;   // number of seconds since the last frame
-
   // render loop
   // ------------------------------------------------------------------------
   while(window.loop())
@@ -178,7 +164,10 @@ int main()
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
 
-      // draw scene here with instance
+
+
+
+  #if 0 // draw scene here with instance
       // ----------------------------------
       glEnable(GL_DEPTH_TEST);
       shaderScene->use();
@@ -192,8 +181,8 @@ int main()
       meshCube.preDraw();
       glDrawElementsInstanced(GL_TRIANGLES, ebo.nIndices, GL_UNSIGNED_INT, 0, 100);
       meshCube.postDraw();
+  #endif
 
-#if 0
       // draw scene here
       // ----------------------------------
       glEnable(GL_DEPTH_TEST);
@@ -202,10 +191,10 @@ int main()
       shaderScene->setMat4f("projection", projection);
       shaderScene->setVec3f("viewPos",    camera.position);
       dirLight.render(shaderScene);
-      modelFloor.draw(shaderScene, GL_TRIANGLES);
+      modelFloor.draw(shaderScene);
       glEnable(GL_CULL_FACE);
-      modelCrate.draw(shaderScene, GL_TRIANGLES);
-      modelCube.draw(shaderScene, GL_TRIANGLES);
+      modelCrate.draw(shaderScene);
+      modelCube.draw(shaderScene);
       glDisable(GL_CULL_FACE);
       
       glDepthFunc(GL_LEQUAL);
@@ -215,7 +204,6 @@ int main()
       skybox.draw();
       glDepthFunc(GL_LESS);
       // ----------------------------------
-#endif
 
 
       auto end = std::chrono::high_resolution_clock::now();
@@ -304,14 +292,12 @@ int main()
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   #endif
-
-    
   }
 
-  modelFloor.destroy();
-  modelCrate.destroy();
-  modelCube.destroy();
-  skybox.destroy();
+  // modelFloor.destroy();
+  // modelCrate.destroy();
+  // modelCube.destroy();
+  // skybox.destroy();
   
   pool::ShaderPool::freeBuffer();
   pool::TexturePool::freeBuffer();

@@ -63,14 +63,13 @@ void Model::loadModel(const string& path)
   _numMeshes = scene->mNumMeshes;
   _meshPool  = std::make_unique<Mesh3D[]>(_numMeshes);
 
-  //spdlog::info("Loading meshes {}", _numMeshes);
+  spdlog::info("Loading model {}: num meshes {}", path, _numMeshes);
   for(uint32_t i = 0; i < _numMeshes; i++)
   {
     aiMesh* aimesh = scene->mMeshes[i];
     loadMesh(i, scene, aimesh);
   }
-  //spdlog::info("Done!");
-
+  spdlog::info("Done!");
 }
 
 void Model::loadMesh(uint32_t index, const aiScene* scene, const aiMesh* aimesh)
