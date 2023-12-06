@@ -17,7 +17,7 @@ public:
   Model(const Model&) = delete;            // delete copy constructor
   Model& operator=(const Model&) = delete; // delete assign op
 
-  void draw(Shader* shader); // GL_TRIANGLES | GL_LINE_STRIP
+  void draw(Shader* shader);
   
   void destroy();
 

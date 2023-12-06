@@ -85,7 +85,7 @@ void main()
 
 vec3 CalcDirLight(DirLight dirLight, vec3 normal, vec3 viewDir)
 {
-  vec3 lightDir = normalize(-dirLight.direction);
+  vec3 lightDir   = normalize(-dirLight.direction);
   
   // diffuse shading
   float diff = max(dot(normal, lightDir), 0.0);
