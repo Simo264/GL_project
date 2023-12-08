@@ -42,8 +42,7 @@ void Texture2D::loadImage()
   if (data)
   {
     int format = GL_RGB;
-    auto suffix = _path.substr(_path.find_last_of('.')).c_str();
-    if(strcmp(suffix, ".png") == 0)
+    if(nrChannels == 4)
       format = GL_RGBA;
     
     // mutable storage

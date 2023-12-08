@@ -23,6 +23,8 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "stb_image.h"
+
 int main()
 { 
   // init libraries and create GLFW window
@@ -113,15 +115,6 @@ int main()
   Mesh2D grass;
   grass.texture = pool::TexturePool::getTexture("res/grass.png");
 
-  array<string, 6> skyboxImages = {
-    "res/Skybox/right.jpg",
-    "res/Skybox/left.jpg",
-    "res/Skybox/top.jpg",
-    "res/Skybox/bottom.jpg",
-    "res/Skybox/front.jpg",
-    "res/Skybox/back.jpg",
-  };
-  SkyBox skybox(skyboxImages); (void) skybox;
 
   // light object
   // ------------------------------------------------------------------------
@@ -155,16 +148,14 @@ int main()
 
       // draw scene here
       // ----------------------------------
-      glClearColor(0.1f, 0.1f, 0.1f, 1.0f);               // values for the color buffers
+      glClearColor(0.1f, 0.4f, 0.4f, 1.0f);               // values for the color buffers
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffers to preset values
       
-      glEnable(GL_DEPTH_TEST);
       shaderScene->use();
       shaderScene->setMat4f("view",       view);
       shaderScene->setMat4f("projection", projection);
       shaderScene->setVec3f("viewPos",    camera.position);
       dirLight.render(shaderScene);
-
       modelFloor.draw(shaderScene);
       glEnable(GL_CULL_FACE);
       modelCrate.draw(shaderScene);
@@ -172,23 +163,14 @@ int main()
       glDisable(GL_CULL_FACE);
 
       glEnable(GL_BLEND); 
-      shaderSky->use();
-      shaderSky->setMat4f("model",      mat4f(1.f));
-      shaderSky->setMat4f("view",       view);
-      shaderSky->setMat4f("projection", projection);
+      shaderBlend->use();
+      shaderBlend->setMat4f("model",      mat4f(1.0f));
+      shaderBlend->setMat4f("view",       view);
+      shaderBlend->setMat4f("projection", projection);
       grass.preDraw();
       grass.draw();
       grass.postDraw();
       glDisable(GL_BLEND);
-
-      glDepthFunc(GL_LEQUAL);
-      shaderSky->use();
-      shaderSky->setMat4f("view",       mat4f(mat3f(view)));
-      shaderSky->setMat4f("projection", projection);
-      skybox.preDraw();
-      skybox.draw();
-      skybox.postDraw();
-      glDepthFunc(GL_LESS);
       // ----------------------------------
       auto end = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> msRenderTime = end - start;
